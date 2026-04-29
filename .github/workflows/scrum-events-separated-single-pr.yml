@@ -1,0 +1,413 @@
+name: Scrum Events Orchestrator
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+run-name: Scrum Events Orchestrator
+
+jobs:
+  validate-worker-token:
+    name: Validate Worker Push Token
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure GH_AW_GITHUB_TOKEN is configured
+        env:
+          GH_AW_GITHUB_TOKEN: ${{ secrets.GH_AW_GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${GH_AW_GITHUB_TOKEN}" ]]; then
+            echo "::error::GH_AW_GITHUB_TOKEN secret is required for worker safe-outputs."
+            echo "::error::.github/workflows/** を含む差分を push するには、Contents に加えて Workflows 権限を持つ PAT または GitHub App token を設定してください。"
+            exit 1
+          fi
+
+  initialize-pr:
+    name: Initialize Pull Request
+    needs: validate-worker-token
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      created_pr_number: ${{ steps.ensure-pr.outputs.pr_number }}
+      created_pr_url: ${{ steps.ensure-pr.outputs.pr_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_BRANCH_NAME: ai-sprint-${{ github.run_id }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Create or reuse aggregate PR
+        id: ensure-pr
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          latest_sprint_number=""
+          if [[ -d scrum ]]; then
+            latest_sprint_number=$(
+              find scrum -maxdepth 1 -type d -name 'sprint[0-9][0-9][0-9]' -printf '%f\n' |
+                sed -E 's/^sprint([0-9]{3})$/\1/' |
+                LC_ALL=C sort |
+                tail -n 1
+            )
+          fi
+
+          if [[ -n "${latest_sprint_number}" ]]; then
+            next_sprint_number=$(printf '%03d' "$((10#${latest_sprint_number} + 1))")
+          else
+            next_sprint_number="001"
+          fi
+
+          pr_head="${GITHUB_REPOSITORY_OWNER}:${PR_BRANCH_NAME}"
+          pr_title="[ai-sprint] Sprint ${next_sprint_number} - スプリント成果物集約PR"
+
+          read -r pr_number pr_url < <(
+            gh pr list \
+              --head "${pr_head}" \
+              --state open \
+              --json number,url \
+              --jq '(.[0] // {}) | [(.number // ""), (.url // "")] | @tsv'
+          )
+
+          if [[ -z "${pr_number}" ]]; then
+            if git ls-remote --exit-code --heads origin "${PR_BRANCH_NAME}" >/dev/null 2>&1; then
+              git fetch origin "${PR_BRANCH_NAME}:${PR_BRANCH_NAME}"
+              git switch "${PR_BRANCH_NAME}"
+            else
+              git switch -c "${PR_BRANCH_NAME}"
+              git commit --allow-empty -m "Initialize sprint aggregate PR"
+              git push origin "${PR_BRANCH_NAME}"
+            fi
+
+            created_pr_url=$(
+              gh pr create \
+              --draft \
+              --base "${GITHUB_REF_NAME}" \
+              --head "${PR_BRANCH_NAME}" \
+              --title "${pr_title}" \
+              --body "このPRはスクラムイベント分割実行の成果物を集約するために作成されました。初回は空コミットのみを含み、planning 以降の成果物が順次積み増されます。" |
+                tail -n 1
+            )
+
+            created_pr_url="${created_pr_url//$'\r'/}"
+            if [[ "${created_pr_url}" =~ ^https://github\.com/.+/pull/[0-9]+$ ]]; then
+              pr_url="${created_pr_url}"
+              pr_number="${created_pr_url##*/}"
+            fi
+          fi
+
+          if [[ -z "${pr_number}" || -z "${pr_url}" ]]; then
+            for attempt in 1 2 3 4 5; do
+              read -r pr_number pr_url < <(
+                gh pr list \
+                  --head "${pr_head}" \
+                  --state open \
+                  --json number,url \
+                  --jq '(.[0] // {}) | [(.number // ""), (.url // "")] | @tsv'
+              )
+              if [[ -n "${pr_number}" && -n "${pr_url}" ]]; then
+                break
+              fi
+              sleep "${attempt}"
+            done
+          fi
+
+          if [[ -z "${pr_number}" || -z "${pr_url}" ]]; then
+            echo "::error::Failed to determine aggregate pull request."
+            exit 1
+          fi
+
+          echo "pr_number=${pr_number}" >> "$GITHUB_OUTPUT"
+          echo "pr_url=${pr_url}" >> "$GITHUB_OUTPUT"
+
+  planning:
+    name: Sprint Planning
+    needs: initialize-pr
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-planning.lock.yml
+    with:
+      phase_name: planning
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-planning:
+    name: Verify Sprint Planning Push
+    needs: planning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require planning push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.planning.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Sprint Planning did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  day1:
+    name: One Day In Scrum (day1)
+    needs:
+      - initialize-pr
+      - verify-planning
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-day.lock.yml
+    with:
+      day_number: "1"
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-day1:
+    name: Verify Day1 Push
+    needs: day1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require day1 push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.day1.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Day1 did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  day2:
+    name: One Day In Scrum (day2)
+    needs:
+      - initialize-pr
+      - verify-day1
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-day.lock.yml
+    with:
+      day_number: "2"
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-day2:
+    name: Verify Day2 Push
+    needs: day2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require day2 push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.day2.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Day2 did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  day3:
+    name: One Day In Scrum (day3)
+    needs:
+      - initialize-pr
+      - verify-day2
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-day.lock.yml
+    with:
+      day_number: "3"
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-day3:
+    name: Verify Day3 Push
+    needs: day3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require day3 push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.day3.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Day3 did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  day4:
+    name: One Day In Scrum (day4)
+    needs:
+      - initialize-pr
+      - verify-day3
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-day.lock.yml
+    with:
+      day_number: "4"
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-day4:
+    name: Verify Day4 Push
+    needs: day4
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require day4 push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.day4.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Day4 did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  day5:
+    name: One Day In Scrum (day5)
+    needs:
+      - initialize-pr
+      - verify-day4
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-day.lock.yml
+    with:
+      day_number: "5"
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-day5:
+    name: Verify Day5 Push
+    needs: day5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require day5 push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.day5.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Day5 did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  review:
+    name: Sprint Review
+    needs:
+      - initialize-pr
+      - verify-day5
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-review.lock.yml
+    with:
+      phase_name: review
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-review:
+    name: Verify Review Push
+    needs: review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require review push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.review.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Sprint Review did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  retrospective:
+    name: Sprint Retrospective
+    needs:
+      - initialize-pr
+      - verify-review
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/scrum-events-worker-retrospective.lock.yml
+    with:
+      phase_name: retrospective
+      pr_branch_name: ai-sprint-${{ github.run_id }}
+      pull_request_number: ${{ needs.initialize-pr.outputs.created_pr_number }}
+    secrets: inherit
+
+  verify-retrospective:
+    name: Verify Retrospective Push
+    needs: retrospective
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require retrospective push result
+        shell: bash
+        env:
+          PUSH_COMMIT_SHA: ${{ needs.retrospective.outputs.push_commit_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUSH_COMMIT_SHA}" ]]; then
+            echo "::error::Sprint Retrospective did not push any成果物. The worker must update existing files and call push_to_pull_request_branch."
+            exit 1
+          fi
+
+  finalize-pr:
+    name: Finalize Pull Request
+    needs:
+      - initialize-pr
+      - verify-retrospective
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ needs.initialize-pr.outputs.created_pr_number }}
+      PR_BRANCH_NAME: ai-sprint-${{ github.run_id }}
+    steps:
+      - name: Update pull request body
+        shell: bash
+        run: |
+          body=$(cat <<EOF
+          このPRはスクラムイベントを分割実行して集約したものです。
+
+          - sprint-planning、day1〜day5、sprint-review、sprint-retrospective を独立workerで順番実行
+          - 変更は同一PRブランチ \`${PR_BRANCH_NAME}\` に集約
+          - 主な更新成果物はPR差分を参照
+          EOF
+          )
+          gh pr edit -R "${{ github.repository }}" "${PR_NUMBER}" --body "${body}"
