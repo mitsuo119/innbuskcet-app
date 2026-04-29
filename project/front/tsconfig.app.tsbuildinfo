@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/answerbuttons.tsx","./src/components/caseview.tsx","./src/components/explanationview.tsx","./src/domain/case.ts","./src/domain/judge.test.ts","./src/domain/judge.ts","./src/domain/loader.test.ts","./src/domain/loader.ts","./src/domain/random.test.ts","./src/domain/random.ts"],"version":"5.9.3"}

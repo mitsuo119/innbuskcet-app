@@ -34,7 +34,7 @@ on:
 description: one-day-in-scrum を独立コンテキストで実行し、既存PRブランチへ反映するworker
 engine:
   id: copilot
-  model: claude-opus-4.6
+  model: claude-opus-4.7
 imports:
   - uses: shared/apm.md
     with:
@@ -95,4 +95,3 @@ jobs:
 1. 必要ならリモートブランチを取得し、`${{ needs.pre_activation.outputs.pr_branch_name }}` に切り替える
 2. `/one-day-in-scrum` スキルを実行する
 3. 変更を確認し、`push_to_pull_request_branch` で **PR #`${{ needs.pre_activation.outputs.pull_request_number }}`** に push する
-

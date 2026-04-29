@@ -34,7 +34,7 @@ on:
 description: スプリントプランニングを独立コンテキストで実行し、既存PRブランチへ反映するworker
 engine:
   id: copilot
-  model: claude-opus-4.6
+  model: claude-opus-4.7
 imports:
   - uses: shared/apm.md
     with:

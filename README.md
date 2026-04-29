@@ -23,13 +23,13 @@ As a user (stakeholder / product owner's manager), you simply write your request
 
 The template ships with five pre-configured AI personas (default Japanese names). These are placeholders defined in the skill files — you can rename them to fit your team.
 
-| Agent | Role |
-|---|---|
-| Sato | Customer (Stakeholder Proxy) |
-| Suzuki | Product Owner |
-| Takahashi | Scrum Master |
-| Ito | Developer |
-| Tanaka | Developer |
+| Agent     | Role                         |
+| --------- | ---------------------------- |
+| Sato      | Customer (Stakeholder Proxy) |
+| Suzuki    | Product Owner                |
+| Takahashi | Scrum Master                 |
+| Ito       | Developer                    |
+| Tanaka    | Developer                    |
 
 ---
 
@@ -37,10 +37,10 @@ The template ships with five pre-configured AI personas (default Japanese names)
 
 ### Prerequisites
 
-| Tool | Notes |
-|---|---|
-| **GitHub Copilot CLI** | Recommended — best experience for running skill commands |
-| **VS Code + GitHub Copilot** | Also supported; requires Agent Mode to be enabled |
+| Tool                         | Notes                                                    |
+| ---------------------------- | -------------------------------------------------------- |
+| **GitHub Copilot CLI**       | Recommended — best experience for running skill commands |
+| **VS Code + GitHub Copilot** | Also supported; requires Agent Mode to be enabled        |
 
 ---
 
@@ -50,6 +50,7 @@ Describe what you want to build in `scrum/order/order001.md`.
 
 ```markdown
 <!-- Example: scrum/order/order001.md -->
+
 I want a ticket management system.
 I'd like status tracking and a dashboard for visualization.
 ```
@@ -229,12 +230,13 @@ gh aw compile
 
 The following two environment variables must be set:
 
-| Token | Description |
-|---|---|
-| `GH_AW_GITHUB_TOKEN` | GitHub personal access token |
-| `COPILOT_GITHUB_TOKEN` | Copilot GitHub token |
+| Token                  | Description                  |
+| ---------------------- | ---------------------------- |
+| `GH_AW_GITHUB_TOKEN`   | GitHub personal access token |
+| `COPILOT_GITHUB_TOKEN` | Copilot GitHub token         |
 
 Both tokens require **Read and Write access** to:
+
 - **Code**
 - **Pull requests**
 - **Workflows**
@@ -261,7 +263,7 @@ The following settings must be configured on your repository:
 
 ### ⚠️ AI Model Notice
 
-The prompts and skill definitions in this template are currently tuned for **Claude Opus 4.6** and **GPT-5.4**.  
+The prompts and skill definitions in this template are currently tuned for **Claude Opus 4.7** and **GPT-5.4**.  
 If you are using a different AI model, you may need to adjust the prompts or skill files to suit your model's characteristics. Results may vary depending on the model used.  
 Also, since this template heavily uses AI agents and consumes a large number of tokens, please check the billing model and costs for the model you are using and switch to a different model if necessary.
 
@@ -278,4 +280,3 @@ This template's prompts, skill definitions, and all generated artifacts are curr
 > If there's enough demand, we plan to publish a dedicated English edition of this template. Please [open an issue](../../issues) or drop us a note — we'd love to hear from you!
 
 ---
-

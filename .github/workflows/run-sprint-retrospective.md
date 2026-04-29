@@ -7,7 +7,7 @@ on:
 
 engine:
   id: copilot
-  model: claude-opus-4.6
+  model: claude-opus-4.7
 
 timeout-minutes: 360
 
@@ -26,7 +26,6 @@ safe-outputs:
   create-pull-request:
     draft: true
     protected-files: fallback-to-issue
-
 ---
 
 `.github/skills/sprint-retrospective/SKILL.md` の指示に従い、スプリントレトロスペクティブを実施してください。

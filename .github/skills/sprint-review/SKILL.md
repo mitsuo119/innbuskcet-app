@@ -6,19 +6,22 @@ description: スプリントレビューを実施する。インクリメント�
 # スプリントレビュー実施
 
 ## 準備
-- サブエージェントとして、鈴木エージェント(`.github/agents/product-owner.suzuki.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、伊藤エージェント(`.github/agents/developer.ito.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、田中エージェント(`.github/agents/developer.tanaka.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、高橋エージェント(`.github/agents/scrum-master.takahashi.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、佐藤エージェント(`.github/agents/customer.sato.agent.md`)をモデル"Claude Opus 4.6"で実行します。
+
+- サブエージェントとして、鈴木エージェント(`.github/agents/product-owner.suzuki.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、伊藤エージェント(`.github/agents/developer.ito.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、田中エージェント(`.github/agents/developer.tanaka.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、高橋エージェント(`.github/agents/scrum-master.takahashi.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、佐藤エージェント(`.github/agents/customer.sato.agent.md`)をモデル"Claude Opus 4.7"で実行します。
 
 山本と中村は契約の都合でレビューには参加できませんが、田中・伊藤経由でフィードバックがあれば提供している前提で進めます。
 
 ## 対象スプリント
+
 スプリント番号が引数で指定された場合はそのスプリントを対象とします。
 指定がない場合は、scrumフォルダから最新のsprintXXX(XXXは連番)を対象とします。
 
 ## 事前確認
+
 1. `scrum/${sprint_number}/sprint_backlog.md` を読み、完了したPBIと未完了のPBIを確認する
 2. `scrum/product_goal.md` を読み、プロダクトゴールへの進捗を確認する
 3. `scrum/definition_of_done.md` を読み、完成の定義を確認する
@@ -26,13 +29,16 @@ description: スプリントレビューを実施する。インクリメント�
 ## スプリントレビューの実施
 
 ### 1. スプリントゴール達成状況の共有
+
 - 高橋エージェントを使い、スプリントゴールの達成状況をまとめてください
 
 ### 2. インクリメントのデモと検査
+
 - 伊藤エージェント、田中エージェントを使い、完了したPBIのデモ内容を説明してください
 - 完成の定義を満たしていることを確認してください
 
 ### 3. ステークホルダーフィードバック
+
 - 佐藤エージェントを使い、以下の観点でフィードバックを提供してください：
   - 機能性: 要求通りに動作するか
   - ユーザビリティ: 使いやすいか
@@ -40,24 +46,29 @@ description: スプリントレビューを実施する。インクリメント�
   - 改善提案: より良くするためのアイデア
 
 ### 4. 受入判定
+
 - 鈴木エージェントを使い、各PBIの受入判定を行ってください
   - 受入: 完成の定義を満たし、受入基準をクリア
   - 差戻: プロダクトバックログに戻す
 
 ### 5. 環境変化の共有
+
 - ビジネス環境や市場の変化、技術的な変化があれば共有する
 
 ### 6. プロダクトバックログの調整
+
 - 鈴木エージェントを使い、レビュー結果に基づいてプロダクトバックログを調整してください
 - 新たな機会や要望をPBIとして追加する
 
 ## 記録
+
 - `scrum/${sprint_number}/sprint_review.md` にレビュー結果を記録する
 - `scrum/product_backlog.csv` を更新する（完了PBIのステータス変更、新規PBI追加）
 - `scrum/velocity.csv` にスプリント実績を記録する
 - `scrum/${sprint_number}/ask_user.md` にユーザへの確認事項・質問事項を記録する（必要に応じて）
 
 ## 注意事項
+
 - レビューはプレゼンテーションに限定せず、ワーキングセッションとして実施する
 - 次に何をすべきかについて参加者全員で協力して議論する
 - 記録は必要な要素を落とさずに、一方でできるだけ簡潔に短く記載すること

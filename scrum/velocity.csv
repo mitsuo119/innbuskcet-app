@@ -1,2 +1,2 @@
-sprint,planned_points,completed_points,carried_over_points,sprint_start,sprint_end,notes
-sprint001,0,0,0,YYYY-MM-DD,YYYY-MM-DD,（備考）
+﻿sprint,planned_points,completed_points,carried_over_points,sprint_start,sprint_end,notes
+sprint001,21,21,0,2026-04-29,2026-05-05,初スプリント。MVP学習サイクル完成。全PBI受入。DoD全項目合格(test11件成功/lint0warn/build成功)。

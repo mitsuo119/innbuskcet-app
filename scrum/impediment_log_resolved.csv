@@ -1,2 +1,2 @@
 id,title,description,reported_by,reported_at,status,resolved_at,resolution,sprint
-IMP-001,（障害物タイトル）,（詳細説明）,（報告者）,YYYY-MM-DD,Open,,（解決策）,sprint001
+IMP-001,ESLint v9 flat config への移行,ESLint v9 では .eslintrc 形式が廃止され eslint.config.js (flat config) が必須。pnpm lint が起動時にエラー終了した。,田中,2026-04-29,Resolved,2026-04-29,eslint.config.js を作成し typescript-eslint / globals を追加導入して解消,sprint001

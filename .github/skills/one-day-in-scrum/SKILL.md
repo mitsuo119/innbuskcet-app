@@ -6,19 +6,21 @@ description: デイリースクラムとインクリメント作成を実施す�
 # デイリースクラム実施
 
 ## 準備
-- サブエージェントとして、伊藤エージェント(`.github/agents/developer.ito.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、田中エージェント(`.github/agents/developer.tanaka.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、山本エージェント(`.github/agents/contractor.yamamoto.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、中村エージェント(`.github/agents/contractor.nakamura.agent.md`)をモデル"Claude Opus 4.6"で実行します。
-- サブエージェントとして、高橋エージェント(`.github/agents/scrum-master.takahashi.agent.md`)をモデル"Claude Opus 4.6"で実行します。
 
+- サブエージェントとして、伊藤エージェント(`.github/agents/developer.ito.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、田中エージェント(`.github/agents/developer.tanaka.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、山本エージェント(`.github/agents/contractor.yamamoto.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、中村エージェント(`.github/agents/contractor.nakamura.agent.md`)をモデル"Claude Opus 4.7"で実行します。
+- サブエージェントとして、高橋エージェント(`.github/agents/scrum-master.takahashi.agent.md`)をモデル"Claude Opus 4.7"で実行します。
 
 15分のタイムボックスを意識してください。
 
 ## 対象スプリント
+
 scrumフォルダから最新のsprintXXX(XXXは連番)を対象とします。
 
 ## 事前確認
+
 1. `scrum/${sprint_number}/sprint_backlog.md` を読み、現在のスプリントバックログの状態を確認する
 2. スプリントゴールを確認する
 
@@ -33,25 +35,30 @@ scrumフォルダから最新のsprintXXX(XXXは連番)を対象とします。
 **それぞれ簡潔に短く報告してもらうようにしてください。**
 
 ## 進捗の検査
+
 - スプリントゴールに対する全体的な進捗状況を評価する
 - スプリントバックログのタスクステータスを更新する
 - バーンダウンを更新する
 
 ## 障害物の処理
+
 - 識別された障害物がある場合、高橋エージェントを使い `scrum/impediment_log.csv` に記録する
 - 既存の障害物の解決状況を確認する
 - その場で解決できる障害を解決する。その場で解決できないものはレトロスペクティブにて対応する。
 
 ## 記録
+
 - `scrum/sprint${sprint_number}/daily_scrum.md` に本日のデイリースクラム記録を追記する
 - `scrum/sprint${sprint_number}/sprint_backlog.md` のタスクステータスを更新する
-**daily_scrum.mdとsprint_backlog.mdは、必要な要素を欠落させることなく、ただし簡潔に短く記録することを意識してください。**
+  **daily_scrum.mdとsprint_backlog.mdは、必要な要素を欠落させることなく、ただし簡潔に短く記録することを意識してください。**
 
 ## 適応
+
 - 計画の調整が必要な場合、スプリントバックログを更新する
 - スプリントゴールに影響がある場合、鈴木エージェントとスコープの再交渉を検討する
- ※鈴木エージェントとの再交渉には、サブエージェントとして、鈴木エージェント(`.github/agents/product-owner.suzuki.agent.md`)をモデル"Claude Opus 4.6(fast mode)"で実行する必要があります。
+  ※鈴木エージェントとの再交渉には、サブエージェントとして、鈴木エージェント(`.github/agents/product-owner.suzuki.agent.md`)をモデル"Claude Opus 4.7(fast mode)"で実行する必要があります。
 
 # インクリメント作成
+
 - デイリースクラムの内容を踏まえて、インクリメントを作成します。
- - インクリメント作成中はexplorerなどの長時間かかるタスクは最小限実行するように気を付けてください。
+- インクリメント作成中はexplorerなどの長時間かかるタスクは最小限実行するように気を付けてください。
