@@ -1,2 +1,3 @@
 ﻿sprint,planned_points,completed_points,carried_over_points,sprint_start,sprint_end,notes
 sprint001,21,21,0,2026-04-29,2026-05-05,初スプリント。MVP学習サイクル完成。全PBI受入。DoD全項目合格(test11件成功/lint0warn/build成功)。
+sprint002,13,13,0,2026-05-06,2026-05-12,UX強化(PBI-010〜014)+vite/vitest依存更新(PBI-015)を計画通り完了。全PBI受入。DoD15項目「はい」(test25件成功/lint0/build成功/audit clean)。Day3で全PBI Done、Day4-5は凍結バッファ。

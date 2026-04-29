@@ -5,12 +5,14 @@ interface Props {
   caseItem: Case;
   answer: Priority;
   judgement: Judgement;
+  onRetry?: () => void;
 }
 
 /**
  * 採点結果と解説を表示する。
+ * onRetry が渡された場合、同一案件をもう一度解き直す導線を表示する。
  */
-export function ExplanationView({ caseItem, answer, judgement }: Props) {
+export function ExplanationView({ caseItem, answer, judgement, onRetry }: Props) {
   const isCorrect = judgement === 'correct';
   return (
     <section
@@ -27,6 +29,18 @@ export function ExplanationView({ caseItem, answer, judgement }: Props) {
         </span>
       </div>
       <p className="explanation__body">{caseItem.explanation}</p>
+      {onRetry && (
+        <div className="explanation__actions">
+          <button
+            type="button"
+            className="explanation__retry"
+            onClick={onRetry}
+            aria-label="同じ案件をもう一度解き直す"
+          >
+            もう一度この問題
+          </button>
+        </div>
+      )}
     </section>
   );
 }
