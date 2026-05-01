@@ -20,15 +20,7 @@ import { loadCases } from './domain/loader';
 import { applyModeChange, initialMode } from './domain/mode';
 import { pickNextCaseByMode, type FilterMode } from './domain/random';
 import { addModeScore, addScore, initialModeScores, initialScore } from './domain/score';
-import { resolveShortcut } from './domain/shortcut';
-
-/** 入力中の要素ではショートカットを誤発火させない */
-function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  const tag = target.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
-  return target.isContentEditable;
-}
+import { resolveShortcut, isEditableTarget } from './domain/shortcut';
 
 export default function App() {
   const allCases = useMemo<Case[]>(() => loadCases(), []);

@@ -45,3 +45,40 @@
 
 ### 障害物
 - 当日新規発生なし（impediment_log.csv 追記なし）。
+
+---
+
+## DAY 2 (2026-05-28 木)
+
+### 進捗・計画・障害物
+
+| 参加者 | 昨日やったこと | 今日やること | 障害物 |
+| ------ | -------------- | ------------ | ------ |
+| 伊藤（Dev） | TASK-001 完了 / TASK-002 レビュー対応 | TASK-003 (WritingPreview) 着手・完了 / TASK-008 着手準備 | なし |
+| 田中（Dev） | TASK-002 設計レビュー | TASK-004 (shortcut.ts textarea ガード) 完了 / shortcut.test 拡充 | なし |
+| 山本（Dev・助っ人） | TASK-002 骨格 | TASK-007 (cases.json modelAnswer 5〜10件) 着手・完了 | なし |
+| 中村（Dev・助っ人） | TASK-007 スキーマ案起草 | TASK-007 山本と協働 / TASK-012 準備 | なし |
+| 高橋（SM） | A-16 還流欄 / DoD §10 判定手順 | DoD §10-2 / §10-3 のエビデンス収集様式整備 | なし |
+
+### スプリントゴール進捗
+- 計画ポイント 6pt / 残 5pt（PBI-023 主要 UI 実装ほぼ揃い、PBI-024 データ基盤着手）。
+- 主要実装 3 件着地：
+  - **TASK-003 完了**：`ui/WritingPreview.tsx` 新設（読み取り専用プレビュー / `<dl>` セマンティクス / `aria-label="記述内容のプレビュー"` / 改行保持 `pre-wrap` / 全空時は「未記述」案内）。`dangerouslySetInnerHTML` 不使用（DoD §10-2 エビデンス取得）。styles.css に対応スタイルを CSS 変数ベースで追加。
+  - **TASK-004 完了**：`domain/shortcut.ts` に `isEditableTarget()` を新設・export し App.tsx の重複ヘルパを撤去。判定対象を input/textarea/select に加え contenteditable も明示。`shortcut.test.ts` に 6 件のテストを追加（textarea / input / select / contenteditable / 非編集要素・null / textarea フォーカス時の A 押下統合確認）。
+  - **TASK-007 完了**：`data/cases.json` の case-001〜case-010（A:4 / B:2 / C:4 = A/B/C 各 30% 維持）に `modelAnswer{judgment,reason,action}` を投入。`domain/case.ts` に `ModelAnswer` 型を追加し `Case.modelAnswer?` をオプショナル化。`domain/loader.ts` に `parseModelAnswer()` を新設し型・必須キー・非空文字列の検証を実施（DoD §10-3）。未整備案件は `undefined` フォールバック。
+
+### 検証結果（DAY2 時点）
+- pnpm test: **96 passed (90 既存 + 6 新規 shortcut)** ✅
+- pnpm lint: エラー・警告なし ✅
+- pnpm exec tsc -b --noEmit: 型エラーなし ✅
+- DoD §10-2 エビデンス：WritingPreview にて React テキスト描画のみで実装・dangerouslySetInnerHTML 不使用を確認 ✅
+- DoD §10-3 エビデンス：loader.ts で modelAnswer 型不正・キー欠落・空文字を例外化 ✅
+- A/B/C 30% 維持：modelAnswer 投入 10 件の比率 A:4 / B:2 / C:4（30% 以上 / TASK-012 事前確認）✅
+
+### 計画調整
+- TASK-002 を「完了」に更新（DAY1 末時点で残作業はレビューのみ、TASK-003 連携で確認完了）。
+- TASK-005（App.tsx 結線）は DAY3 着手で計画通り（TASK-003/004 完了でブロッカー解消）。
+- バーンダウン：残タスク 9 → 6（計画値 9 を上回る進捗）。
+
+### 障害物
+- 当日新規発生なし（impediment_log.csv 追記なし）。

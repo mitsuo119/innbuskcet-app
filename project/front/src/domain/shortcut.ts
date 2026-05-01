@@ -16,6 +16,26 @@ interface ShortcutContext {
   hasModifier: boolean;
 }
 
+/** ショートカット誤発火を抑止すべき編集系タグ名（大文字比較） */
+const EDITABLE_TAG_NAMES: ReadonlySet<string> = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+
+/**
+ * イベントターゲットが「ユーザー入力中」と見なすべき要素か判定する。
+ * - input / textarea / select は対象（PBI-023 で textarea を追加：DoD §9-1）
+ * - contenteditable 領域も対象
+ * - それ以外（button, div, body 等）は false
+ *
+ * 純粋関数として shortcut.ts に集約し、UI 層と独立にテスト可能とする。
+ */
+export function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (EDITABLE_TAG_NAMES.has(target.tagName)) return true;
+  // jsdom では HTMLElement.isContentEditable が未実装のため属性値でフォールバック判定する
+  if (target.isContentEditable === true) return true;
+  const attr = target.getAttribute('contenteditable');
+  return attr === '' || attr === 'true' || attr === 'plaintext-only';
+}
+
 /**
  * キーボードショートカットの解釈（純粋関数）。
  * - A/B/C: 未回答状態かつ案件あり → answer 確定

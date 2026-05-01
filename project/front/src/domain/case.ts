@@ -7,6 +7,21 @@
 export type Priority = 'A' | 'B' | 'C';
 
 /**
+ * 模範回答骨格（PBI-024）。
+ * 「判断・理由・アクション」の 3 ブロックでの合格答案の型を提示する。
+ * - 全フィールド必須（modelAnswer 自体はオプショナル）
+ * - 段階移行のため、未整備の案件では undefined となる
+ */
+export interface ModelAnswer {
+  /** 判断の模範回答骨格 */
+  judgment: string;
+  /** 理由の模範回答骨格 */
+  reason: string;
+  /** アクションの模範回答骨格 */
+  action: string;
+}
+
+/**
  * 学習用の案件（インバスケット問題1件）。
  */
 export interface Case {
@@ -20,4 +35,9 @@ export interface Case {
   correctPriority: Priority;
   /** 解説文（なぜその優先度なのか） */
   explanation: string;
+  /**
+   * 模範回答骨格（PBI-024 / 任意）。
+   * cases.json で段階的に整備中。未整備の案件では undefined。
+   */
+  modelAnswer?: ModelAnswer;
 }

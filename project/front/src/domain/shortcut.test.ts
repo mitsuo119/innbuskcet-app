@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveShortcut } from './shortcut';
+import { isEditableTarget, resolveShortcut } from './shortcut';
 
 const base = { locked: false, hasCurrent: true, isEditable: false, hasModifier: false };
 
@@ -40,5 +40,43 @@ describe('resolveShortcut()', () => {
   it('対象外キーは ignore', () => {
     expect(resolveShortcut('d', base)).toEqual({ type: 'ignore' });
     expect(resolveShortcut(' ', base)).toEqual({ type: 'ignore' });
+  });
+});
+
+describe('isEditableTarget()（PBI-023 / TASK-004：textarea ガード）', () => {
+  it('textarea は編集中とみなす（DoD §10-1：3 ブロック記述 UI で誤発火を抑止）', () => {
+    const el = document.createElement('textarea');
+    expect(isEditableTarget(el)).toBe(true);
+  });
+
+  it('input は編集中とみなす（既存挙動）', () => {
+    const el = document.createElement('input');
+    expect(isEditableTarget(el)).toBe(true);
+  });
+
+  it('select は編集中とみなす（既存挙動）', () => {
+    const el = document.createElement('select');
+    expect(isEditableTarget(el)).toBe(true);
+  });
+
+  it('contenteditable=true の div は編集中とみなす', () => {
+    const el = document.createElement('div');
+    el.setAttribute('contenteditable', 'true');
+    expect(isEditableTarget(el)).toBe(true);
+  });
+
+  it('button / 通常 div / null は編集中ではない', () => {
+    expect(isEditableTarget(document.createElement('button'))).toBe(false);
+    expect(isEditableTarget(document.createElement('div'))).toBe(false);
+    expect(isEditableTarget(null)).toBe(false);
+  });
+
+  it('textarea にフォーカスがある状態を再現すると A/B/C ショートカットは ignore される', () => {
+    const ta = document.createElement('textarea');
+    const action = resolveShortcut('a', {
+      ...base,
+      isEditable: isEditableTarget(ta),
+    });
+    expect(action).toEqual({ type: 'ignore' });
   });
 });
