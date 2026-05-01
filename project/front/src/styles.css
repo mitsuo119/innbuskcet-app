@@ -711,3 +711,62 @@ body {
   color: var(--color-text-muted);
   font-style: italic;
 }
+
+/* ===== ModelAnswerView (PBI-024 / TASK-009) ===== */
+
+.model-answer {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-left-width: 4px;
+  border-left-color: var(--color-primary);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.model-answer--empty {
+  background: var(--color-surface-muted);
+  border-left-color: var(--color-border-strong);
+}
+
+.model-answer__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.model-answer__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.model-answer__list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.model-answer__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.model-answer__term {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.model-answer__desc {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

@@ -6,6 +6,7 @@ import { HistoryView } from './ui/HistoryView';
 import { ModeSelector } from './ui/ModeSelector';
 import { ScoreCounter } from './ui/ScoreCounter';
 import { ThemeToggle } from './ui/ThemeToggle';
+import { ModelAnswerView } from './ui/ModelAnswerView';
 import { WritingInput } from './ui/WritingInput';
 import { WritingPreview } from './ui/WritingPreview';
 import type { Case, Priority } from './domain/case';
@@ -187,6 +188,10 @@ export default function App() {
               <WritingPreview
                 entry={writingEntry}
                 isEmpty={isWritingEntryEmpty(writingEntry)}
+              />
+              <ModelAnswerView
+                modelAnswer={current.modelAnswer}
+                visible={!!judgement}
               />
               <ExplanationView
                 caseItem={current}

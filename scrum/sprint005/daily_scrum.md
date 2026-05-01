@@ -183,3 +183,56 @@
 
 ### 障害物
 - 当日新規発生なし（impediment_log.csv 追記なし）。
+
+---
+
+## DAY 4 (2026-06-01 月)
+
+### 進捗・計画・障害物
+
+| 参加者 | 昨日やったこと | 今日やること | 障害物 |
+| ------ | -------------- | ------------ | ------ |
+| 伊藤（Dev） | TASK-005 (App.tsx 結線・PBI-023 完成) | TASK-010 (ModelAnswerView を App.tsx 統合) 着手・完了 / TASK-006 a11y 検証協力 | なし |
+| 田中（Dev） | TASK-008 (loader フォールバック) | レビュー支援 / DoD §10 エビデンス再確認 | なし |
+| 山本（Dev・助っ人） | TASK-005/008 統合確認 | TASK-006 (WritingInput a11y 検証・調整) 着手・完了 | なし |
+| 中村（Dev・助っ人） | TASK-009 設計準備 | TASK-009 (ModelAnswerView 実装) 着手・完了 | なし |
+| 高橋（SM） | DoD §10-3 運用確認 | TASK-015 レビュー準備着手 / 障害物受付 | なし |
+
+> Day0 担当割の小調整：TASK-006 を山本（実機 a11y 検証）/ TASK-009 を中村（一次情報＝既存 WritingPreview / cases.json 構造を踏まえた骨格実装）/ TASK-010 を伊藤（App.tsx 結線継続）にスワップして集中投下。バックログの TASK 説明（採点ポイントチェックボックス・左右並列レイアウト）は Sprint006 以降の拡張余地として残し、DAY4 では PBI-024 受入基準（回答後に模範骨格表示／未整備案件は「模範解答準備中」／DoD §10-2 準拠／テスト必須）に焦点を絞った。
+
+### スプリントゴール進捗
+- 計画ポイント 6pt / 残 0pt（**PBI-023 / PBI-024 主要実装完了**）。残作業は a11y チェックリスト最終転記・TASK-011/012/013/014/015。
+- 主要実装 3 件着地：
+  - **TASK-009 完了（中村）**：`ui/ModelAnswerView.tsx` 新設（`ModelAnswer` 型を受け取り判断/理由/アクションを `<dl>` 構造で表示）。
+    - `modelAnswer` undefined または `visible=false` のとき「模範解答準備中（この案件はまだ模範回答骨格が整備されていません）」のプレースホルダを表示。
+    - `aria-label="模範解答"` をセクションに付与。`<dl>/<dt>/<dd>` で意味的にラベルと内容を対応付け（DoD §9-3）。
+    - React テキスト描画のみで構成し `dangerouslySetInnerHTML` 不使用（DoD §10-2）。XSS 文字列のエスケープを vitest で証明。
+    - styles.css に `.model-answer*` を CSS 変数ベースで追加（左ボーダーで模範を視覚的に強調 / ライト・ダーク自動追従 / 改行 `pre-wrap` 保持）。
+    - `ui/ModelAnswerView.test.tsx` を新設（**5 件**：visible=false プレースホルダ / undefined プレースホルダ / 整備済み表示 / dangerouslySetInnerHTML 不使用 / dl 構造 3 項目）。
+  - **TASK-010 完了（伊藤）**：App.tsx に `ModelAnswerView` を統合。回答後（`judgement && selected`）の `WritingPreview` 直後・`ExplanationView` の手前に配置し、`modelAnswer={current.modelAnswer}` / `visible={!!judgement}` を渡す。`handleNext` / `handleModeChange` で writingEntry 初期化済みのため次案件へは自動的に持ち越されない。`handleRetry` では judgement=null となり ModelAnswerView は自然に非表示（受入基準「未入力でも閲覧可能」は再回答後に再表示される導線で担保）。
+  - **TASK-006 完了（山本）**：`ui/WritingInput.tsx` の a11y を `project/docs/a11y_checklist.md` に照らし検証。修正不要であることを確認。
+    - §1-1-h（textarea 内で A/B/C/Enter 誤発火しない）：DAY2 の TASK-004 で実装済み・shortcut.test.ts のテストで OK。
+    - §2（フォーカス可視）：`.writing-input__textarea:focus-visible` で 2px outline + offset 2px、`--color-focus-ring` でテーマ追従 OK。
+    - §3（aria）：各 textarea に `aria-label` / `<label htmlFor>` で関連付け、`role="group"` + `aria-label="判断・理由・アクションを入力"`、文字数カウンタは `aria-live="polite"`。OK。
+    - §1-2 キートラップ：通常の Tab フローで textarea 間および後続要素へ抜けられる。OK。
+
+### 検証結果（DAY4 時点）
+- pnpm test: **109 passed (104 既存 + 5 新規 ModelAnswerView)** ✅
+- pnpm lint: エラー・警告なし ✅
+- pnpm exec tsc -b --noEmit: 型エラーなし ✅
+- DoD §10-2 エビデンス：ModelAnswerView の React テキスト描画限定 + `<script>` / `<img onerror>` / `<b>` のエスケープを 1 件のテストで証明 ✅
+- DoD §10-3 エビデンス：未整備案件（modelAnswer=undefined）でもプレースホルダが安全に表示され、Case ロード継続 ✅
+- DoD §9-1/§9-3 エビデンス：a11y チェックリスト §1-1/§1-2/§2/§3 を WritingInput 観点で再点検し OK 確認 ✅
+- PBI-024 受入基準：
+  - 回答後に模範骨格が表示される ✅
+  - 未設定案件は「模範解答準備中」プレースホルダ ✅
+  - DoD §10-2 準拠（dangerouslySetInnerHTML 不使用） ✅
+  - テスト必須 ✅（ModelAnswerView 5 件）
+
+### 計画調整
+- TASK-006 / TASK-009 / TASK-010 を「完了」に更新。**PBI-023 / PBI-024 の主要受入基準を満たす状態に到達**。
+- バーンダウン：残タスク 4 → 1（TASK-011 a11y / TASK-012 A-15 PR チェック / TASK-013 A-16 還流欄 / TASK-014 §10 判定手順 / TASK-015 レビュー準備が DAY5 残）。実体は DAY1〜DAY3 で先行着手済みのものが多く、DAY5 はチェックリスト転記＋レビュー準備に集中可能。
+- 実装スコープ調整メモ：バックログの TASK-009 説明にあった「採点ポイントチェックボックス」「左右並列レイアウト（モバイル縦積み）」は PBI-024 受入基準に直接含まれないため Sprint006 以降の拡張余地として残置。本スプリントは「模範骨格を比較できる」最小限の価値提供にフォーカス。
+
+### 障害物
+- 当日新規発生なし（impediment_log.csv 追記なし）。
