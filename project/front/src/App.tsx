@@ -12,7 +12,7 @@ import { judge, type Judgement } from './domain/judge';
 import { loadCases } from './domain/loader';
 import { applyModeChange, initialMode } from './domain/mode';
 import { pickNextCaseByMode, type FilterMode } from './domain/random';
-import { addScore, initialScore } from './domain/score';
+import { addModeScore, addScore, initialModeScores, initialScore } from './domain/score';
 import { resolveShortcut } from './domain/shortcut';
 
 /** 入力中の要素ではショートカットを誤発火させない */
@@ -32,6 +32,7 @@ export default function App() {
   const [selected, setSelected] = useState<Priority | null>(null);
   const [judgement, setJudgement] = useState<Judgement | null>(null);
   const [score, setScore] = useState(initialScore);
+  const [modeScores, setModeScores] = useState(initialModeScores);
   const [history, setHistory] = useState<readonly HistoryItem[]>(initialHistory);
 
   const locked = judgement !== null;
@@ -49,6 +50,7 @@ export default function App() {
     setSelected(answer);
     setJudgement(result);
     setScore((prev) => addScore(prev, result));
+    setModeScores((prev) => addModeScore(prev, current.correctPriority, result));
     setHistory((prev) =>
       pushHistory(prev, {
         caseId: current.id,
@@ -119,8 +121,8 @@ export default function App() {
           <h1>InBusket</h1>
           <ThemeToggle />
         </div>
-        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 004 Day 1）</p>
-        <ScoreCounter score={score} />
+        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 004 Day 2）</p>
+        <ScoreCounter score={score} modeScores={modeScores} currentMode={mode} />
       </header>
 
       <ModeSelector mode={mode} onChange={handleModeChange} />

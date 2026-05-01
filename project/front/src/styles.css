@@ -1,3 +1,66 @@
+/* ===== テーマトークン（PBI-019 / TASK-002） =====
+ * すべての配色は CSS Custom Properties（変数）経由で参照する。
+ * - ライト/ダーク双方で WCAG 2.1 AA コントラスト比 4.5:1 以上を確保
+ *   （docs/a11y_checklist.md §4 で実測検証）
+ * - data-theme 未指定（初期 SSR 等）はライト相当でフォールバック
+ * - 色のみで意味を伝えない（§9-2）。優先度や正誤は記号・テキストも併記
+ */
+
+:root,
+:root[data-theme='light'] {
+  /* 背景・前景 */
+  --color-bg: #f7f7f8; /* body */
+  --color-surface: #ffffff; /* カード・パネル */
+  --color-surface-muted: #f6f8fa; /* ボタン地・kbd */
+  --color-text: #1f2328; /* 本文（vs #f7f7f8: 12.6:1） */
+  --color-text-muted: #57606a; /* サブ文字（vs #f7f7f8: 4.83:1） */
+  --color-border: #d0d7de;
+  --color-border-strong: #9aa4ad;
+
+  /* アクセント / フォーカス（青） */
+  --color-primary: #0969da;
+  --color-primary-bg: #ddf4ff;
+  --color-focus-ring: #0969da;
+
+  /* 正誤（緑/赤）— ライト用は濃色を採用しコントラスト確保 */
+  --color-success: #1a7f37; /* vs #ffffff: 4.95:1 */
+  --color-success-bg: #ecfdf3;
+  --color-success-text: #0a5a23; /* vs #ecfdf3: 8.4:1 */
+  --color-danger: #cf222e; /* vs #ffffff: 4.83:1 */
+  --color-danger-bg: #fff1f0;
+  --color-danger-text: #82071e; /* vs #fff1f0: 9.7:1 */
+
+  /* バッジ文字色（白）と背景の組合せはコントラスト確保済 */
+  --color-on-success: #ffffff;
+  --color-on-danger: #ffffff;
+  --color-on-primary: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-muted: #21262d;
+  --color-text: #e6edf3; /* vs #0d1117: 14.5:1 */
+  --color-text-muted: #9da7b3; /* vs #0d1117: 6.7:1 */
+  --color-border: #30363d;
+  --color-border-strong: #6e7681;
+
+  --color-primary: #58a6ff; /* vs #0d1117: 7.9:1 */
+  --color-primary-bg: #163b66;
+  --color-focus-ring: #79c0ff;
+
+  --color-success: #3fb950;
+  --color-success-bg: #0f2e1a;
+  --color-success-text: #7ee787; /* vs #0f2e1a: 9.0:1 */
+  --color-danger: #f85149;
+  --color-danger-bg: #2d0f10;
+  --color-danger-text: #ff8a80; /* vs #2d0f10: 8.1:1 */
+
+  --color-on-success: #04210d;
+  --color-on-danger: #2a0407;
+  --color-on-primary: #0d1117;
+}
+
 :root {
   font-family:
     system-ui,
@@ -10,8 +73,8 @@
 
 body {
   margin: 0;
-  background: #f7f7f8;
-  color: #1f2328;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .container {
@@ -25,24 +88,28 @@ body {
 }
 
 .app-subtitle {
-  color: #57606a;
+  color: var(--color-text-muted);
   margin-top: -0.5rem;
 }
+
+/* ===== ScoreCounter（PBI-021 拡張対応） ===== */
 
 .score-counter {
   display: inline-flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.35rem 0.75rem;
   margin-top: 0.25rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.95rem;
 }
 
 .score-counter__label {
-  color: #57606a;
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }
 
@@ -51,29 +118,42 @@ body {
 }
 
 .score-counter__sep {
-  color: #57606a;
+  color: var(--color-text-muted);
   margin: 0 0.15rem;
+}
+
+.score-counter__rate {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.score-counter__mode {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .app-footer {
   margin-top: 1rem;
-  color: #57606a;
+  color: var(--color-text-muted);
 }
 
 .app-footer kbd {
   display: inline-block;
   padding: 0 0.4rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-bottom-width: 2px;
   border-radius: 4px;
-  background: #f6f8fa;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.85em;
 }
 
 .case-view {
-  background: #ffffff;
-  border: 1px solid #d0d7de;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1.25rem 1rem;
   margin-bottom: 1rem;
@@ -97,9 +177,10 @@ body {
 
 .actions button {
   padding: 0.5rem 1rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: #f6f8fa;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
   cursor: pointer;
   font: inherit;
 }
@@ -111,7 +192,7 @@ body {
 
 .actions button:focus-visible,
 .answer-buttons__btn:focus-visible {
-  outline: 2px solid #0969da;
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -128,9 +209,10 @@ body {
   align-items: center;
   gap: 0.25rem;
   padding: 0.75rem 0.5rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
   font: inherit;
   transition:
@@ -139,12 +221,12 @@ body {
 }
 
 .answer-buttons__btn:hover:not(:disabled) {
-  border-color: #0969da;
+  border-color: var(--color-primary);
 }
 
 .answer-buttons__btn--selected {
-  border-color: #0969da;
-  background: #ddf4ff;
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
 }
 
 .answer-buttons__btn:disabled {
@@ -159,24 +241,25 @@ body {
 
 .answer-buttons__hint {
   font-size: 0.8rem;
-  color: #57606a;
+  color: var(--color-text-muted);
 }
 
 .explanation {
-  background: #ffffff;
-  border: 1px solid #d0d7de;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-left-width: 4px;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
+  color: var(--color-text);
 }
 
 .explanation--correct {
-  border-left-color: #1a7f37;
+  border-left-color: var(--color-success);
 }
 
 .explanation--incorrect {
-  border-left-color: #cf222e;
+  border-left-color: var(--color-danger);
 }
 
 .explanation__header {
@@ -188,7 +271,7 @@ body {
 }
 
 .explanation__summary {
-  color: #57606a;
+  color: var(--color-text-muted);
   font-size: 0.95rem;
 }
 
@@ -203,15 +286,16 @@ body {
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #ffffff;
 }
 
 .badge--correct {
-  background: #1a7f37;
+  background: var(--color-success);
+  color: var(--color-on-success);
 }
 
 .badge--incorrect {
-  background: #cf222e;
+  background: var(--color-danger);
+  color: var(--color-on-danger);
 }
 
 .explanation__actions {
@@ -222,36 +306,38 @@ body {
 
 .explanation__retry {
   padding: 0.4rem 0.9rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: #f6f8fa;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
   cursor: pointer;
   font: inherit;
 }
 
 .explanation__retry:hover {
-  border-color: #0969da;
+  border-color: var(--color-primary);
 }
 
 .explanation__retry:focus-visible {
-  outline: 2px solid #0969da;
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
 /* ===== HistoryView (PBI-016) ===== */
 
 .history-view {
-  background: #ffffff;
-  border: 1px solid #d0d7de;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
+  color: var(--color-text);
 }
 
 .history-view__title {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: #57606a;
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 
@@ -265,7 +351,7 @@ body {
 }
 
 .history-view__empty {
-  color: #57606a;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
@@ -275,23 +361,24 @@ body {
   gap: 0.2rem;
   min-width: 2.4rem;
   padding: 0.2rem 0.5rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: #f6f8fa;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
   font-size: 0.9rem;
   line-height: 1.2;
 }
 
 .history-view__item--correct {
-  border-color: #1a7f37;
-  background: #ecfdf3;
-  color: #0a5a23;
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 
 .history-view__item--incorrect {
-  border-color: #cf222e;
-  background: #fff1f0;
-  color: #82071e;
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
 }
 
 .history-view__mark {
@@ -300,7 +387,7 @@ body {
 
 .history-view__priority {
   font-size: 0.8rem;
-  color: #57606a;
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 
@@ -316,32 +403,33 @@ body {
 
 .mode-selector__label {
   font-size: 0.9rem;
-  color: #57606a;
+  color: var(--color-text-muted);
   margin-right: 0.25rem;
 }
 
 .mode-selector__btn {
   padding: 0.35rem 0.85rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
   font: inherit;
   font-size: 0.9rem;
 }
 
 .mode-selector__btn:hover {
-  border-color: #0969da;
+  border-color: var(--color-primary);
 }
 
 .mode-selector__btn:focus-visible {
-  outline: 2px solid #0969da;
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
 .mode-selector__btn--selected {
-  border-color: #0969da;
-  background: #ddf4ff;
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
   font-weight: 700;
 }
 
@@ -370,9 +458,7 @@ body {
   }
 }
 
-/* ===== ThemeToggle (PBI-019 / TASK-001) =====
- * ��: �e�[�}�� CSS Custom Properties ���� TASK-002�i�R�{�j�őΉ��B
- * �����ł̓g�O���{�^�����g�̌����ڂ̂ݒ�`����B */
+/* ===== ThemeToggle (PBI-019 / TASK-001) ===== */
 
 .app-header__top {
   display: flex;
@@ -387,20 +473,21 @@ body {
   align-items: center;
   gap: 0.4rem;
   padding: 0.35rem 0.75rem;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
   font: inherit;
   font-size: 0.9rem;
 }
 
 .theme-toggle:hover {
-  border-color: #0969da;
+  border-color: var(--color-primary);
 }
 
 .theme-toggle:focus-visible {
-  outline: 2px solid #0969da;
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
