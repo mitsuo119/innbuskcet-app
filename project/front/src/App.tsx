@@ -6,6 +6,8 @@ import { HistoryView } from './ui/HistoryView';
 import { ModeSelector } from './ui/ModeSelector';
 import { ScoreCounter } from './ui/ScoreCounter';
 import { ThemeToggle } from './ui/ThemeToggle';
+import { WritingInput } from './ui/WritingInput';
+import { WritingPreview } from './ui/WritingPreview';
 import type { Case, Priority } from './domain/case';
 import {
   initialHistory,
@@ -21,6 +23,11 @@ import { applyModeChange, initialMode } from './domain/mode';
 import { pickNextCaseByMode, type FilterMode } from './domain/random';
 import { addModeScore, addScore, initialModeScores, initialScore } from './domain/score';
 import { resolveShortcut, isEditableTarget } from './domain/shortcut';
+import {
+  createEmptyWritingEntry,
+  isWritingEntryEmpty,
+  type WritingEntry,
+} from './domain/writing';
 
 export default function App() {
   const allCases = useMemo<Case[]>(() => loadCases(), []);
@@ -34,6 +41,7 @@ export default function App() {
   const [modeScores, setModeScores] = useState(initialModeScores);
   const [history, setHistory] = useState<readonly HistoryItem[]>(initialHistory);
   const [historyLimit, setHistoryLimit] = useState<HistoryLimit>(10);
+  const [writingEntry, setWritingEntry] = useState<WritingEntry>(() => createEmptyWritingEntry());
 
   const locked = judgement !== null;
 
@@ -68,6 +76,7 @@ export default function App() {
     setCurrent(pickNextCaseByMode(allCases, current?.id, mode));
     setSelected(null);
     setJudgement(null);
+    setWritingEntry(createEmptyWritingEntry());
   };
 
   /**
@@ -94,6 +103,7 @@ export default function App() {
     setCurrent(reset.current);
     setSelected(null);
     setJudgement(null);
+    setWritingEntry(createEmptyWritingEntry());
   };
 
   /**
@@ -166,14 +176,25 @@ export default function App() {
       {current ? (
         <>
           <CaseView caseItem={current} />
+          <WritingInput
+            entry={writingEntry}
+            onChange={setWritingEntry}
+            disabled={locked}
+          />
           <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
           {judgement && selected && (
-            <ExplanationView
-              caseItem={current}
-              answer={selected}
-              judgement={judgement}
-              onRetry={handleRetry}
-            />
+            <>
+              <WritingPreview
+                entry={writingEntry}
+                isEmpty={isWritingEntryEmpty(writingEntry)}
+              />
+              <ExplanationView
+                caseItem={current}
+                answer={selected}
+                judgement={judgement}
+                onRetry={handleRetry}
+              />
+            </>
           )}
         </>
       ) : (

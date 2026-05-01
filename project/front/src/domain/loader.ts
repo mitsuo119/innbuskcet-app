@@ -4,26 +4,38 @@ import type { Case, ModelAnswer, Priority } from './case';
 const VALID_PRIORITIES: ReadonlySet<Priority> = new Set<Priority>(['A', 'B', 'C']);
 
 /**
- * raw な modelAnswer を検証して返す。
- * - 未指定（undefined / null）は undefined を返す（任意フィールド）
- * - 形式不一致（型不正・キー欠落・空文字）はエラーとしてデータ不備に早期に気付けるようにする
- *   （DoD §10-3：受領データの整合性検証）
+ * raw な modelAnswer を検証して返す（DoD §10-3：受領データの整合性検証）。
+ *
+ * 設計方針（TASK-008 / Sprint005）:
+ * - 必須キー（judgment / reason / action）が揃った非空文字列のオブジェクトでない場合は
+ *   undefined を返す「フォールバック」方式で、`Case` 自体のロードは継続させる。
+ * - これにより modelAnswer の段階移行（一部案件のみ整備）を妨げずに、UI 側で
+ *   「模範解答準備中」プレースホルダ表示にフォールバックできる（PBI-024 / TASK-010）。
+ * - 不整合は開発者向けに `console.warn` で通知し、データ不備の早期発見を支援する。
+ *
+ * @returns 妥当な ModelAnswer、または undefined（未指定 / 不整合）
  */
-function parseModelAnswer(raw: unknown, index: number, id: string): ModelAnswer | undefined {
+export function parseModelAnswer(
+  raw: unknown,
+  index?: number,
+  id?: string,
+): ModelAnswer | undefined {
   if (raw === undefined || raw === null) return undefined;
+  const ctx = index !== undefined && id !== undefined ? `cases.json[${index}] (id=${id})` : 'modelAnswer';
+
   if (typeof raw !== 'object' || Array.isArray(raw)) {
-    throw new Error(
-      `cases.json[${index}] の modelAnswer はオブジェクトである必要があります (id=${id})`,
-    );
+    console.warn(`${ctx}: modelAnswer はオブジェクトである必要があります（undefined にフォールバック）`);
+    return undefined;
   }
   const m = raw as Partial<Record<keyof ModelAnswer, unknown>>;
   const keys: (keyof ModelAnswer)[] = ['judgment', 'reason', 'action'];
   for (const key of keys) {
     const value = m[key];
     if (typeof value !== 'string' || value.length === 0) {
-      throw new Error(
-        `cases.json[${index}] の modelAnswer.${key} は非空文字列である必要があります (id=${id})`,
+      console.warn(
+        `${ctx}: modelAnswer.${key} は非空文字列である必要があります（undefined にフォールバック）`,
       );
+      return undefined;
     }
   }
   return {

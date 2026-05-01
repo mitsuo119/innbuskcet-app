@@ -82,3 +82,104 @@
 
 ### 障害物
 - 当日新規発生なし（impediment_log.csv 追記なし）。
+
+---
+
+## DAY 3 (2026-05-29 金)
+
+### 進捗・計画・障害物
+
+| 参加者 | 昨日やったこと | 今日やること | 障害物 |
+| ------ | -------------- | ------------ | ------ |
+| 伊藤（Dev） | TASK-003 (WritingPreview) 完了 | TASK-005 (App.tsx 結線・PBI-023 完成) 着手・完了 | なし |
+| 田中（Dev） | TASK-004 (shortcut textarea ガード) 完了 | TASK-008 (loader スキーマ検証 + undefined フォールバック) 着手・完了 | なし |
+| 山本（Dev・助っ人） | TASK-007 (cases.json modelAnswer 投入) 完了 | TASK-005/008 統合確認・レビュー支援 / TASK-009 設計準備 | なし |
+| 中村（Dev・助っ人） | TASK-007 山本と協働 | TASK-009 (ModelAnswerView 骨格) 準備 / TASK-012 PRチェック | なし |
+| 高橋（SM） | DoD §10-2/§10-3 エビデンス様式整備 | DoD §10-3 不整合フォールバック運用確認・障害物受付 | なし |
+
+### スプリントゴール進捗
+- 計画ポイント 6pt / 残 3pt（**PBI-023 完成**）。PBI-024 はデータ基盤＋ローダ検証まで完了し、UI（TASK-009/010/011/012）が残作業。
+- 主要実装 2 件着地：
+  - **TASK-005 完了（PBI-023 Done）**：App.tsx に WritingInput / WritingPreview を統合。
+    - state writingEntry: WritingEntry（createEmptyWritingEntry() 初期化）追加。
+    - 配置：CaseView の直後に WritingInput（**回答前から入力可能**＝先に考えてから A/B/C を選べるフロー）。回答後（locked）は disabled=true で答えを変えられないようガード。
+    - 回答後（judgement && selected）に WritingPreview を表示し ExplanationView の手前に並べる。isWritingEntryEmpty() で全空フォールバック表示。
+    - handleNext / handleModeChange 時に setWritingEntry(createEmptyWritingEntry()) で初期化（次案件に持ち越さない）。handleRetry は同一案件再挑戦のため writingEntry を保持（編集して再回答可能）。
+    - 既存の shortcut textarea ガード（DAY2 / TASK-004）と整合：textarea フォーカス中は A/B/C/Enter が誤発火しないことを統合確認。
+  - **TASK-008 完了**：domain/loader.ts の parseModelAnswer を「不整合時 undefined フォールバック」方式に変更し export。
+    - 旧実装（DAY2）は throw 方式だったが、TASK-008 仕様（DoD §10-3）に合わせ「undefined フォールバック + console.warn 通知」へ修正。段階移行中の cases.json でも Case ロード継続を保証。
+    - loader.test.ts に **8 件のテスト追加**（正常 1 / undefined・null 1 / 空文字 1 / キー欠落 1 / 型不正 1 / 配列・文字列 1 / loadCases 経由整備済 1 / 未整備 1）。
+
+### 検証結果（DAY3 時点）
+- pnpm test: **104 passed (96 既存 + 8 新規 loader)** ✅
+- pnpm lint: エラー・警告なし ✅
+- pnpm exec tsc -b --noEmit: 型エラーなし ✅
+- DoD §10-3 エビデンス：
+  - parseModelAnswer の不整合時フォールバック挙動を 6 件のテストで証明（空文字・キー欠落・型不正・配列・文字列・undefined/null）✅
+  - loadCases 経由でも整備済 / 未整備の両ケースが想定通りに動作することを確認 ✅
+- DoD §10-1/§10-2 エビデンス（DAY1/DAY2 取得分）が App.tsx 統合後も維持されていることを統合確認 ✅
+- PBI-023 受入基準：
+  - 判断・理由・アクションを 3 ブロックで記述できる ✅
+  - 回答前に記述できる（先に考えてから選択）✅
+  - 回答後は記述を変えられない（disabled）✅
+  - 回答後に WritingPreview で記述内容を確認できる ✅
+  - 次の問題に進むと記述がリセットされる ✅
+
+### 計画調整
+- TASK-005 / TASK-008 を「完了」に更新。残タスク：TASK-006（a11y 検証）/ PBI-024 の TASK-009/010/011/012。
+- バーンダウン：残タスク 6 → 4（計画値 6 を上回る進捗）。DAY4 で PBI-024 の UI（TASK-009/010）と a11y 検証（TASK-006）を集中投下する計画。
+- 設計上の小修正：DAY2 で実装した parseModelAnswer の throw 方式を undefined フォールバックに変更（TASK-008 仕様に整合）。データ不備は console.warn で開発者通知に切替。
+
+### 障害物
+- 当日新規発生なし（impediment_log.csv 追記なし）。
+
+
+---
+
+## DAY 3 (2026-05-29 金)
+
+### 進捗・計画・障害物
+
+| 参加者 | 昨日やったこと | 今日やること | 障害物 |
+| ------ | -------------- | ------------ | ------ |
+| 伊藤（Dev） | TASK-003 (WritingPreview) 完了 | TASK-005 (App.tsx 結線・PBI-023 完成) 着手・完了 | なし |
+| 田中（Dev） | TASK-004 (shortcut textarea ガード) 完了 | TASK-008 (loader スキーマ検証 + undefined フォールバック) 着手・完了 | なし |
+| 山本（Dev・助っ人） | TASK-007 (cases.json modelAnswer 投入) 完了 | TASK-005/008 統合確認・レビュー支援 / TASK-009 設計準備 | なし |
+| 中村（Dev・助っ人） | TASK-007 山本と協働 | TASK-009 (ModelAnswerView 骨格) 準備 / TASK-012 PRチェック | なし |
+| 高橋（SM） | DoD §10-2/§10-3 エビデンス様式整備 | DoD §10-3 不整合フォールバック運用確認・障害物受付 | なし |
+
+### スプリントゴール進捗
+- 計画ポイント 6pt / 残 3pt（**PBI-023 完成**）。PBI-024 はデータ基盤＋ローダ検証まで完了し、UI（TASK-009/010/011/012）が残作業。
+- 主要実装 2 件着地：
+  - **TASK-005 完了（PBI-023 Done）**：App.tsx に WritingInput / WritingPreview を統合。
+    - state writingEntry: WritingEntry（createEmptyWritingEntry() 初期化）追加。
+    - 配置：CaseView の直後に WritingInput（**回答前から入力可能**＝先に考えてから A/B/C を選べるフロー）。回答後（locked）は disabled=true で答えを変えられないようガード。
+    - 回答後（judgement && selected）に WritingPreview を表示し ExplanationView の手前に並べる。isWritingEntryEmpty() で全空フォールバック表示。
+    - handleNext / handleModeChange 時に setWritingEntry(createEmptyWritingEntry()) で初期化（次案件に持ち越さない）。handleRetry は同一案件再挑戦のため writingEntry を保持（編集して再回答可能）。
+    - 既存の shortcut textarea ガード（DAY2 / TASK-004）と整合：textarea フォーカス中は A/B/C/Enter が誤発火しないことを統合確認。
+  - **TASK-008 完了**：domain/loader.ts の parseModelAnswer を「不整合時 undefined フォールバック」方式に変更し export。
+    - 旧実装（DAY2）は throw 方式だったが、TASK-008 仕様（DoD §10-3）に合わせ「undefined フォールバック + console.warn 通知」へ修正。段階移行中の cases.json でも Case ロード継続を保証。
+    - loader.test.ts に **8 件のテスト追加**（正常 1 / undefined・null 1 / 空文字 1 / キー欠落 1 / 型不正 1 / 配列・文字列 1 / loadCases 経由整備済 1 / 未整備 1）。
+
+### 検証結果（DAY3 時点）
+- pnpm test: **104 passed (96 既存 + 8 新規 loader)** ✅
+- pnpm lint: エラー・警告なし ✅
+- pnpm exec tsc -b --noEmit: 型エラーなし ✅
+- DoD §10-3 エビデンス：
+  - parseModelAnswer の不整合時フォールバック挙動を 6 件のテストで証明（空文字・キー欠落・型不正・配列・文字列・undefined/null）✅
+  - loadCases 経由でも整備済 / 未整備の両ケースが想定通りに動作することを確認 ✅
+- DoD §10-1/§10-2 エビデンス（DAY1/DAY2 取得分）が App.tsx 統合後も維持されていることを統合確認 ✅
+- PBI-023 受入基準：
+  - 判断・理由・アクションを 3 ブロックで記述できる ✅
+  - 回答前に記述できる（先に考えてから選択）✅
+  - 回答後は記述を変えられない（disabled）✅
+  - 回答後に WritingPreview で記述内容を確認できる ✅
+  - 次の問題に進むと記述がリセットされる ✅
+
+### 計画調整
+- TASK-005 / TASK-008 を「完了」に更新。残タスク：TASK-006（a11y 検証）/ PBI-024 の TASK-009/010/011/012。
+- バーンダウン：残タスク 6 → 4（計画値 6 を上回る進捗）。DAY4 で PBI-024 の UI（TASK-009/010）と a11y 検証（TASK-006）を集中投下する計画。
+- 設計上の小修正：DAY2 で実装した parseModelAnswer の throw 方式を undefined フォールバックに変更（TASK-008 仕様に整合）。データ不備は console.warn で開発者通知に切替。
+
+### 障害物
+- 当日新規発生なし（impediment_log.csv 追記なし）。
