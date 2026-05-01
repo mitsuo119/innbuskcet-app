@@ -1,5 +1,6 @@
 import type { Priority } from './case';
 import type { Judgement } from './judge';
+import type { LearningStyle } from './learningStyle';
 
 /** 履歴1件: ○×（judgement）と正解優先度を保持 */
 export interface HistoryItem {
@@ -9,6 +10,13 @@ export interface HistoryItem {
   judgement: Judgement;
   /** その案件の正解優先度（A/B/C） */
   correctPriority: Priority;
+  /**
+   * 回答時の学習スタイル（PBI-037 / TASK-014）。
+   * - quick: 優先順位のみ回答
+   * - deep: 記述あり
+   * 既存履歴互換のため optional。未指定は Sprint006 以前のレコードを示す。
+   */
+  learningStyle?: LearningStyle;
 }
 
 /** 直近何件まで保持するか（PBI-016 受入基準。PBI-020 で表示件数 10/20 切替可） */

@@ -8,6 +8,12 @@ interface Props {
   onChange: (entry: WritingEntry) => void;
   /** 入力無効化（優先度未選択時など） */
   disabled?: boolean;
+  /**
+   * 「今回は書かない」スキップ動線（PBI-036 / TASK-010）。
+   * 渡された場合のみリンクボタンを表示し、クリックで親に通知する。
+   * 親は WritingEntry をクリアする想定。
+   */
+  onSkip?: () => void;
 }
 
 /**
@@ -48,7 +54,7 @@ const FIELDS: ReadonlyArray<{
  * - DoD §9-3: 各 textarea に `aria-label` を付与し、文字数補助は `aria-live="polite"` で読み上げ。
  * - 無効化（disabled）は readonly ではなく `disabled` 属性を使用（操作不可・フォーカス不可）。
  */
-export function WritingInput({ entry, onChange, disabled = false }: Props) {
+export function WritingInput({ entry, onChange, disabled = false, onSkip }: Props) {
   const idPrefix = useId();
 
   const handleChange = (key: keyof WritingEntry, value: string) => {
@@ -57,6 +63,19 @@ export function WritingInput({ entry, onChange, disabled = false }: Props) {
 
   return (
     <div className="writing-input" role="group" aria-label="判断・理由・アクションを入力">
+      {onSkip && (
+        <div className="writing-input__skip-row">
+          <button
+            type="button"
+            className="writing-input__skip"
+            onClick={onSkip}
+            disabled={disabled}
+            aria-label="今回は記述を書かずに進む"
+          >
+            今回は書かない
+          </button>
+        </div>
+      )}
       {FIELDS.map(({ key, label, ariaLabel, placeholder }) => {
         const id = `${idPrefix}-${key}`;
         const value = entry[key];

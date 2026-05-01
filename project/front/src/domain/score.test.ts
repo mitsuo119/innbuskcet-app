@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { addModeScore, addScore, initialModeScores, initialScore, ratePercent } from './score';
+import {
+  addLearningStyleScore,
+  addModeScore,
+  addScore,
+  initialLearningStyleScores,
+  initialModeScores,
+  initialScore,
+  ratePercent,
+} from './score';
 
 describe('addScore()', () => {
   it('初期値は 0/0', () => {
@@ -104,5 +112,43 @@ describe('addModeScore() / ratePercent() (PBI-021)', () => {
     expect(ratePercent({ total: 4, correct: 2 })).toBe(50);
     expect(ratePercent({ total: 1, correct: 1 })).toBe(100);
     expect(ratePercent({ total: 1, correct: 0 })).toBe(0);
+  });
+});
+
+describe('addLearningStyleScore() (PBI-037 / TASK-015)', () => {
+  it('initialLearningStyleScores は quick/deep ともに 0/0', () => {
+    expect(initialLearningStyleScores).toEqual({
+      quick: { total: 0, correct: 0 },
+      deep: { total: 0, correct: 0 },
+    });
+  });
+
+  it('quick 正解時は quick のみ +1（deep 据え置き）', () => {
+    const next = addLearningStyleScore(initialLearningStyleScores, 'quick', 'correct');
+    expect(next.quick).toEqual({ total: 1, correct: 1 });
+    expect(next.deep).toEqual({ total: 0, correct: 0 });
+  });
+
+  it('deep 不正解時は deep のみ total +1', () => {
+    const next = addLearningStyleScore(initialLearningStyleScores, 'deep', 'incorrect');
+    expect(next.deep).toEqual({ total: 1, correct: 0 });
+    expect(next.quick).toEqual({ total: 0, correct: 0 });
+  });
+
+  it('連続加算で quick/deep が独立集計される', () => {
+    let s = initialLearningStyleScores;
+    s = addLearningStyleScore(s, 'quick', 'correct');
+    s = addLearningStyleScore(s, 'quick', 'incorrect');
+    s = addLearningStyleScore(s, 'deep', 'correct');
+    s = addLearningStyleScore(s, 'deep', 'correct');
+    expect(s.quick).toEqual({ total: 2, correct: 1 });
+    expect(s.deep).toEqual({ total: 2, correct: 2 });
+  });
+
+  it('元の LearningStyleScores を変更しない（イミュータブル）', () => {
+    const base = initialLearningStyleScores;
+    const next = addLearningStyleScore(base, 'quick', 'correct');
+    expect(base).toEqual(initialLearningStyleScores);
+    expect(next).not.toBe(base);
   });
 });

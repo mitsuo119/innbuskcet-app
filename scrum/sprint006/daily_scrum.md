@@ -496,3 +496,165 @@ PBI-036 全体の DoD は TASK-009〜013 完了後に再判定。
 - 田中: TASK-010（Deep 時「今回は書かない」リンクボタン）+ TASK-013（PBI-036 の a11y 検証＋記録）
 - 中村: TASK-014（`HistoryItem` 拡張）→ TASK-015（LearningStyle 別正答率集計）
 - 高橋: TASK-018（A-20）進行確認＋ TASK-020（佐藤デモシナリオ準備着手）
+
+---
+
+## DAY 4（2026-06-08 月）
+
+### 開催情報
+
+| 項目     | 内容                                            |
+| -------- | ----------------------------------------------- |
+| 時刻     | 09:30 - 09:45                                   |
+| ファシリ | 高橋（SM）                                      |
+| 参加者   | 伊藤・田中・山本・中村・高橋（SM）              |
+| スプリントゴール再確認 | 学習スタイル切替・記述任意化・A/B/C 意味ラベル全画面統一表示 |
+
+### 各メンバーの共有
+
+#### 中村（助っ人）
+
+- **昨日やったこと**: TASK-014 型拡張ドラフト（`HistoryItem.learningStyle?`）。
+- **今日やること（巻取あり）**:
+  - TASK-014: `HistoryItem` に `learningStyle?: LearningStyle` 追加 + `App.tsx` での記録結線
+  - TASK-015: `ScoreCounter` に `learningStyleScores` / `currentStyle` props を追加し、現在モードの正答率を強調バッジで表示
+  - 田中の TASK-009/010 と伊藤の TASK-011/012 を **DAY4 オール巻取** で `App.tsx` に集約統合（PBI-036 / PBI-037 連動の整合性確認のためエスパー巻取）
+- **障害物**: なし。
+
+#### 田中（開発者）
+
+- **昨日やったこと**: TASK-006/007/008（骨格）完了。
+- **今日やること**: TASK-013（PBI-036 a11y 検証＋ `a11y_checklist.md` 記録）に集中。中村が `App.tsx` 統合を巻き取るためレビュー＋整合性確認に専念。
+- **障害物**: なし。
+
+#### 伊藤（開発者）
+
+- **昨日やったこと**: TASK-018（A-20）進行・TASK-009/011/012 の I/F 案準備。
+- **今日やること**: I/F 案（`isWritingEntryEmpty` を確認ダイアログのトリガに使う、`saveLearningStyle` を切替時に呼ぶ）を中村に共有 + コードレビュー。TASK-019（A-21: PBI-029 Ready 化）を鈴木と協働。
+- **障害物**: なし。
+
+#### 山本（助っ人）
+
+- **昨日やったこと**: TASK-008 仕上げ（CSS スタイリング骨格）。
+- **今日やること**: 中村の `App.tsx` 統合に合わせて `learning-style-toggle` / `writing-input__skip` / `score-counter__style` の CSS 仕上げ＋ダーク/ライト両対応の見え方確認。
+- **障害物**: なし。
+
+#### 高橋（SM）
+
+- 中村による DAY4 オール巻取（TASK-009/010/011/012/014/015）はバーンダウン Day4 計画（残 4 タスク / 残 2pt）達成のための戦術判断（中村の「一次情報＋全体把握」特性を活用）。当初担当（田中=TASK-009/010, 伊藤=TASK-011/012）は記録に併記し透明性を担保。
+- TASK-020（佐藤デモシナリオ）着手。
+
+### スプリントゴールへの進捗評価
+
+- **加速中**: 中村の DAY4 巻取により PBI-036 の主要実装（TASK-009/010/011/012）と PBI-037 の主要実装（TASK-014/015）を一括で `App.tsx` に統合完了。バーンダウン Day4 計画を上回る進捗。
+- **要観察**: TASK-013（PBI-036 a11y 検証）／ TASK-014 の `HistoryView` 行内バッジ表示（[Q]/[D]）／ TASK-016 の a11y_checklist.md 記録は DAY5 残作業。
+
+### 障害物
+
+- なし（全員 Green）。
+
+---
+
+### 本日の作業ログ（中村）
+
+#### TASK-014: `HistoryItem` 型拡張 + App.tsx 記録結線 ✅ 完了（型・結線）
+
+- 更新ファイル: [project/front/src/domain/history.ts](../../project/front/src/domain/history.ts)
+  - `HistoryItem` に `learningStyle?: LearningStyle` を追加（既存履歴互換のため optional）。
+- 更新ファイル: [project/front/src/App.tsx](../../project/front/src/App.tsx)
+  - `handleSubmit` で `pushHistory` 呼出時に現在の `learningStyle` を記録するよう結線。
+- 残: `HistoryView.tsx` の行内 [Q]/[D] バッジ表示は DAY5 へ繰越（TASK-014 進行中）。
+
+#### TASK-015: `ScoreCounter` 拡張（LearningStyle 別正答率） ✅ 完了
+
+- 新規ドメイン: [project/front/src/domain/score.ts](../../project/front/src/domain/score.ts)
+  - `LearningStyleScores` 型 / `initialLearningStyleScores` / `addLearningStyleScore(scores, style, judgement)` を追加。
+- 更新ファイル: [project/front/src/ui/ScoreCounter.tsx](../../project/front/src/ui/ScoreCounter.tsx)
+  - props に `learningStyleScores?` / `currentStyle?` を追加（後方互換）。
+  - `currentStyle` の正答率を `score-counter__style` バッジで強調表示（`Quick 3 / 5 (60%)` 形式）。
+  - `aria-label` に学習スタイル別サマリを連結（`aria-live="polite"` で SR 通知）。
+- テスト: [project/front/src/domain/score.test.ts](../../project/front/src/domain/score.test.ts) に 5 件追加（initial / quick 正解 / deep 不正解 / 連続加算 / イミュータブル）。
+
+#### TASK-009: Quick 時のフロー短縮（巻取） ✅ 完了
+
+- 更新ファイル: [project/front/src/App.tsx](../../project/front/src/App.tsx)
+  - `isDeep = isDeepMode(learningStyle)` を導出し、`<WritingInput>` / `<WritingPreview>` / `<ModelAnswerView>` を `{isDeep && ...}` でガード。
+  - Quick モードでは案件文 → A/B/C 回答 → `ExplanationView` のみの最短フロー。
+  - Deep モードは従来通り全コンポーネント表示。
+
+#### TASK-010: 「今回は書かない」スキップ動線（巻取） ✅ 完了
+
+- 更新ファイル: [project/front/src/ui/WritingInput.tsx](../../project/front/src/ui/WritingInput.tsx)
+  - props に `onSkip?: () => void` を追加。
+  - 渡された場合のみ `<button class="writing-input__skip">今回は書かない</button>` をフィールド群の上部右に表示。
+  - aria-label「今回は記述を書かずに進む」付与（DoD §9-3）。
+- 更新ファイル: [project/front/src/App.tsx](../../project/front/src/App.tsx)
+  - `handleSkipWriting` を追加（`createEmptyWritingEntry()` で WritingEntry をクリア）。
+  - `onSkip` は `isWritingEntryEmpty(writingEntry)` が `false` の時のみ渡す（空入力時はリンク非表示）。
+
+#### TASK-011: モード切替時の確認ダイアログ（簡易版・巻取） ✅ 完了
+
+- 更新ファイル: [project/front/src/App.tsx](../../project/front/src/App.tsx)
+  - `handleLearningStyleChange(next)` で `!isWritingEntryEmpty(writingEntry)` の場合に `window.confirm('現在の入力内容を破棄してモード切替しますか?')` を呼出。
+  - OK で切替＋ WritingEntry リセット、キャンセルで即時 return（state 不変）。
+  - 同値再選択は no-op。
+
+#### TASK-012: localStorage 永続化＋起動時復元結線（巻取） ✅ 完了
+
+- 更新ファイル: [project/front/src/App.tsx](../../project/front/src/App.tsx)
+  - 初期 state `useState<LearningStyle>(() => loadLearningStyle())` で起動時復元。
+  - `handleLearningStyleChange` 内で `saveLearningStyle(next)` を呼出し永続化（DoD §10-3 範囲・try/catch ラップは learningStyle.ts 側）。
+  - ヘッダーに `<LearningStyleToggle style={learningStyle} onChange={handleLearningStyleChange} />` を `ThemeToggle` 隣に配置（`app-header__controls` でラップ）。
+
+#### CSS 仕上げ（山本）
+
+- 更新ファイル: [project/front/src/styles.css](../../project/front/src/styles.css)
+  - `.app-header__controls`（LearningStyleToggle と ThemeToggle のヘッダー右側ラップ）
+  - `.learning-style-toggle` / `__btn` / `__btn--selected`（セグメントコントロール、選択中は `--color-primary` 反転）
+  - `.writing-input__skip-row` / `.writing-input__skip`（テキストリンク風ボタン）
+  - `.score-counter__style` / `__style-label`（学習スタイル別正答率バッジ・`--color-primary-bg` で控えめに強調）
+  - 既存 `--color-*` 変数のみ使用（ライト/ダーク両対応）。
+
+### テスト・品質確認結果
+
+- `pnpm test`（vitest run）: **141 passed (15 files)** ─ score.test.ts に 5 件追加（136 → 141）。
+- `pnpm lint`（eslint）: エラー・警告ゼロ。
+- `pnpm exec tsc -b --noEmit`: 型エラーゼロ。
+
+### DoD チェック（PBI-036 / PBI-037 進捗）
+
+#### PBI-036（DAY4 統合完了分）
+
+| #    | 項目                                                                                  | 状態 |
+| ---- | ------------------------------------------------------------------------------------- | ---- |
+| 1-1  | TS 型エラーゼロ                                                                       | はい |
+| 1-2  | ESLint エラー・警告ゼロ                                                               | はい |
+| 2-1  | 主要ロジック単体テスト全件成功（141 件）                                              | はい |
+| 4-x  | 動作確認（Quick/Deep 切替・記述スキップ・確認ダイアログ・localStorage 永続化）        | はい（中村ローカル確認） |
+| 7-x  | UI/UX: ヘッダー右上に学習スタイルトグル＋スキップ動線＋強調バッジ                     | はい |
+| 9-3  | role / aria 属性（aria-pressed / aria-label / aria-live）                             | はい |
+| 10-2 | `dangerouslySetInnerHTML` 不使用                                                      | はい |
+| 10-3 | localStorage 不正値フォールバック＋ try/catch ラップ（learningStyle.ts 側で担保）     | はい |
+
+PBI-036 全体 DoD は TASK-013（a11y 検証＋ a11y_checklist.md 記録）で最終判定（DAY5）。
+
+#### PBI-037（DAY4 統合完了分）
+
+| #    | 項目                                                                                  | 状態 |
+| ---- | ------------------------------------------------------------------------------------- | ---- |
+| 1-1  | TS 型エラーゼロ                                                                       | はい |
+| 1-2  | ESLint エラー・警告ゼロ                                                               | はい |
+| 2-1  | LearningStyleScores 純粋関数テスト 5 件 PASS                                          | はい |
+| 7-x  | UI/UX: ScoreCounter に Quick/Deep 別バッジ強調表示                                    | はい |
+| 9-3  | aria-live="polite" + aria-label に学習スタイル別サマリ連結                            | はい |
+| 10-2 | `dangerouslySetInnerHTML` 不使用                                                      | はい |
+
+PBI-037 全体 DoD は TASK-014（HistoryView 行内バッジ）+ TASK-016（a11y_checklist.md 記録）で最終判定（DAY5）。
+
+### 明日（DAY 5）に向けて
+
+- 田中: TASK-013（PBI-036 a11y 検証＋ `a11y_checklist.md` 記録）
+- 中村: TASK-014（HistoryView 行内 [Q]/[D] バッジ）+ TASK-016（a11y_checklist.md PBI-037 記録）
+- 山本: 全 PBI の最終 UI 確認（Quick/Deep × ライト/ダーク × A/B/C 全フィルタモードの組合せ動作）
+- 伊藤: PBI-035/036/037 の DoD 21 項目最終チェック・PR レビュー
+- 高橋: TASK-020（佐藤デモシナリオ）完成・スプリントレビュー＆レトロ準備（TASK-018/019 進行確認）

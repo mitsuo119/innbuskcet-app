@@ -1,5 +1,7 @@
 import type { FilterMode } from '../domain/random';
-import type { ModeScores, Score } from '../domain/score';
+import type { LearningStyle } from '../domain/learningStyle';
+import { LEARNING_STYLES } from '../domain/learningStyle';
+import type { LearningStyleScores, ModeScores, Score } from '../domain/score';
 import { ratePercent } from '../domain/score';
 
 interface Props {
@@ -12,6 +14,12 @@ interface Props {
   modeScores?: ModeScores;
   /** 現在の出題モード（PBI-021）。modeScores と併用 */
   currentMode?: FilterMode;
+  /**
+   * 学習スタイル別スコア（PBI-037 / TASK-015）。指定時は currentStyle のサマリを併記。
+   */
+  learningStyleScores?: LearningStyleScores;
+  /** 現在の学習スタイル（PBI-037）。learningStyleScores と併用 */
+  currentStyle?: LearningStyle;
 }
 
 const MODE_LABEL: Record<FilterMode, string> = {
@@ -32,15 +40,29 @@ function formatRate(score: Score): string {
  * - A/B/C モード: 当該モードの「正答数/出題数(正答率%)」を表示
  * - aria-live="polite" で SR にも通知（DoD §9）
  */
-export function ScoreCounter({ score, modeScores, currentMode }: Props) {
+export function ScoreCounter({
+  score,
+  modeScores,
+  currentMode,
+  learningStyleScores,
+  currentStyle,
+}: Props) {
   // 拡張プロパティ（modeScores + currentMode）が両方揃った場合のみモード別表示
   const showMode = modeScores !== undefined && currentMode !== undefined;
   const target: Score = showMode ? modeScores![currentMode!] : score;
   const modeLabel = showMode ? MODE_LABEL[currentMode!] : null;
 
-  const ariaLabel = showMode
+  // 学習スタイル別表示（PBI-037 / TASK-015）
+  const showStyle = learningStyleScores !== undefined && currentStyle !== undefined;
+  const styleTarget: Score | null = showStyle ? learningStyleScores![currentStyle!] : null;
+  const styleLabel = showStyle ? LEARNING_STYLES[currentStyle!].label : null;
+
+  const ariaLabelBase = showMode
     ? `${modeLabel} 正答 ${target.correct} / 出題 ${target.total}（正答率 ${formatRate(target)}）`
     : '正答数 / 出題数';
+  const ariaLabel = showStyle && styleTarget
+    ? `${ariaLabelBase}。${styleLabel}モード 正答 ${styleTarget.correct} / 出題 ${styleTarget.total}（正答率 ${formatRate(styleTarget)}）`
+    : ariaLabelBase;
 
   return (
     <div className="score-counter" aria-live="polite" aria-label={ariaLabel}>
@@ -58,6 +80,19 @@ export function ScoreCounter({ score, modeScores, currentMode }: Props) {
       {showMode && (
         <span className="score-counter__rate" aria-hidden="true">
           ({formatRate(target)})
+        </span>
+      )}
+      {showStyle && styleTarget && (
+        <span
+          className="score-counter__style"
+          aria-hidden="true"
+          title={`${styleLabel}モードの正答率（強調）`}
+        >
+          <span className="score-counter__style-label">{styleLabel}</span>
+          <strong>{styleTarget.correct}</strong>
+          <span className="score-counter__sep">/</span>
+          <strong>{styleTarget.total}</strong>
+          <span className="score-counter__rate">({formatRate(styleTarget)})</span>
         </span>
       )}
     </div>

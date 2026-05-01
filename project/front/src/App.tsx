@@ -3,6 +3,7 @@ import { AnswerButtons } from './ui/AnswerButtons';
 import { CaseView } from './ui/CaseView';
 import { ExplanationView } from './ui/ExplanationView';
 import { HistoryView } from './ui/HistoryView';
+import { LearningStyleToggle } from './ui/LearningStyleToggle';
 import { ModeSelector } from './ui/ModeSelector';
 import { ScoreCounter } from './ui/ScoreCounter';
 import { ThemeToggle } from './ui/ThemeToggle';
@@ -19,10 +20,23 @@ import {
   HISTORY_LIMIT_OPTIONS,
 } from './domain/history';
 import { judge, type Judgement } from './domain/judge';
+import {
+  loadLearningStyle,
+  saveLearningStyle,
+  isDeepMode,
+  type LearningStyle,
+} from './domain/learningStyle';
 import { loadCases } from './domain/loader';
 import { applyModeChange, initialMode } from './domain/mode';
 import { pickNextCaseByMode, type FilterMode } from './domain/random';
-import { addModeScore, addScore, initialModeScores, initialScore } from './domain/score';
+import {
+  addLearningStyleScore,
+  addModeScore,
+  addScore,
+  initialLearningStyleScores,
+  initialModeScores,
+  initialScore,
+} from './domain/score';
 import { resolveShortcut, isEditableTarget } from './domain/shortcut';
 import { createEmptyWritingEntry, isWritingEntryEmpty, type WritingEntry } from './domain/writing';
 
@@ -39,8 +53,11 @@ export default function App() {
   const [history, setHistory] = useState<readonly HistoryItem[]>(initialHistory);
   const [historyLimit, setHistoryLimit] = useState<HistoryLimit>(10);
   const [writingEntry, setWritingEntry] = useState<WritingEntry>(() => createEmptyWritingEntry());
+  const [learningStyle, setLearningStyle] = useState<LearningStyle>(() => loadLearningStyle());
+  const [learningStyleScores, setLearningStyleScores] = useState(initialLearningStyleScores);
 
   const locked = judgement !== null;
+  const isDeep = isDeepMode(learningStyle);
 
   const handleSelect = (priority: Priority) => {
     if (locked || !current) return;
@@ -56,6 +73,7 @@ export default function App() {
     setJudgement(result);
     setScore((prev) => addScore(prev, result));
     setModeScores((prev) => addModeScore(prev, current.correctPriority, result));
+    setLearningStyleScores((prev) => addLearningStyleScore(prev, learningStyle, result));
     setHistory((prev) =>
       pushHistory(
         prev,
@@ -63,6 +81,7 @@ export default function App() {
           caseId: current.id,
           judgement: result,
           correctPriority: current.correctPriority,
+          learningStyle,
         },
         historyLimit,
       ),
@@ -116,6 +135,29 @@ export default function App() {
     setHistory((prev) => trimHistory(prev, next));
   };
 
+  /**
+   * 学習スタイル切替（PBI-036 / TASK-009/012）。
+   * - 同値再選択は no-op。
+   * - WritingEntry が空でない（Deep で記述あり）の場合は確認ダイアログ。
+   * - 切替時は WritingEntry をリセットし、localStorage へ永続化する。
+   * - カウンタ・履歴・現問題はモード切替（filter）と独立に維持。
+   */
+  const handleLearningStyleChange = (next: LearningStyle) => {
+    if (next === learningStyle) return;
+    if (!isWritingEntryEmpty(writingEntry)) {
+      const ok = window.confirm('現在の入力内容を破棄してモード切替しますか?');
+      if (!ok) return;
+    }
+    setLearningStyle(next);
+    saveLearningStyle(next);
+    setWritingEntry(createEmptyWritingEntry());
+  };
+
+  /** 「今回は書かない」スキップ（PBI-036 / TASK-010）: WritingEntry をクリアするのみ。 */
+  const handleSkipWriting = () => {
+    setWritingEntry(createEmptyWritingEntry());
+  };
+
   // キーボードショートカット: A/B/C で回答即確定、Enter で次の問題
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -143,10 +185,19 @@ export default function App() {
       <header className="app-header">
         <div className="app-header__top">
           <h1>InBusket</h1>
-          <ThemeToggle />
+          <div className="app-header__controls">
+            <LearningStyleToggle style={learningStyle} onChange={handleLearningStyleChange} />
+            <ThemeToggle />
+          </div>
         </div>
-        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 005）</p>
-        <ScoreCounter score={score} modeScores={modeScores} currentMode={mode} />
+        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 006）</p>
+        <ScoreCounter
+          score={score}
+          modeScores={modeScores}
+          currentMode={mode}
+          learningStyleScores={learningStyleScores}
+          currentStyle={learningStyle}
+        />
       </header>
 
       <ModeSelector mode={mode} onChange={handleModeChange} />
@@ -173,16 +224,29 @@ export default function App() {
       {current ? (
         <>
           <CaseView caseItem={current} />
-          <WritingInput entry={writingEntry} onChange={setWritingEntry} disabled={locked} />
+          {isDeep && (
+            <WritingInput
+              entry={writingEntry}
+              onChange={setWritingEntry}
+              disabled={locked}
+              onSkip={
+                isWritingEntryEmpty(writingEntry) ? undefined : handleSkipWriting
+              }
+            />
+          )}
           <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
           {judgement && selected && (
             <>
-              <WritingPreview entry={writingEntry} isEmpty={isWritingEntryEmpty(writingEntry)} />
-              <ModelAnswerView
-                modelAnswer={current.modelAnswer}
-                visible={!!judgement}
-                correctPriority={current.correctPriority}
-              />
+              {isDeep && (
+                <>
+                  <WritingPreview entry={writingEntry} isEmpty={isWritingEntryEmpty(writingEntry)} />
+                  <ModelAnswerView
+                    modelAnswer={current.modelAnswer}
+                    visible={!!judgement}
+                    correctPriority={current.correctPriority}
+                  />
+                </>
+              )}
               <ExplanationView
                 caseItem={current}
                 answer={selected}

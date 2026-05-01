@@ -1,6 +1,7 @@
 import type { Judgement } from './judge';
 import { FILTER_MODES, type FilterMode } from './random';
 import type { Priority } from './case';
+import type { LearningStyle } from './learningStyle';
 
 /** セッション内スコア（リロードでリセット） */
 export interface Score {
@@ -66,3 +67,28 @@ export function ratePercent(score: Score): number | null {
 
 /** 列挙ヘルパ（UI で「全モード横並び表示」する用途を想定） */
 export const ALL_MODES: readonly FilterMode[] = FILTER_MODES;
+
+/** 学習スタイル別スコア（PBI-037 / TASK-015） */
+export type LearningStyleScores = Record<LearningStyle, Score>;
+
+/** 初期学習スタイル別スコア（quick/deep ともに 0/0） */
+export const initialLearningStyleScores: LearningStyleScores = {
+  quick: { total: 0, correct: 0 },
+  deep: { total: 0, correct: 0 },
+};
+
+/**
+ * 学習スタイル別スコアに 1 件分の回答結果を加算した新しい LearningStyleScores を返す（PBI-037）。
+ * - 当該学習スタイル（quick/deep）にのみ加算（モード別とは独立）
+ * - イミュータブル（入力を変更しない）
+ */
+export function addLearningStyleScore(
+  scores: LearningStyleScores,
+  style: LearningStyle,
+  judgement: Judgement,
+): LearningStyleScores {
+  return {
+    ...scores,
+    [style]: addScore(scores[style], judgement),
+  };
+}
