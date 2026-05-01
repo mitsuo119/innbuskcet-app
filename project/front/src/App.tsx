@@ -178,7 +178,11 @@ export default function App() {
           {judgement && selected && (
             <>
               <WritingPreview entry={writingEntry} isEmpty={isWritingEntryEmpty(writingEntry)} />
-              <ModelAnswerView modelAnswer={current.modelAnswer} visible={!!judgement} />
+              <ModelAnswerView
+                modelAnswer={current.modelAnswer}
+                visible={!!judgement}
+                correctPriority={current.correctPriority}
+              />
               <ExplanationView
                 caseItem={current}
                 answer={selected}
