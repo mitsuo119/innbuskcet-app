@@ -1,4 +1,26 @@
-import type { Case } from './case';
+import type { Case, Priority } from './case';
+
+/**
+ * 出題モード（PBI-018）。
+ * - 'all' : 全件から出題
+ * - 'A' / 'B' / 'C' : 該当する正解優先度の案件のみ
+ */
+export type FilterMode = 'all' | Priority;
+
+/** 出題モードの一覧（UI 切替で使用） */
+export const FILTER_MODES: readonly FilterMode[] = ['all', 'A', 'B', 'C'] as const;
+
+/**
+ * 指定モードに合致する案件のみを抽出する純粋関数。
+ * - mode='all' は入力をそのまま返す（参照は新規配列）。
+ * - 一致なしなら空配列を返す（呼び出し側で「該当なし」表示を担保する）。
+ */
+export function filterByMode(cases: readonly Case[], mode: FilterMode): Case[] {
+  if (mode === 'all') {
+    return [...cases];
+  }
+  return cases.filter((c) => c.correctPriority === mode);
+}
 
 /**
  * 直前に出題した1件を除外したうえでランダムに1件返す。
@@ -28,4 +50,17 @@ export function pickNextCase(
 
   const index = Math.floor(random() * pool.length);
   return pool[index];
+}
+
+/**
+ * モードでフィルタしたうえで次の1件を選ぶ便利関数（PBI-018）。
+ * - フィルタ後 0 件なら null（UI 側で「該当案件なし」を表示する責務）。
+ */
+export function pickNextCaseByMode(
+  cases: readonly Case[],
+  previousId: string | undefined,
+  mode: FilterMode,
+  random: () => number = Math.random,
+): Case | null {
+  return pickNextCase(filterByMode(cases, mode), previousId, random);
 }

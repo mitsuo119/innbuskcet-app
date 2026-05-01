@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { pickNextCase } from './random';
-import type { Case } from './case';
+import { FILTER_MODES, filterByMode, pickNextCase, pickNextCaseByMode } from './random';
+import type { Case, Priority } from './case';
 
-const c = (id: string): Case => ({
+const c = (id: string, p: Priority = 'A'): Case => ({
   id,
   title: `t-${id}`,
   body: `b-${id}`,
-  correctPriority: 'A',
+  correctPriority: p,
   explanation: `e-${id}`,
 });
 
@@ -43,5 +43,61 @@ describe('pickNextCase', () => {
       expect(picked!.id).not.toBe(prev);
       prev = picked!.id;
     }
+  });
+});
+
+describe('filterByMode (PBI-018)', () => {
+  const cases = [c('a1', 'A'), c('a2', 'A'), c('b1', 'B'), c('c1', 'C')];
+
+  it('FILTER_MODES は all/A/B/C の4種', () => {
+    expect(FILTER_MODES).toEqual(['all', 'A', 'B', 'C']);
+  });
+
+  it("mode='all' は全件返す（新規配列）", () => {
+    const out = filterByMode(cases, 'all');
+    expect(out).toHaveLength(4);
+    expect(out).not.toBe(cases);
+  });
+
+  it.each(['A', 'B', 'C'] as const)("mode='%s' は該当優先度のみ返す", (mode) => {
+    const out = filterByMode(cases, mode);
+    expect(out.every((x) => x.correctPriority === mode)).toBe(true);
+  });
+
+  it('該当 0 件のときは空配列を返す', () => {
+    const onlyA = [c('a1', 'A')];
+    expect(filterByMode(onlyA, 'C')).toEqual([]);
+  });
+
+  it('入力配列を破壊しない', () => {
+    const snapshot = [...cases];
+    filterByMode(cases, 'A');
+    expect(cases).toEqual(snapshot);
+  });
+});
+
+describe('pickNextCaseByMode (PBI-018)', () => {
+  const cases = [c('a1', 'A'), c('a2', 'A'), c('b1', 'B'), c('c1', 'C')];
+
+  it("mode='C' で C のみが返る", () => {
+    const picked = pickNextCaseByMode(cases, undefined, 'C', () => 0);
+    expect(picked?.correctPriority).toBe('C');
+    expect(picked?.id).toBe('c1');
+  });
+
+  it("mode='all' は previousId 直前を除外する", () => {
+    const picked = pickNextCaseByMode(cases, 'a1', 'all', () => 0);
+    // a1 を除外した先頭は a2
+    expect(picked?.id).toBe('a2');
+  });
+
+  it("mode='B' でフィルタ後 1 件のときはその案件が返る（previousId 一致でも）", () => {
+    const picked = pickNextCaseByMode(cases, 'b1', 'B', () => 0);
+    expect(picked?.id).toBe('b1');
+  });
+
+  it('該当 0 件なら null', () => {
+    const onlyA = [c('a1', 'A')];
+    expect(pickNextCaseByMode(onlyA, undefined, 'C', () => 0)).toBeNull();
   });
 });

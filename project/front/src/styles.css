@@ -238,6 +238,113 @@ body {
   outline-offset: 2px;
 }
 
+/* ===== HistoryView (PBI-016) ===== */
+
+.history-view {
+  background: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.history-view__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #57606a;
+  font-weight: 600;
+}
+
+.history-view__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.history-view__empty {
+  color: #57606a;
+  font-size: 0.9rem;
+}
+
+.history-view__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 2.4rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background: #f6f8fa;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.history-view__item--correct {
+  border-color: #1a7f37;
+  background: #ecfdf3;
+  color: #0a5a23;
+}
+
+.history-view__item--incorrect {
+  border-color: #cf222e;
+  background: #fff1f0;
+  color: #82071e;
+}
+
+.history-view__mark {
+  font-weight: 700;
+}
+
+.history-view__priority {
+  font-size: 0.8rem;
+  color: #57606a;
+  font-weight: 600;
+}
+
+/* ===== ModeSelector (PBI-018) ===== */
+
+.mode-selector {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.mode-selector__label {
+  font-size: 0.9rem;
+  color: #57606a;
+  margin-right: 0.25rem;
+}
+
+.mode-selector__btn {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid #d0d7de;
+  border-radius: 999px;
+  background: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.mode-selector__btn:hover {
+  border-color: #0969da;
+}
+
+.mode-selector__btn:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 2px;
+}
+
+.mode-selector__btn--selected {
+  border-color: #0969da;
+  background: #ddf4ff;
+  font-weight: 700;
+}
+
 @media (max-width: 480px) {
   .answer-buttons {
     grid-template-columns: 1fr;
@@ -254,5 +361,11 @@ body {
   .actions button {
     flex: 1;
     padding: 0.75rem 1rem;
+  }
+
+  .history-view__item {
+    min-width: 2.2rem;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.85rem;
   }
 }

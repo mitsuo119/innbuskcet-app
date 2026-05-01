@@ -2,11 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { AnswerButtons } from './ui/AnswerButtons';
 import { CaseView } from './ui/CaseView';
 import { ExplanationView } from './ui/ExplanationView';
+import { HistoryView } from './ui/HistoryView';
+import { ModeSelector } from './ui/ModeSelector';
 import { ScoreCounter } from './ui/ScoreCounter';
 import type { Case, Priority } from './domain/case';
+import { initialHistory, pushHistory, type HistoryItem } from './domain/history';
 import { judge, type Judgement } from './domain/judge';
 import { loadCases } from './domain/loader';
-import { pickNextCase } from './domain/random';
+import { applyModeChange, initialMode } from './domain/mode';
+import { pickNextCaseByMode, type FilterMode } from './domain/random';
 import { addScore, initialScore } from './domain/score';
 import { resolveShortcut } from './domain/shortcut';
 
@@ -20,10 +24,14 @@ function isEditableTarget(target: EventTarget | null): boolean {
 
 export default function App() {
   const allCases = useMemo<Case[]>(() => loadCases(), []);
-  const [current, setCurrent] = useState<Case | null>(() => pickNextCase(allCases, undefined));
+  const [mode, setMode] = useState<FilterMode>(initialMode);
+  const [current, setCurrent] = useState<Case | null>(() =>
+    pickNextCaseByMode(allCases, undefined, initialMode),
+  );
   const [selected, setSelected] = useState<Priority | null>(null);
   const [judgement, setJudgement] = useState<Judgement | null>(null);
   const [score, setScore] = useState(initialScore);
+  const [history, setHistory] = useState<readonly HistoryItem[]>(initialHistory);
 
   const locked = judgement !== null;
 
@@ -40,10 +48,17 @@ export default function App() {
     setSelected(answer);
     setJudgement(result);
     setScore((prev) => addScore(prev, result));
+    setHistory((prev) =>
+      pushHistory(prev, {
+        caseId: current.id,
+        judgement: result,
+        correctPriority: current.correctPriority,
+      }),
+    );
   };
 
   const handleNext = () => {
-    setCurrent(pickNextCase(allCases, current?.id));
+    setCurrent(pickNextCaseByMode(allCases, current?.id, mode));
     setSelected(null);
     setJudgement(null);
   };
@@ -54,6 +69,22 @@ export default function App() {
    */
   const handleRetry = () => {
     if (!current) return;
+    setSelected(null);
+    setJudgement(null);
+  };
+
+  /**
+   * 出題モード切替（PBI-018）。
+   * - 履歴・カウンタを初期化し、新モードでフィルタした候補から次の1件を選び直す。
+   * - 同モード再選択は no-op。
+   */
+  const handleModeChange = (next: FilterMode) => {
+    if (next === mode) return;
+    const reset = applyModeChange(allCases, next);
+    setMode(reset.mode);
+    setHistory(reset.history);
+    setScore(reset.score);
+    setCurrent(reset.current);
     setSelected(null);
     setJudgement(null);
   };
@@ -84,9 +115,13 @@ export default function App() {
     <main className="container">
       <header className="app-header">
         <h1>InBusket</h1>
-        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 002 Day 3）</p>
+        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 003 Day 3）</p>
         <ScoreCounter score={score} />
       </header>
+
+      <ModeSelector mode={mode} onChange={handleModeChange} />
+
+      <HistoryView history={history} />
 
       {current ? (
         <>
@@ -102,7 +137,7 @@ export default function App() {
           )}
         </>
       ) : (
-        <p>表示できる案件がありません。</p>
+        <p>該当する優先度の案件がありません。モードを切替えてください。</p>
       )}
 
       <div className="actions">

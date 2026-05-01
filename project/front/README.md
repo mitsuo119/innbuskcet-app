@@ -50,21 +50,27 @@ project/front/
     │   ├── CaseView.tsx          # 案件1件の出題表示
     │   ├── AnswerButtons.tsx     # A/B/C 回答ボタン（radiogroup）
     │   ├── ExplanationView.tsx   # 採点バッジ・正解・解説 ＋ 「もう一度」ボタン（PBI-014）
-    │   └── ScoreCounter.tsx      # セッション内 正答数/出題数カウンタ（PBI-012）
+    │   ├── ScoreCounter.tsx      # セッション内 正答数/出題数カウンタ（PBI-012）
+    │   ├── HistoryView.tsx       # 直近10問の正誤履歴（aria-live / Sprint003 PBI-016）
+    │   └── ModeSelector.tsx      # 出題モード切替 radiogroup（aria-checked / 矢印キー / Sprint003 PBI-018）
     ├── domain/               # ドメイン層（型・ロジック）
     │   ├── case.ts           # 案件(Case)/Priority 型定義
     │   ├── loader.ts         # cases.json の検証付きローダ（UI からの JSON 直 import 禁止）
     │   ├── loader.test.ts
     │   ├── judge.ts          # 採点関数 judge()
     │   ├── judge.test.ts
-    │   ├── random.ts         # 直前1件除外つきランダム選択
+    │   ├── random.ts         # 直前1件除外つきランダム選択 ＋ FilterMode/pickNextCaseByMode（Sprint003 PBI-018）
     │   ├── random.test.ts
     │   ├── shortcut.ts       # A/B/C・Enter キー判定の純粋関数 resolveShortcut（PBI-011）
     │   ├── shortcut.test.ts
     │   ├── score.ts          # セッション内カウンタの加算ロジック addScore（PBI-012）
-    │   └── score.test.ts
+    │   ├── score.test.ts
+    │   ├── history.ts        # 直近10件履歴の純粋関数 pushHistory（Sprint003 PBI-016）
+    │   ├── history.test.ts
+    │   ├── mode.ts           # 出題モード切替リセット applyModeChange（Sprint003 PBI-018）
+    │   └── mode.test.ts
     └── data/                 # データ層（JSON）
-        └── cases.json        # 案件データ（32件 / Sprint002 PBI-013 で 28→32 件に拡充）
+        └── cases.json        # 案件データ（40件 / Sprint003 PBI-017 で 32→40 件・A/B/C 各30%以上に拡充）
 ```
 
 ## 案件データ（cases.json）スキーマ
@@ -101,7 +107,7 @@ project/front/
    }
    ```
 
-2. `id` は既存と重複しないこと（`loader.ts` がスキーマ不正・id 重複を起動時に検出する）。`correctPriority` は A/B/C 各 25% 以上の分布を維持する。
+2. `id` は既存と重複しないこと（`loader.ts` がスキーマ不正・id 重複を起動時に検出する）。`correctPriority` は A/B/C 各 30% 以上の分布を維持する（Sprint003 PBI-017 で受入基準を 25%→30% に強化）。`ref/chapter08` の 20 業務パターンとの紐付けは [`project/docs/case_pattern_mapping.md`](../docs/case_pattern_mapping.md) を参照。
 
 3. 検証:
 
@@ -110,20 +116,22 @@ project/front/
    pnpm dev     # ブラウザで実機表示確認
    ```
 
-## 動作仕様（MVP / Sprint002 時点）
+## 動作仕様（MVP / Sprint003 時点）
 
-- 起動時に `cases.json` から1件をランダム出題する。
+- 起動時に `cases.json` から1件をランダム出題する（出題モードに従いフィルタ）。
 - A/B/C のいずれかを選択 → 「回答する」ボタン押下で確定し、ボタン群はロックされる。
 - 採点結果（正解/不正解）と解説、自分の回答・正解優先度を表示する。
 - 「次の問題」ボタンで次の案件へ。**直前と同じ案件は連続して出題されない**。
 - 「もう一度」ボタン（解説枠内）で同一案件を未回答状態に戻して再挑戦できる（カウンタは加算しない / PBI-014）。
 - キーボードショートカット（PBI-011）: `A` / `B` / `C` で回答選択、`Enter` で確定 / 次問 / もう一度。入力欄フォーカス中や修飾キー併用時は誤発火しない。
 - セッション内カウンタ（PBI-012）: 画面右上に「正答数 / 出題数」を常時表示。リロードで 0/0 にリセット。
-- 案件データ: 32件（A:12 / B:12 / C:8、各 25%以上）。`ref/chapter08` の業務パターンに紐付け。
+- **直近10問の正誤履歴表示（Sprint003 PBI-016）**: ヘッダ直下に ○/× ＋正解優先度を時系列で表示（aria-live）。FIFO で直近10件を保持し、リロードでクリア。
+- **出題モード切替（Sprint003 PBI-018）**: 「全件 / A / B / C」を radiogroup で切替。Tab/矢印キー操作・focus 可視・aria-checked 対応。**切替時は履歴・カウンタ・現在の案件を一括リセット**。モード設定はセッション内のみ保持（リロードで「全件」に復帰）。
+- 案件データ: 40件（A:13 / B:14 / C:13、各 32.5%/35.0%/32.5% で 30%以上）。`ref/chapter08` の 20 業務パターンを完全網羅（[case_pattern_mapping.md](../docs/case_pattern_mapping.md) 参照）。
 - データはローカル静的 JSON のみ。サーバ・DB・外部 API は使用しない。
 
 ## 関連スクラム成果物
 
-- スプリントバックログ（最新）: [../../scrum/sprint002/sprint_backlog.md](../../scrum/sprint002/sprint_backlog.md)
+- スプリントバックログ（最新）: [../../scrum/sprint003/sprint_backlog.md](../../scrum/sprint003/sprint_backlog.md)
 - プロダクトゴール: [../../scrum/product_goal.md](../../scrum/product_goal.md)
 - 完成の定義: [../../scrum/definition_of_done.md](../../scrum/definition_of_done.md)
