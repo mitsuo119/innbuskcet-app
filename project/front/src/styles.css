@@ -463,6 +463,25 @@ body {
   font-weight: 700;
 }
 
+/* 履歴セル内 学習スタイルバッジ（[Q]/[D]） — PBI-037 / Sprint006 TASK-014
+ * - 色のみに依存しないよう [Q]/[D] のテキスト併記
+ * - aria-label に「Quickモード/Deepモード」を含めることで SR 読み上げを担保
+ */
+.history-view__style {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-left: 0.15rem;
+}
+
+.history-view__style--quick {
+  color: var(--color-primary, #2a7);
+}
+
+.history-view__style--deep {
+  color: var(--color-text-muted);
+}
+
 /* ===== ModeSelector (PBI-018) ===== */
 
 .mode-selector {

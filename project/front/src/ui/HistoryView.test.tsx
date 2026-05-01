@@ -85,6 +85,38 @@ describe('HistoryView（PBI-020 表示件数切替）', () => {
   });
 });
 
+describe('HistoryView（PBI-037 学習スタイルバッジ）', () => {
+  it('learningStyle="quick" の履歴に [Q] バッジが表示される', () => {
+    const history: HistoryItem[] = [
+      { caseId: 'c1', judgement: 'correct', correctPriority: 'A', learningStyle: 'quick' },
+    ];
+    const html = renderToStaticMarkup(<HistoryView history={history} />);
+    expect(html).toContain('[Q]');
+    expect(html).toContain('history-view__style--quick');
+    expect(html).toContain(' Quickモード');
+  });
+
+  it('learningStyle="deep" の履歴に [D] バッジが表示される', () => {
+    const history: HistoryItem[] = [
+      { caseId: 'c1', judgement: 'incorrect', correctPriority: 'B', learningStyle: 'deep' },
+    ];
+    const html = renderToStaticMarkup(<HistoryView history={history} />);
+    expect(html).toContain('[D]');
+    expect(html).toContain('history-view__style--deep');
+    expect(html).toContain(' Deepモード');
+  });
+
+  it('learningStyle 未設定の履歴にはバッジが表示されない（後方互換）', () => {
+    const history: HistoryItem[] = [
+      { caseId: 'c1', judgement: 'correct', correctPriority: 'C' },
+    ];
+    const html = renderToStaticMarkup(<HistoryView history={history} />);
+    expect(html).not.toContain('[Q]');
+    expect(html).not.toContain('[D]');
+    expect(html).not.toContain('history-view__style');
+  });
+});
+
 describe('trimHistory（PBI-020 切替時の補正）', () => {
   it('履歴件数 ≤ max のときはそのまま新配列で返す', () => {
     const h = buildHistory(5, 20);

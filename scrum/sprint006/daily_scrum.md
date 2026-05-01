@@ -658,3 +658,140 @@ PBI-037 全体 DoD は TASK-014（HistoryView 行内バッジ）+ TASK-016（a11
 - 山本: 全 PBI の最終 UI 確認（Quick/Deep × ライト/ダーク × A/B/C 全フィルタモードの組合せ動作）
 - 伊藤: PBI-035/036/037 の DoD 21 項目最終チェック・PR レビュー
 - 高橋: TASK-020（佐藤デモシナリオ）完成・スプリントレビュー＆レトロ準備（TASK-018/019 進行確認）
+
+---
+
+## DAY 5（2026-06-09 火 / 最終日）
+
+### 開催情報
+
+| 項目     | 内容                                            |
+| -------- | ----------------------------------------------- |
+| 時刻     | 09:30 - 09:45                                   |
+| ファシリ | 高橋（SM）                                      |
+| 参加者   | 伊藤・田中・山本・中村・高橋（SM）              |
+| スプリントゴール再確認 | 学習スタイル切替・記述任意化・A/B/C 意味ラベル全画面統一表示 |
+
+### 各メンバーの共有
+
+#### 伊藤（開発者 / DAY5 リード）
+
+- **昨日やったこと**: TASK-009/011/012 の I/F 案共有・中村レビュー、TASK-019 進行確認。
+- **今日やること**: DAY5 残作業（TASK-014 HistoryView 行内バッジ／TASK-013/016 a11y_checklist.md 追記／PBI-035/036/037 の DoD 21 項目最終確認／全品質チェック／PR チェックリスト更新）を集中対応。
+- **障害物**: なし。
+
+#### 田中（開発者）
+
+- **昨日やったこと**: 中村オール巻取分のレビュー・整合性確認。
+- **今日やること**: 伊藤と並走で DoD 21 項目最終確認、特に §1 §2 §9 §10 のクロスチェック。
+- **障害物**: なし。
+
+#### 山本（助っ人）
+
+- **昨日やったこと**: ヘッダー周辺・スキップ動線・スコアバッジの CSS 仕上げ。
+- **今日やること**: Quick / Deep × ライト / ダーク × A / B / C 全フィルタモード × 履歴件数 10/20 の組合せ動作の最終目視確認。
+- **障害物**: なし。
+
+#### 中村（助っ人）
+
+- **昨日やったこと**: TASK-009/010/011/012/014/015 のオール巻取統合。
+- **今日やること**: TASK-014 HistoryView 行内 [Q]/[D] バッジ表示の追加テスト補完サポート、TASK-016 a11y_checklist.md 記録の最終確認。
+- **障害物**: なし。
+
+#### 高橋（SM）
+
+- DoD 21 項目「はい」最終判定を伊藤・田中とクロスチェックし、スプリントレビュー（TASK-020 佐藤デモ）／レトロ準備を完了。
+
+### スプリントゴールへの進捗評価
+
+- **達成見込み**: PBI-035 / PBI-036 / PBI-037 の主要実装は DAY4 までに完了。本日の残作業（HistoryView バッジ・a11y_checklist.md 追記・全品質確認）で全 PBI Done 候補化。
+
+### 障害物
+
+- なし（全員 Green）。
+
+---
+
+### 本日の作業ログ（伊藤）
+
+#### TASK-014 残: `HistoryView.tsx` 行内 [Q]/[D] バッジ ✅ 完了
+
+- 更新ファイル: [project/front/src/ui/HistoryView.tsx](../../project/front/src/ui/HistoryView.tsx)
+  - 各履歴セルに `learningStyle === 'quick'` で `[Q]`、`'deep'` で `[D]` バッジを表示。`undefined`（既存履歴互換）はバッジ非表示。
+  - `aria-label` / `title` に「Quickモード」「Deepモード」を連結し SR 読み上げ・ホバー補足を担保（DoD §9-3）。
+  - `<span aria-hidden="true">` で可視テキストを描画（色非依存・テキスト併記。DoD §9-2 / WCAG 1.4.1 / a11y_checklist 5-6）。
+- 更新ファイル: [project/front/src/styles.css](../../project/front/src/styles.css)
+  - `.history-view__style` / `.history-view__style--quick` / `.history-view__style--deep` を追加（`--color-primary` / `--color-text-muted` 既存変数のみ使用）。
+- 追加テスト: [project/front/src/ui/HistoryView.test.tsx](../../project/front/src/ui/HistoryView.test.tsx) に 3 件追加（quick / deep / 後方互換 未設定）。
+
+#### TASK-013 / TASK-016: `a11y_checklist.md` 追記 ✅ 完了
+
+- 更新ファイル: [project/docs/a11y_checklist.md](../../project/docs/a11y_checklist.md)
+  - 3 章「role / aria 属性」に項目 3-16（LearningStyleToggle）/ 3-17（WritingInput スキップ動線）/ 3-18（ScoreCounter Quick/Deep 別正答率）/ 3-19（HistoryView [Q]/[D] バッジ）を追記。
+  - 5 章「色非依存」に項目 5-6（履歴セルの学習スタイルはテキスト `[Q]`/`[D]` ＋ `aria-label` 併記）を追記。
+  - 6-A 章「PBI-036 / PBI-037 横展開メモ（Sprint006 DAY5 追記）」を新設し、6 コンポーネント（LearningStyleToggle / WritingInput / App.tsx / learningStyle.ts / ScoreCounter / HistoryView）の確認観点を一覧化。
+
+#### PR チェックリスト更新 ✅ 完了
+
+- 更新ファイル: [project/docs/pr_checklist.md](../../project/docs/pr_checklist.md)
+  - §7 アクセシビリティに「学習スタイル切替（PBI-036）／意味ラベル統一（PBI-035）／Quick/Deep 別履歴・正答率（PBI-037）に該当する変更時に a11y_checklist.md 3-12〜3-19 / 5-5〜5-6 を確認する」を追記。
+  - 改定履歴に v0.3.0（Sprint006 完了）を追記。
+
+### 全品質確認結果（`project/front/`）
+
+- `pnpm test`: **144 passed (15 files)** ─ HistoryView.test.tsx に 3 件追加（141 → 144）。
+- `pnpm lint`: エラー・警告ゼロ。
+- `pnpm exec tsc -b --noEmit`: 型エラーゼロ。
+- `pnpm build`: `tsc -b && vite build` 成功（`dist/assets/index-*.js` 約 60.0 kB gzip）。
+- `pnpm audit`: **No known vulnerabilities found**（DoD §5-1 OK）。
+
+### DoD 21 項目 最終チェック（PBI-035 / PBI-036 / PBI-037 共通）
+
+| #    | 基準                                                                       | 判定 |
+| ---- | -------------------------------------------------------------------------- | ---- |
+| 1-1  | TypeScript 型エラーゼロ                                                    | はい |
+| 1-2  | ESLint / Prettier エラー・警告ゼロ                                          | はい |
+| 1-3  | チーム内ペア確認（伊藤・田中・山本・中村）でレビュー完了                    | はい |
+| 2-1  | 主要ロジック単体テスト全件成功（144 件 / 15 files）                         | はい |
+| 2-2  | 受入基準を満たす手動動作確認（山本: Quick/Deep × ライト/ダーク × A/B/C 全フィルタ × 履歴 10/20 の組合せ） | はい |
+| 3-1  | README に起動手順記載済（Sprint001 以来維持）                              | はい |
+| 3-2  | cases.json スキーマ・追加方法のドキュメント維持（変更なし）                 | はい |
+| 4-1  | 最新版 Chrome でエラーなく動作                                             | はい |
+| 4-2  | 出題→回答→解説→次問サイクル破綻なし（Quick / Deep 双方）                   | はい |
+| 5-1  | `pnpm audit`: No known vulnerabilities found                               | はい |
+| 5-2  | シークレット情報のハードコード無し                                         | はい |
+| 6-1  | 出題切替の応答が体感 1 秒以内（Vite dev / production build いずれも）       | はい |
+| 7-1  | スマホ幅〜PC 幅で表示崩れなし（Quick / Deep 双方・LearningStyleToggle 含む） | はい |
+| 7-2  | 主要操作 1〜2 タップ／キー入力で完結（A/B/C 回答・次問・モード切替）        | はい |
+| 8-1  | 案件データは JSON 管理（変更なし）                                         | はい |
+| 9-1  | キーボードのみで主要操作完結（Tab / A/B/C / Enter / Space）                  | はい |
+| 9-2  | フォーカス可視（`:focus-visible` 維持・ライト/ダーク両テーマ）              | はい |
+| 9-3  | role / aria 属性付与（aria-pressed / aria-label / aria-live / role="group"） | はい |
+| 10-1 | 入力検証・境界値テスト（learningStyle: 10 件 / score: 18 件 / writing 既存 12 件） | はい |
+| 10-2 | `dangerouslySetInnerHTML` 不使用（全コンポーネント）                       | はい |
+| 10-3 | localStorage `inbasket.learningStyle.v1` の不正値・例外時 `'deep'` フォールバック＋ try/catch | はい |
+
+**結論: 21 項目すべて「はい」。PBI-035 / PBI-036 / PBI-037 を Done 判定（スプリントレビューで最終確認）。**
+
+### スプリントゴール達成確認
+
+> 「学習スタイル（Quick / Deep）切替と記述任意化を導入し、A/B/C 回答の意味ラベル（最優先/中優先/低優先）を全画面で統一表示することで、隙間時間と腰を据えた練習の双方で破綻なく合格答案の型を反復できる学習体験を実現する」
+
+- ✅ Quick / Deep のセグメントコントロールでヘッダーから 1 タップ切替（PBI-036）。
+- ✅ Quick は記述非表示の最短フロー、Deep は従来フロー＋「今回は書かない」スキップ動線。モード切替時の未確定入力は確認ダイアログで保護。
+- ✅ A/B/C 意味ラベル（◎/最優先/即時着手すべき 等）を `priorityLabel.ts` 単一ソースで AnswerButtons / ExplanationView / HistoryView / ModelAnswerView の 4 画面に統一表示（PBI-035）。
+- ✅ 履歴セルに学習スタイル `[Q]`/`[D]` バッジ＋ ScoreCounter に Quick/Deep 別正答率を強調表示（PBI-037）。
+- ✅ localStorage 永続化（`inbasket.learningStyle.v1`）＋不正値フォールバック（DoD §10-3）。
+
+→ **スプリントゴール達成**。
+
+### 残課題（Sprint007 持ち越し / リファインメント）
+
+- TASK-018: A-20 PBI-033（modelAnswer 残 30 件）の 1〜2pt 単位分割起票（鈴木・伊藤）— 未着手。Sprint007 プランニング前に Ready 化。
+- TASK-019: A-21 PBI-029（記述自己採点チェックリスト）受入基準詳細化＋見積もり再検証 — 未着手。Sprint007 プランニング前に Ready 化。
+- TASK-020: スプリントレビュー / レトロ準備（佐藤デモシナリオ）— DAY4 着手済、本日 高橋 が完了見込み。
+
+### スプリントレビュー / レトロへの引き継ぎ
+
+- レビュー: Quick/Deep 切替 → 意味ラベル全画面確認 → 学習スタイル別正答率の体験フローを佐藤にデモ（TASK-020 シナリオ）。
+- レトロ: A-16（handoff 構造化還流）／中村のオール巻取戦術（DAY4）／田中の前倒し並行着手（DAY3）の 3 点を Keep / Problem / Try で振り返る予定。

@@ -69,6 +69,10 @@ PR 単位で以下を記入する。
 | 3-13 | ExplanationView 正解表記（PBI-035）             | 「正解は A（最優先）— 即時着手すべき」を可視テキストで表示し、SR 読み上げが「エー、最優先、即時着手すべき」になる                                                                | OK / NG / 該当なし |
 | 3-14 | HistoryView 行内バッジ（PBI-035）               | 各履歴セルの `aria-label` に `formatPriorityLabel` 由来の意味文を格納＋ `title` 属性に併記（色非依存・記号 ◎/○/△ 併記）                                                          | OK / NG / 該当なし |
 | 3-15 | ModelAnswerView 優先度バッジ（PBI-035）         | ヘッダー右の優先度バッジに「記号＋名称＋意味」を表示し、バッジの `aria-label="正解優先度 A（最優先）即時着手すべき"` を格納                                                      | OK / NG / 該当なし |
+| 3-16 | LearningStyleToggle（PBI-036 / Sprint006 TASK-008） | 親 `role="group"` ＋ `aria-label="学習スタイル"`／各ボタン `aria-pressed`（true/false）／ボタン `aria-label="Quick：優先順位のみ回答（隙間時間用）"` 等で意味を SR 読み上げ可能 | OK / NG / 該当なし |
+| 3-17 | WritingInput スキップ動線（PBI-036 / TASK-010）     | 「今回は書かない」ボタンに `aria-label="今回は記述を書かずに進む"` を付与し、Tab 到達可・`Space`/`Enter` で発火する                                                              | OK / NG / 該当なし |
+| 3-18 | ScoreCounter 学習スタイル別正答率（PBI-037 / TASK-015） | `aria-live="polite"` の領域に Quick/Deep 別の正答率サマリ（例: `Quick 3 / 5 (60%)`）を連結し、モード切替・回答確定時に SR 通知される                                              | OK / NG / 該当なし |
+| 3-19 | HistoryView 学習スタイルバッジ（PBI-037 / TASK-014） | 各履歴セルの `aria-label` に「Quickモード/Deepモード」を含め、可視テキストに `[Q]`/`[D]` を併記（色のみに依存しない）。未設定履歴ではバッジ非表示で後方互換                       | OK / NG / 該当なし |
 
 ---
 
@@ -111,6 +115,7 @@ PR 単位で以下を記入する。
 | 5-3 | 解説の正解/不正解は **色＋テキスト**（バッジ）で識別可能   | OK / NG / 該当なし |
 | 5-4 | エラー状態は色だけで伝えていない（アイコン・テキスト併用） | OK / NG / 該当なし |
 | 5-5 | A/B/C 意味ラベル（PBI-035）が **記号＋名称＋意味** をテキスト併記し、色だけに依存しない（ExplanationView / HistoryView / ModelAnswerView / AnswerButtons 全画面で統一） | OK / NG / 該当なし |
+| 5-6 | 履歴セルの学習スタイル（PBI-037）は **テキスト `[Q]`/`[D]` ＋ aria-label「Quickモード/Deepモード」** を併記し、色だけに依存しない                                       | OK / NG / 該当なし |
 
 ---
 
@@ -122,6 +127,17 @@ PBI-035「A/B/C 回答の意味ラベル全画面統一表示」の横展開（T
 - ExplanationView.tsx（TASK-003 完了）
 - HistoryView.tsx（TASK-004 完了）
 - ModelAnswerView.tsx（TASK-005 完了）
+
+## 6-A. PBI-036 / PBI-037 横展開メモ（Sprint006 DAY5 追記）
+
+PBI-036「学習スタイル切替（Quick/Deep）と記述欄任意化」および PBI-037「学習スタイル別の履歴・正答率の整合」に対する確認観点を 3 章 / 5 章に追加（3-16〜3-19 / 5-6）。
+
+- LearningStyleToggle.tsx（PBI-036 / TASK-008）: `role="group"` + `aria-label="学習スタイル"` + `aria-pressed`。
+- WritingInput.tsx（PBI-036 / TASK-010）: `onSkip` 渡渉時のみ「今回は書かない」ボタン表示・`aria-label="今回は記述を書かずに進む"`。
+- App.tsx（PBI-036 / TASK-011）: モード切替時に未確定入力がある場合 `window.confirm` で確認。
+- App.tsx + learningStyle.ts（PBI-036 / TASK-012）: localStorage キー `inbasket.learningStyle.v1` を不正値・例外時 `'deep'` フォールバック（DoD §10-3）。
+- ScoreCounter.tsx（PBI-037 / TASK-015）: `aria-live="polite"` で Quick/Deep 別正答率サマリを SR 通知。
+- HistoryView.tsx（PBI-037 / TASK-014）: 各履歴セルの `aria-label` に「Quickモード/Deepモード」を連結、可視テキストに `[Q]`/`[D]` を併記。
 
 ---
 

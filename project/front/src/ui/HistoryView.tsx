@@ -40,6 +40,18 @@ export function HistoryView({ history, maxDisplay = MAX_HISTORY }: Props) {
           visible.map((item, index) => {
             const label = PRIORITY_LABELS[item.correctPriority];
             const priorityAria = formatPriorityLabel(item.correctPriority);
+            const styleBadge =
+              item.learningStyle === 'quick'
+                ? 'Q'
+                : item.learningStyle === 'deep'
+                  ? 'D'
+                  : null;
+            const styleAria =
+              item.learningStyle === 'quick'
+                ? ' Quickモード'
+                : item.learningStyle === 'deep'
+                  ? ' Deepモード'
+                  : '';
             return (
               <li
                 key={`${item.caseId}-${index}`}
@@ -49,8 +61,8 @@ export function HistoryView({ history, maxDisplay = MAX_HISTORY }: Props) {
                     ? 'history-view__item--correct'
                     : 'history-view__item--incorrect')
                 }
-                aria-label={`${index + 1}問目 ${judgementAria(item.judgement)} 正解優先度${priorityAria}`}
-                title={`${judgementAria(item.judgement)} / 正解 ${priorityAria}`}
+                aria-label={`${index + 1}問目 ${judgementAria(item.judgement)} 正解優先度${priorityAria}${styleAria}`}
+                title={`${judgementAria(item.judgement)} / 正解 ${priorityAria}${styleAria}`}
               >
                 <span className="history-view__mark" aria-hidden="true">
                   {judgementLabel(item.judgement)}
@@ -59,6 +71,14 @@ export function HistoryView({ history, maxDisplay = MAX_HISTORY }: Props) {
                   {item.correctPriority}
                   {label.symbol}
                 </span>
+                {styleBadge !== null && (
+                  <span
+                    className={`history-view__style history-view__style--${item.learningStyle}`}
+                    aria-hidden="true"
+                  >
+                    [{styleBadge}]
+                  </span>
+                )}
               </li>
             );
           })
