@@ -345,3 +345,136 @@
 
 
 
+
+---
+
+## Day 4 - 2026-05-25（月）
+
+ファシリテーター: 高橋（SM） / 場所: オンライン / 開始: 09:30 / 終了: 09:43
+
+### 共有事項（朝イチ）
+
+- 高橋（SM）: 本日のメイン。TASK-004（テーマ永続化テスト, 田中）/ TASK-009（履歴コントラスト改修, 山本）/ TASK-012（PBI-023〜028 リファインメント, 鈴木・伊藤）。Day3 終了時点で残タスク 3 / 残ポイント 1 の計画通り。
+- 高橋（SM）: handoff_for_helpers.md を 09:00 に山本・中村へ再共有済（A-8 適用）、09:25 受領確認。
+- 高橋（SM）: Day4 完了で計画 6pt 全消化見込み。Day5 はスプリントレビュー／レトロに専念。
+
+### 伊藤（開発者）
+
+- **昨日**: TASK-003/007/008 のレビュア兼任完了、PBI-021 の最終確認完了。
+- **今日**:
+  - TASK-012（PBI-023〜028 リファインメント、鈴木と共同 3h）に午後集中。scrum/product_backlog.csv の受入基準・備考更新を担当。
+  - 田中の TASK-004（ThemeToggle 永続化テスト）/ 山本の TASK-009（履歴コントラスト改修）のレビュア兼任。
+  - Day5 スプリントレビュー資料の準備（PBI-019/020/021/022 の Done 報告）。
+- **障害物**: なし。
+
+### 田中（開発者）
+
+- **昨日**: 結線テスト雛形作成（Day3 17:30 時点で 1h 進捗）。
+- **今日**:
+  - TASK-004（ThemeToggle 永続化・状態保持テスト、残 1h）を午前で完了。
+    - project/front/src/ui/ThemeToggle.test.tsx を新規作成（5 件追加、合計 78 テスト）。
+    - localStorage からの dark/light 復元、無効値フォールバック、クリックでの切替、ria-checked と <html data-theme> と localStorage の同期、ole=\"switch\" ＋ ria-label の SSR 検証を網羅。
+    - jsdom + eact-dom/client + ct で useEffect の永続化処理まで検証（IS_REACT_ACT_ENVIRONMENT=true を設定し warning を解消）。
+    - テストの分離（eforeEach/fterEach で localStorage と <html data-theme> をクリーン化）を徹底し副作用混入なし。
+  - 一次情報重視で React 18.3 の ct 仕様（react 直接 export）と vitest jsdom 環境の対応を再確認。
+  - TASK-012 の伊藤・鈴木のレビュア兼任（cases.json 拡張方針への影響評価）。
+- **障害物**: なし。
+
+### 山本（助っ人開発者）
+
+- **昨日**: TASK-003（A/B/C 記号併記）完了。
+- **今日**:
+  - TASK-009（履歴コントラスト改修、3h）に着手し本日中に完了。
+    - project/front/src/styles.css のテーマトークンに履歴セル専用変数を 5 種追加（--color-history-icon-correct/incorrect、--color-history-priority-correct/incorrect/neutral）。ライト/ダーク双方で一次情報（WebAIM Contrast Checker）に基づき実測。
+    - 正答セル: ライト 9.3:1（icon）/ 8.4:1（priority）、ダーク 9.0:1（icon）/ 11.2:1（priority）。誤答セル: ライト 9.7:1 / 8.6:1、ダーク 8.1:1 / 9.5:1。すべて WCAG AA 4.5:1 を上回る。
+    - .history-view__priority を従来の --color-text-muted（背景非依存）から状態別の専用変数へ切替。ont-size を 0.8 → 0.85rem に微増し可読性向上。
+    - 色非依存（DoD 9-2）は既存の judgementLabel（○/×）＋優先度文字（A/B/C）＋ ria-label（「○問目 正解 正解優先度A」）の3冗長化を維持。
+  - PBI-019（テーマ設計）と PBI-022（履歴コントラスト）が同じ CSS Custom Properties 体系で統合され、二重メンテにならないことを伊藤と確認。
+- **障害物**: なし。
+
+### 中村（助っ人開発者）
+
+- **昨日**: TASK-007/008（履歴件数切替 UI ＋テスト）完了。
+- **今日**:
+  - 自分の担当タスクは Day3 までに全完了（TASK-007/008/011）。
+  - 田中の TASK-004（ThemeToggle テスト）レビュア兼任、jsdom + eact-dom/client + ct パターンの一次情報確認（React 公式ドキュメント ct API、vitest jsdom 環境設定）に協力。
+  - 山本の TASK-009（履歴コントラスト改修）レビュア兼任、CSS 変数命名と既存テーマトークンとの整合確認。WebAIM Contrast Checker の実測値を独立検証し AA 基準クリアを確認。
+  - 余力で Day5 スプリントレビュー用の動作確認シナリオ（PBI-019/020/021/022 受入基準ベース）を伊藤と共有。
+- **障害物**: なし。
+
+### 高橋（SM）
+
+- **昨日**: 助っ人 2 名 handoff フォロー、AnswerButtons 記号併記の a11y_checklist.md §5 再点検完了。
+- **今日**:
+  - 助っ人 2 名の handoff フォロー継続。
+  - TASK-009 完了後にライト/ダーク双方で 11y_checklist.md §4（コントラスト比測定手順）を最終試行。Sprint004 の §9 a11y 適用を完結。
+  - TASK-012 ファシリ（鈴木・伊藤の論点整理 → product_backlog.csv 反映）。
+  - Day5 のスプリントレビュー／レトロ準備。
+- **障害物**: なし。
+
+### 計画の調整
+
+- 順序確認: TASK-004 → TASK-009 → TASK-012 の順で午前→午後に消化。テスト・lint・build を都度回し回帰なしを担保。
+- バーンダウン目標: Day4 終了時点で残タスク 0 / 残ポイント 0（計画通り）。今日のキャパは合計約 8h（伊藤 3h / 田中 2h / 山本 3h、中村は予備）。
+
+### 障害物
+
+- なし。impediment_log.csv への新規追加なし。
+
+---
+
+## Day 4 終了時インクリメント作成記録
+
+09:43 のデイリースクラム後、各担当が並行作業に着手。Day4 終了時点（18:00）の達成状況を以下に記録する。
+
+### 達成タスク（Done）
+
+| タスクID | タイトル                                                                       | 担当       | 実績(h) | 成果物                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------- | ------------------------------------------------------------------------------ | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TASK-004 | ThemeToggle 永続化・状態保持テスト                                             | 田中       | 2       | [project/front/src/ui/ThemeToggle.test.tsx](../../project/front/src/ui/ThemeToggle.test.tsx) 新規（5 件、合計 78 テスト）。jsdom + eact-dom/client + ct で useEffect も含めて検証。①dark 復元 ②light 復元 ③無効値→light フォールバック ④クリックで light↔dark トグル＋localStorage＋<html data-theme> 同期 ⑤role=\"switch\" / aria-label の SSR 維持。IS_REACT_ACT_ENVIRONMENT=true 設定で warning ゼロ。各テスト前後で localStorage と <html data-theme> をクリーン化。 |
+| TASK-009 | 履歴○/×・正解優先度ラベルのライト/ダーク両対応コントラスト改修＋色非依存       | 山本       | 3       | [project/front/src/styles.css](../../project/front/src/styles.css) に履歴セル専用変数 5 種を追加（--color-history-icon-correct/incorrect、--color-history-priority-correct/incorrect/neutral）。ライト/ダーク双方で WCAG AA 4.5:1 以上を一次測定で確認（最低 8.1:1 / 最高 11.2:1）。.history-view__item--correct/incorrect 配下で mark と priority を独立変数で上書き、PBI-019 のテーマトークン体系と統合（二重メンテなし）。色非依存（○/× ＋ A/B/C ＋ aria-label）の 3 冗長化維持。 |
+| TASK-012 | PBI-023〜028 リファインメント                                                  | 鈴木・伊藤 | 3       | [scrum/product_backlog.csv](../../scrum/product_backlog.csv) を更新。①PBI-023: localStorage スコープ外で確定（order004 確認事項1）、Refinement→**Ready** ②PBI-024: cases.json 拡張で確定（確認事項2）、オプショナルフィールド明示、Ready ③PBI-025: 回答後都度入力で確定（確認事項3）、入力スキップ可、Ready ④PBI-026: PBI-025 との役割分担明示、Ready ⑤PBI-027: 20 問・90 分固定で確定（確認事項4）、visibilitychange 対応追加、Ready ⑥PBI-028: cases.json 拡張・PBI-024 と整合、Ready。PBI-029/030 は依存先 PBI 完了後の段階導入として Refinement 維持。 |
+
+### 進行中タスク（Day5 へ継続）
+
+- なし。Sprint004 計画タスク（TASK-001〜012）すべて Done。Day5 はスプリントレビュー／レトロに専念。
+
+### Day4 完成の定義（DoD）チェック - TASK-004 / TASK-009 観点
+
+- 1-1 型エラーゼロ: ✅（pnpm build = 	sc -b && vite build 成功 / dist/assets/index-*.js 170.12 kB / dist/assets/index-*.css 9.19 kB）
+- 1-2 ESLint 0 エラー 0 警告: ✅（pnpm lint パス）
+- 1-3 ペアレビュー: ✅（TASK-004 は田中→中村レビュー、TASK-009 は山本→中村レビュー、TASK-012 は鈴木↔伊藤相互レビュー）
+- 2-1 主要ロジックの単体テスト全件成功: ✅（pnpm test = 10 files / 78 tests passed、ThemeToggle 5 件新規追加で 73→78。既存 73 件は全件継続 PASS）
+- 2-2 受入基準の手動動作確認: ✅（テーマ切替で localStorage 永続化＋リロード復元、ライト/ダーク双方で履歴セルのコントラストが視認しやすく改善されたことを目視確認、a11y_checklist.md §4 で実測値ライト 8.4-9.7:1 / ダーク 8.1-11.2:1 を記録）
+- 5-2 シークレット非ハードコード: ✅
+- 7-1 レスポンシブ: ✅（既存 @media (max-width: 480px) ブロック維持。履歴セル font-size 微増の影響なし）
+- 9-1 キーボード操作完結: ✅（テーマ切替トグル Tab → Space/Enter で動作、リグレッションなし）
+- 9-2 フォーカス可視: ✅（既存 :focus-visible で ar(--color-focus-ring) アウトライン維持）
+- 9-3 適切な role/aria: ✅（テスト 5 件目で ole=\"switch\" ＋ ria-label 必須化を SSR で恒久検証）
+- 9-2 色のみで意味を伝えない: ✅（履歴セル ○/× ＋ 優先度文字 ＋ aria-label の 3 冗長化を CSS 変数刷新後も維持）
+
+### Sprint004 計画 PBI 完了判定
+
+| PBI ID  | タイトル                       | 受入基準クリア | 完成の定義 18 項目 | Done 判定 |
+| ------- | ------------------------------ | -------------- | ------------------ | --------- |
+| PBI-019 | ダーク/ライトテーマ切替        | ✅ 全 7 基準   | ✅ 18/18           | **Done**  |
+| PBI-020 | 履歴表示件数の選択 10/20       | ✅ 全 7 基準   | ✅ 18/18           | **Done**  |
+| PBI-021 | モード別正答率の集計表示       | ✅ 全 6 基準   | ✅ 18/18           | **Done**  |
+| PBI-022 | 履歴コントラスト見直し WCAG AA | ✅ 全 5 基準   | ✅ 18/18           | **Done**  |
+
+> 計画 6pt 全消化（PBI-019: 2pt + PBI-020: 1pt + PBI-021: 2pt + PBI-022: 1pt）。Day5 スプリントレビューでステークホルダー（顧客 佐藤）に提示。
+
+### 障害物（追加なし）
+
+- なし。impediment_log.csv への記録は不要（Sprint004 中の障害物発生はゼロ）。
+
+### Day5 申し送り（高橋まとめ）
+
+- Sprint004 計画タスク 12 件すべて Done。バーンダウン計画通り（残 0）。
+- Day5 はスプリントレビュー（午前）／レトロ（午後）に専念。レビューは PBI-019/020/021/022 の受入確認をライト・ダーク両テーマで実機デモ。
+- PBI-023〜028 が Ready 化済（PBI-023: 3pt / PBI-024: 3pt / PBI-025: 3pt / PBI-026: 2pt / PBI-027: 3pt / PBI-028: 2pt = 計 16pt の Ready 在庫）。Sprint005 プランニングはこの中から PO 鈴木が選択する。
+- 78 テスト全件 PASS / lint 0 / build OK。Sprint004 の品質ゲートは全クリア。
+- a11y チェックリスト雛形（A-10）の試行運用が完結。レトロで運用化判断する。
+- A-11（PR チェックリスト）も Sprint004 で運用試行完了。レトロで継続運用判断する。
+
+

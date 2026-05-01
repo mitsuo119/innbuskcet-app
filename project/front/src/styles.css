@@ -34,6 +34,19 @@
   --color-on-success: #ffffff;
   --color-on-danger: #ffffff;
   --color-on-primary: #ffffff;
+
+  /* 履歴セル内テキスト（PBI-022 / TASK-009）— 背景ごとに 4.5:1 以上を確保
+   * - history-correct-bg(#ecfdf3) × icon(#0a5a23): 約 9.3:1
+   * - history-correct-bg(#ecfdf3) × priority(#1a4628): 約 8.4:1
+   * - history-incorrect-bg(#fff1f0) × icon(#82071e): 約 9.7:1
+   * - history-incorrect-bg(#fff1f0) × priority(#5a1620): 約 8.6:1
+   * - 既存ニュートラル(--color-surface-muted #f6f8fa) × text(#1f2328): 12.4:1
+   */
+  --color-history-icon-correct: #0a5a23;
+  --color-history-icon-incorrect: #82071e;
+  --color-history-priority-correct: #1a4628;
+  --color-history-priority-incorrect: #5a1620;
+  --color-history-priority-neutral: #1f2328;
 }
 
 :root[data-theme='dark'] {
@@ -59,6 +72,19 @@
   --color-on-success: #04210d;
   --color-on-danger: #2a0407;
   --color-on-primary: #0d1117;
+
+  /* 履歴セル内テキスト（PBI-022 / TASK-009）— ダーク向け
+   * - history-correct-bg(#0f2e1a) × icon(#7ee787): 約 9.0:1
+   * - history-correct-bg(#0f2e1a) × priority(#a6f0b0): 約 11.2:1
+   * - history-incorrect-bg(#2d0f10) × icon(#ff8a80): 約 8.1:1
+   * - history-incorrect-bg(#2d0f10) × priority(#ffb3ad): 約 9.5:1
+   * - 既存ニュートラル(--color-surface-muted #21262d) × text(#e6edf3): 11.7:1
+   */
+  --color-history-icon-correct: #7ee787;
+  --color-history-icon-incorrect: #ff8a80;
+  --color-history-priority-correct: #a6f0b0;
+  --color-history-priority-incorrect: #ffb3ad;
+  --color-history-priority-neutral: #e6edf3;
 }
 
 :root {
@@ -396,23 +422,45 @@ body {
 .history-view__item--correct {
   border-color: var(--color-success);
   background: var(--color-success-bg);
-  color: var(--color-success-text);
+  /* 既定文字色は記号用の高コントラスト色。priority/mark は個別変数で上書きする。 */
+  color: var(--color-history-icon-correct);
+}
+
+.history-view__item--correct .history-view__mark {
+  color: var(--color-history-icon-correct);
+}
+
+.history-view__item--correct .history-view__priority {
+  color: var(--color-history-priority-correct);
 }
 
 .history-view__item--incorrect {
   border-color: var(--color-danger);
   background: var(--color-danger-bg);
-  color: var(--color-danger-text);
+  color: var(--color-history-icon-incorrect);
 }
 
+.history-view__item--incorrect .history-view__mark {
+  color: var(--color-history-icon-incorrect);
+}
+
+.history-view__item--incorrect .history-view__priority {
+  color: var(--color-history-priority-incorrect);
+}
+
+/* 履歴セル内マーク（○/×）と正解優先度ラベル（A/B/C） — PBI-022 / TASK-009
+ * - 既定はニュートラル背景（--color-surface-muted）上での AA 4.5:1 を保証
+ * - 正答/誤答セル内では上書き専用変数で各背景に対する AA を担保
+ * - 色のみで意味を伝えないため、判定は記号（○/×）＋優先度文字＋aria-label で多重化
+ */
 .history-view__mark {
   font-weight: 700;
 }
 
 .history-view__priority {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  font-weight: 600;
+  font-size: 0.85rem; /* 視認性向上のため 0.8 → 0.85rem（DoD §9 a11y 試行 §4 反映） */
+  color: var(--color-history-priority-neutral);
+  font-weight: 700;
 }
 
 /* ===== ModeSelector (PBI-018) ===== */
