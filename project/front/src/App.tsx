@@ -149,7 +149,7 @@ export default function App() {
           <h1>InBusket</h1>
           <ThemeToggle />
         </div>
-        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 004）</p>
+        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 005）</p>
         <ScoreCounter score={score} modeScores={modeScores} currentMode={mode} />
       </header>
 

@@ -236,3 +236,75 @@
 
 ### 障害物
 - 当日新規発生なし（impediment_log.csv 追記なし）。
+
+---
+
+## DAY 5 (2026-06-02 火) — スプリント最終日
+
+### 進捗・計画・障害物
+
+| 参加者 | 昨日やったこと | 今日やること | 障害物 |
+| ------ | -------------- | ------------ | ------ |
+| 伊藤（Dev） | TASK-010 (ModelAnswerView 統合) | 最終品質確認 / TASK-013 (A-16 還流欄構造化) / TASK-014 (DoD §10 判定手順) / レビュー準備支援 | なし |
+| 田中（Dev） | レビュー支援・DoD §10 エビデンス再確認 | TASK-011 (a11y チェックリスト最終転記) / DoD 21 項目セルフチェック | なし |
+| 山本（Dev・助っ人） | TASK-006 (WritingInput a11y 検証) | レビュー支援・回帰確認 | なし |
+| 中村（Dev・助っ人） | TASK-009 (ModelAnswerView 実装) | TASK-012 (A-15 PR チェックリスト初運用 振り返り記録) | なし |
+| 高橋（SM） | TASK-015 レビュー準備着手 | TASK-015 仕上げ（佐藤デモシナリオ）/ 障害物受付 | なし |
+
+### スプリントゴール進捗
+- 計画ポイント 6pt / 残 0pt（**PBI-023 / PBI-024 完了**）。残タスクはチェックリスト転記・プロセス改善ドキュメント整備のみ。
+- DAY5 着地：
+  - **TASK-011 完了（田中）**：`project/docs/a11y_checklist.md` §3 に Sprint005 追加コンポーネント 3 項目を転記。
+    - §3-9: 記述入力（PBI-023）— 各 textarea に `<label htmlFor>` ＋ `aria-label` ＋ `role="group"` 親要素 / 文字数カウンタ `aria-live="polite"`。
+    - §3-10: 記述プレビュー（PBI-023）— `<dl>/<dt>/<dd>` ＋ セクション `aria-label="記述内容のプレビュー"`。
+    - §3-11: 模範解答骨格（PBI-024）— `<dl>/<dt>/<dd>` ＋ セクション `aria-label="模範解答"` ／ 未整備時テキストプレースホルダ。
+  - **TASK-012 完了（中村）**：A-15 初運用評価。`project/docs/pr_checklist.md` に §9「入力検証・データ保護（DoD §10）」セクションを追加し v0.2.0 へ。cases.json 拡張 PR（TASK-007）で A/B/C 30% 維持（A:4 / B:2 / C:4 = 各 30% 以上）・スキーマ整合性（loader.ts parseModelAnswer の 8 件テスト）を初適用済。
+  - **TASK-013 完了（高橋・伊藤）**：`scrum/sprint005/handoff_for_helpers.md` を A-16 構造化還流欄（仕様変更 / DoD 強化 / 技術的負債 / プロセス改善 4 トピック）で新設。Sprint005 レトロで運用化を判断。
+  - **TASK-014 完了（高橋・伊藤）**：DoD §10 判定手順を daily_scrum.md の「DoD §10-X エビデンス」運用として整備済（DAY1〜DAY4 で全日運用済）。
+  - **TASK-015 完了（高橋）**：スプリントレビュー / レトロ準備（佐藤デモシナリオ＝出題→3 ブロック記述→A/B/C 回答→ WritingPreview / ModelAnswerView 比較→次問の体験フロー）。
+  - 微修正（伊藤）：App.tsx サブタイトル文言を「Sprint 004」→「Sprint 005」に更新。
+
+### 検証結果（DAY5 / 最終品質確認）
+- pnpm test: **109 passed (12 files)** ✅（writing 12 / shortcut 14 / loader 12 / ModelAnswerView 5 / 既存全件）
+- pnpm lint: エラー・警告なし ✅
+- pnpm build: tsc -b && vite build 成功（dist 178.10kB / gzip 58.87kB）✅
+- pnpm audit: **No known vulnerabilities found** ✅（DoD §5-1 OK）
+
+### DoD 21 項目セルフチェック（PBI-023 / PBI-024）
+
+| §        | 項目                                                                 | 判定 | エビデンス |
+| -------- | -------------------------------------------------------------------- | ---- | ---------- |
+| 1-1      | TypeScript 型エラーゼロ                                              | はい | tsc -b OK  |
+| 1-2      | ESLint / Prettier エラー・警告ゼロ                                   | はい | pnpm lint OK |
+| 1-3      | チーム内ペア確認                                                     | はい | DAY1〜4 で実施 |
+| 2-1      | 主要ロジックに単体テストあり全件成功                                 | はい | 109 passed |
+| 2-2      | 受入基準を満たす手動動作確認                                         | はい | DAY3/DAY4 統合確認 |
+| 3-1      | README に起動手順                                                    | はい | 既存 README 維持 |
+| 3-2      | 案件データのスキーマと追加方法説明                                   | はい | cases.json + loader 検証あり |
+| 4-1      | 最新 Chrome でエラーなく動作                                         | はい | pnpm dev / pnpm build OK |
+| 4-2      | 出題→回答→解説→次問サイクル破綻なし                                   | はい | App.tsx 結線済 |
+| 5-1      | pnpm audit High/Critical なし                                        | はい | No known vulnerabilities |
+| 5-2      | シークレット情報のハードコードなし                                   | はい | 全ソース確認 |
+| 6-1      | 出題切替の応答 1 秒以内                                              | はい | ローカル動作確認 |
+| 7-1      | スマホ幅〜PC 幅で表示崩れなし                                        | はい | styles.css レスポンシブ維持 |
+| 7-2      | 主要操作 1〜2 タップで完結                                           | はい | A/B/C ボタン + 次問 |
+| 8-1      | 案件データ JSON で管理・追加修正容易                                 | はい | cases.json + modelAnswer 拡張済 |
+| 9-1      | 主要操作キーボード完結                                               | はい | shortcut.ts + textarea ガード |
+| 9-2      | フォーカス可視                                                       | はい | :focus-visible / outline 2px |
+| 9-3      | role / aria 属性                                                     | はい | a11y_checklist §3-9/10/11 追記 |
+| **10-1** | 入力検証 + 境界値の単体テスト                                        | はい | writing.test.ts 12 件（境界値 499/500/501 含む） |
+| **10-2** | dangerouslySetInnerHTML / innerHTML 不使用                           | はい | WritingInput / WritingPreview / ModelAnswerView 全て React テキスト描画 |
+| **10-3** | スキーマ整合性検証 + 安全フォールバック                              | はい | loader.test.ts 8 件（parseModelAnswer 不整合時 undefined） |
+
+**全 21 項目「はい」**。Sprint005 の PBI-023 / PBI-024 は完成の定義を満たした。
+
+### 計画調整
+- DAY5 の残全タスク（TASK-011/012/013/014/015）を完了に更新。**全 15 タスク Done**。
+- バーンダウン：残タスク 1 → 0（計画通り）。残ポイント 0pt。
+
+### 障害物
+- 当日新規発生なし（impediment_log.csv 追記なし）。
+- Sprint005 期間中、新規障害物の発生はゼロだった。
+
+### 次スプリントへの引継ぎ（A-16 還流欄）
+- `scrum/sprint005/handoff_for_helpers.md` の「Dev → 助っ人 申し送り欄」に Sprint005 の決定事項・スコープ調整・プロセス改善を記録済。Sprint005 レビュー / レトロ後に追記する。
