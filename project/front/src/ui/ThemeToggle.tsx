@@ -49,7 +49,9 @@ export function ThemeToggle() {
       type="button"
       role="switch"
       aria-checked={isDark}
-      aria-label={isDark ? 'ダークテーマ（クリックでライトに切替）' : 'ライトテーマ（クリックでダークに切替）'}
+      aria-label={
+        isDark ? 'ダークテーマ（クリックでライトに切替）' : 'ライトテーマ（クリックでダークに切替）'
+      }
       className="theme-toggle"
       onClick={toggle}
     >

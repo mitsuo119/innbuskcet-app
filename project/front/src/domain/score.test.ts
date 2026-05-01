@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  addModeScore,
-  addScore,
-  initialModeScores,
-  initialScore,
-  ratePercent,
-} from './score';
+import { addModeScore, addScore, initialModeScores, initialScore, ratePercent } from './score';
 
 describe('addScore()', () => {
   it('初期値は 0/0', () => {

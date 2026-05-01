@@ -7,7 +7,14 @@ import { ModeSelector } from './ui/ModeSelector';
 import { ScoreCounter } from './ui/ScoreCounter';
 import { ThemeToggle } from './ui/ThemeToggle';
 import type { Case, Priority } from './domain/case';
-import { initialHistory, pushHistory, trimHistory, type HistoryItem, type HistoryLimit, HISTORY_LIMIT_OPTIONS } from './domain/history';
+import {
+  initialHistory,
+  pushHistory,
+  trimHistory,
+  type HistoryItem,
+  type HistoryLimit,
+  HISTORY_LIMIT_OPTIONS,
+} from './domain/history';
 import { judge, type Judgement } from './domain/judge';
 import { loadCases } from './domain/loader';
 import { applyModeChange, initialMode } from './domain/mode';
