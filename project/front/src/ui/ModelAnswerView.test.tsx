@@ -11,9 +11,7 @@ const sample: ModelAnswer = {
 
 describe('ModelAnswerView（PBI-024 / TASK-009）', () => {
   it('visible=false の場合は「模範解答準備中」プレースホルダを表示する', () => {
-    const html = renderToStaticMarkup(
-      <ModelAnswerView modelAnswer={sample} visible={false} />,
-    );
+    const html = renderToStaticMarkup(<ModelAnswerView modelAnswer={sample} visible={false} />);
     expect(html).toContain('模範解答準備中');
     expect(html).toContain('aria-label="模範解答"');
     expect(html).toContain('model-answer--empty');
@@ -22,17 +20,13 @@ describe('ModelAnswerView（PBI-024 / TASK-009）', () => {
   });
 
   it('modelAnswer が undefined の場合は「模範解答準備中」プレースホルダを表示する', () => {
-    const html = renderToStaticMarkup(
-      <ModelAnswerView modelAnswer={undefined} visible={true} />,
-    );
+    const html = renderToStaticMarkup(<ModelAnswerView modelAnswer={undefined} visible={true} />);
     expect(html).toContain('模範解答準備中');
     expect(html).toContain('model-answer--empty');
   });
 
   it('visible=true かつ modelAnswer 整備済みの場合は判断・理由・アクションを表示する', () => {
-    const html = renderToStaticMarkup(
-      <ModelAnswerView modelAnswer={sample} visible={true} />,
-    );
+    const html = renderToStaticMarkup(<ModelAnswerView modelAnswer={sample} visible={true} />);
     expect(html).toContain('判断');
     expect(html).toContain('理由');
     expect(html).toContain('アクション');
@@ -48,9 +42,7 @@ describe('ModelAnswerView（PBI-024 / TASK-009）', () => {
       reason: '<img src=x onerror=alert(1)>',
       action: '<b>bold</b>',
     };
-    const html = renderToStaticMarkup(
-      <ModelAnswerView modelAnswer={dangerous} visible={true} />,
-    );
+    const html = renderToStaticMarkup(<ModelAnswerView modelAnswer={dangerous} visible={true} />);
     // 実行可能な script タグや b タグが生で出力されていない（エスケープされる）
     expect(html).not.toContain('<script>alert(1)</script>');
     expect(html).not.toContain('<img src=x onerror=alert(1)>');
@@ -61,9 +53,7 @@ describe('ModelAnswerView（PBI-024 / TASK-009）', () => {
 
   it('整備済みでもモデル骨格が空文字なら空ノードとしてそのまま描画する（loader 側で正規化済み前提）', () => {
     // loader.parseModelAnswer が空文字を弾く前提だが、UI はテキスト描画のみで副作用を持たない
-    const html = renderToStaticMarkup(
-      <ModelAnswerView modelAnswer={sample} visible={true} />,
-    );
+    const html = renderToStaticMarkup(<ModelAnswerView modelAnswer={sample} visible={true} />);
     // <dl> 構造で 3 項目がレンダリングされている
     const dtCount = (html.match(/<dt /g) ?? []).length;
     const ddCount = (html.match(/<dd /g) ?? []).length;

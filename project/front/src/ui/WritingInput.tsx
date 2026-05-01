@@ -1,8 +1,5 @@
 import { useId } from 'react';
-import {
-  WRITING_MAX_LENGTH,
-  type WritingEntry,
-} from '../domain/writing';
+import { WRITING_MAX_LENGTH, type WritingEntry } from '../domain/writing';
 
 interface Props {
   /** 現在の記述内容（判断 / 理由 / アクション） */
@@ -82,9 +79,7 @@ export function WritingInput({ entry, onChange, disabled = false }: Props) {
               onChange={(e) => handleChange(key, e.target.value)}
             />
             <div
-              className={
-                'writing-input__count' + (isOver ? ' writing-input__count--over' : '')
-              }
+              className={'writing-input__count' + (isOver ? ' writing-input__count--over' : '')}
               aria-live="polite"
             >
               {length} / {WRITING_MAX_LENGTH}

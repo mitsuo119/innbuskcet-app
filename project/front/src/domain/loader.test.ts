@@ -60,11 +60,7 @@ describe('parseModelAnswer (PBI-024 / TASK-008・DoD §10-3)', () => {
 
   it('異常: judgment が空文字なら undefined にフォールバックし console.warn を呼ぶ', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const result = parseModelAnswer(
-      { judgment: '', reason: 'r', action: 'a' },
-      0,
-      'case-001',
-    );
+    const result = parseModelAnswer({ judgment: '', reason: 'r', action: 'a' }, 0, 'case-001');
     expect(result).toBeUndefined();
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0]?.[0]).toContain('modelAnswer.judgment');

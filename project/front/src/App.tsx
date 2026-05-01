@@ -24,11 +24,7 @@ import { applyModeChange, initialMode } from './domain/mode';
 import { pickNextCaseByMode, type FilterMode } from './domain/random';
 import { addModeScore, addScore, initialModeScores, initialScore } from './domain/score';
 import { resolveShortcut, isEditableTarget } from './domain/shortcut';
-import {
-  createEmptyWritingEntry,
-  isWritingEntryEmpty,
-  type WritingEntry,
-} from './domain/writing';
+import { createEmptyWritingEntry, isWritingEntryEmpty, type WritingEntry } from './domain/writing';
 
 export default function App() {
   const allCases = useMemo<Case[]>(() => loadCases(), []);
@@ -177,22 +173,12 @@ export default function App() {
       {current ? (
         <>
           <CaseView caseItem={current} />
-          <WritingInput
-            entry={writingEntry}
-            onChange={setWritingEntry}
-            disabled={locked}
-          />
+          <WritingInput entry={writingEntry} onChange={setWritingEntry} disabled={locked} />
           <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
           {judgement && selected && (
             <>
-              <WritingPreview
-                entry={writingEntry}
-                isEmpty={isWritingEntryEmpty(writingEntry)}
-              />
-              <ModelAnswerView
-                modelAnswer={current.modelAnswer}
-                visible={!!judgement}
-              />
+              <WritingPreview entry={writingEntry} isEmpty={isWritingEntryEmpty(writingEntry)} />
+              <ModelAnswerView modelAnswer={current.modelAnswer} visible={!!judgement} />
               <ExplanationView
                 caseItem={current}
                 answer={selected}

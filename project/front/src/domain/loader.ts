@@ -21,10 +21,13 @@ export function parseModelAnswer(
   id?: string,
 ): ModelAnswer | undefined {
   if (raw === undefined || raw === null) return undefined;
-  const ctx = index !== undefined && id !== undefined ? `cases.json[${index}] (id=${id})` : 'modelAnswer';
+  const ctx =
+    index !== undefined && id !== undefined ? `cases.json[${index}] (id=${id})` : 'modelAnswer';
 
   if (typeof raw !== 'object' || Array.isArray(raw)) {
-    console.warn(`${ctx}: modelAnswer はオブジェクトである必要があります（undefined にフォールバック）`);
+    console.warn(
+      `${ctx}: modelAnswer はオブジェクトである必要があります（undefined にフォールバック）`,
+    );
     return undefined;
   }
   const m = raw as Partial<Record<keyof ModelAnswer, unknown>>;

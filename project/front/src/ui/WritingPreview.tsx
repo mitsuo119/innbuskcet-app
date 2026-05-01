@@ -27,11 +27,10 @@ const FIELD_LABELS: Readonly<Record<keyof WritingEntry, string>> = {
 export function WritingPreview({ entry, isEmpty }: Props) {
   if (isEmpty) {
     return (
-      <section
-        className="writing-preview writing-preview--empty"
-        aria-label="記述内容のプレビュー"
-      >
-        <p className="writing-preview__empty">未記述（判断・理由・アクションは入力されていません）</p>
+      <section className="writing-preview writing-preview--empty" aria-label="記述内容のプレビュー">
+        <p className="writing-preview__empty">
+          未記述（判断・理由・アクションは入力されていません）
+        </p>
       </section>
     );
   }
@@ -46,7 +45,11 @@ export function WritingPreview({ entry, isEmpty }: Props) {
             <div key={key} className="writing-preview__item">
               <dt className="writing-preview__term">{label}</dt>
               <dd className="writing-preview__desc">
-                {value.length > 0 ? value : <span className="writing-preview__blank">（未入力）</span>}
+                {value.length > 0 ? (
+                  value
+                ) : (
+                  <span className="writing-preview__blank">（未入力）</span>
+                )}
               </dd>
             </div>
           );

@@ -31,11 +31,10 @@ const FIELDS: ReadonlyArray<{ key: keyof ModelAnswer; label: string }> = [
 export function ModelAnswerView({ modelAnswer, visible }: Props) {
   if (!visible || !modelAnswer) {
     return (
-      <section
-        className="model-answer model-answer--empty"
-        aria-label="模範解答"
-      >
-        <p className="model-answer__empty">模範解答準備中（この案件はまだ模範回答骨格が整備されていません）</p>
+      <section className="model-answer model-answer--empty" aria-label="模範解答">
+        <p className="model-answer__empty">
+          模範解答準備中（この案件はまだ模範回答骨格が整備されていません）
+        </p>
       </section>
     );
   }
