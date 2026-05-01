@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { addScore, initialScore } from './score';
+import {
+  addModeScore,
+  addScore,
+  initialModeScores,
+  initialScore,
+  ratePercent,
+} from './score';
 
 describe('addScore()', () => {
   it('初期値は 0/0', () => {
@@ -44,5 +50,65 @@ describe('addScore()', () => {
     // 再回答（不正解）で初めて total のみ +1 される
     const afterRetryAnswer = addScore(afterRetry, 'incorrect');
     expect(afterRetryAnswer).toEqual({ total: 2, correct: 1 });
+  });
+});
+
+describe('addModeScore() / ratePercent() (PBI-021)', () => {
+  it('initialModeScores は全モード 0/0', () => {
+    expect(initialModeScores).toEqual({
+      all: { total: 0, correct: 0 },
+      A: { total: 0, correct: 0 },
+      B: { total: 0, correct: 0 },
+      C: { total: 0, correct: 0 },
+    });
+  });
+
+  it('A 案件正解時は all と A のみ +1（B/C は据え置き）', () => {
+    const next = addModeScore(initialModeScores, 'A', 'correct');
+    expect(next.all).toEqual({ total: 1, correct: 1 });
+    expect(next.A).toEqual({ total: 1, correct: 1 });
+    expect(next.B).toEqual({ total: 0, correct: 0 });
+    expect(next.C).toEqual({ total: 0, correct: 0 });
+  });
+
+  it('B 案件不正解時は all と B のみ total +1（correct は据え置き）', () => {
+    const next = addModeScore(initialModeScores, 'B', 'incorrect');
+    expect(next.all).toEqual({ total: 1, correct: 0 });
+    expect(next.B).toEqual({ total: 1, correct: 0 });
+    expect(next.A).toEqual({ total: 0, correct: 0 });
+    expect(next.C).toEqual({ total: 0, correct: 0 });
+  });
+
+  it('連続加算でモード別に独立集計される', () => {
+    let s = initialModeScores;
+    s = addModeScore(s, 'A', 'correct');
+    s = addModeScore(s, 'A', 'incorrect');
+    s = addModeScore(s, 'B', 'correct');
+    s = addModeScore(s, 'C', 'incorrect');
+    s = addModeScore(s, 'C', 'correct');
+    expect(s.all).toEqual({ total: 5, correct: 3 });
+    expect(s.A).toEqual({ total: 2, correct: 1 });
+    expect(s.B).toEqual({ total: 1, correct: 1 });
+    expect(s.C).toEqual({ total: 2, correct: 1 });
+  });
+
+  it('元の ModeScores を変更しない（イミュータブル）', () => {
+    const base = initialModeScores;
+    const next = addModeScore(base, 'A', 'correct');
+    expect(base).toEqual(initialModeScores);
+    expect(next).not.toBe(base);
+    expect(next.A).not.toBe(base.A);
+  });
+
+  it('ratePercent: 0 件モードは null（除算ガード）', () => {
+    expect(ratePercent({ total: 0, correct: 0 })).toBeNull();
+  });
+
+  it('ratePercent: 端数は四捨五入', () => {
+    expect(ratePercent({ total: 3, correct: 1 })).toBe(33); // 33.33... → 33
+    expect(ratePercent({ total: 3, correct: 2 })).toBe(67); // 66.66... → 67
+    expect(ratePercent({ total: 4, correct: 2 })).toBe(50);
+    expect(ratePercent({ total: 1, correct: 1 })).toBe(100);
+    expect(ratePercent({ total: 1, correct: 0 })).toBe(0);
   });
 });

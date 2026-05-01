@@ -5,6 +5,7 @@ import { ExplanationView } from './ui/ExplanationView';
 import { HistoryView } from './ui/HistoryView';
 import { ModeSelector } from './ui/ModeSelector';
 import { ScoreCounter } from './ui/ScoreCounter';
+import { ThemeToggle } from './ui/ThemeToggle';
 import type { Case, Priority } from './domain/case';
 import { initialHistory, pushHistory, type HistoryItem } from './domain/history';
 import { judge, type Judgement } from './domain/judge';
@@ -114,8 +115,11 @@ export default function App() {
   return (
     <main className="container">
       <header className="app-header">
-        <h1>InBusket</h1>
-        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 003 Day 3）</p>
+        <div className="app-header__top">
+          <h1>InBusket</h1>
+          <ThemeToggle />
+        </div>
+        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 004 Day 1）</p>
         <ScoreCounter score={score} />
       </header>
 

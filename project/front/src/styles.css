@@ -369,3 +369,42 @@ body {
     font-size: 0.85rem;
   }
 }
+
+/* ===== ThemeToggle (PBI-019 / TASK-001) =====
+ * 注: テーマ別 CSS Custom Properties 化は TASK-002（山本）で対応。
+ * ここではトグルボタン自身の見た目のみ定義する。 */
+
+.app-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #d0d7de;
+  border-radius: 999px;
+  background: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.theme-toggle:hover {
+  border-color: #0969da;
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 2px;
+}
+
+.theme-toggle__icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
