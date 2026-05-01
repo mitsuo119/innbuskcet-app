@@ -15,3 +15,33 @@
 ---
 
 （Sprint005 期間中に日次追記）
+
+## DAY 1 (2026-05-27 水)
+
+### 進捗・計画・障害物
+
+| 参加者 | 昨日やったこと | 今日やること | 障害物 |
+| ------ | -------------- | ------------ | ------ |
+| 伊藤（Dev） | プランニング参加 / DoD §10 適用方針確認 | TASK-001 (writing.ts) 完了 / TASK-002 レビュー支援 / TASK-008 着手準備 | なし |
+| 田中（Dev） | プランニング参加 | TASK-004 (shortcut.ts textarea 判定) 着手 / TASK-002 設計レビュー | なし |
+| 山本（Dev・助っ人） | handoff_for_helpers.md 確認 | TASK-002 (WritingInput 骨格) 着手 | aria-label 文言ガイドを伊藤に確認 → 解消 |
+| 中村（Dev・助っ人） | handoff_for_helpers.md 確認 | TASK-007 (cases.json modelAnswer スキーマ案) 起草 | なし |
+| 高橋（SM） | A-16 還流欄構造化 (TASK-013) | DoD §10 判定手順 (TASK-014) 整備 / 障害物受付 | なし |
+
+### スプリントゴール進捗
+- 計画ポイント 6pt / 残 6pt（DAY1 はインクリメント基盤の構築日）。
+- 主要実装 2 件着地：
+  - **TASK-001 完了**：domain/writing.ts（純粋関数・型定義）+ writing.test.ts（12 件追加 / 境界値 499・500・501、空・部分入力、型破壊）。DoD §10-1 のエビデンスを取得。
+  - **TASK-002 レビュー中**：ui/WritingInput.tsx 骨格作成（textarea×3 / aria-label / maxLength=500 / placeholder 例示 / disabled 対応 / 文字数カウンタ aria-live）。styles.css に CSS 変数ベースのテーマ対応スタイル追加。dangerouslySetInnerHTML 不使用（DoD §10-2）。
+
+### 検証結果（DAY1 時点）
+- pnpm test: **90 passed (78 既存 + 12 新規)** ✅
+- pnpm lint: エラー・警告なし ✅
+- 	sc -b --noEmit: 型エラーなし ✅
+- DoD §10-1 境界値テスト 4 件（空 / 499 / 500 / 501）取得 ✅
+
+### 計画調整
+- なし（バーンダウン計画通り：残タスク 12 → DAY2 朝点検時に再評価）。
+
+### 障害物
+- 当日新規発生なし（impediment_log.csv 追記なし）。

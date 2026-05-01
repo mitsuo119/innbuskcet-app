@@ -32,8 +32,8 @@
 
 | タスクID | タスク名                                                                                                                                | 担当者 | 見積もり(h) | ステータス |
 | -------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------- | ---------- |
-| TASK-001 | `domain/writing.ts` 新設：3 ブロック入力検証（最大長 500 / 型 / 任意）純粋関数 + vitest 境界値テスト（DoD §10-1）                       | 伊藤   | 4           | 未着手     |
-| TASK-002 | `WritingInput.tsx`：textarea×3（判断/理由/アクション）+ aria-label + 見出し + 例示 placeholder + 目安文字数補助                           | 伊藤   | 5           | 未着手     |
+| TASK-001 | `domain/writing.ts` 新設：3 ブロック入力検証（最大長 500 / 型 / 任意）純粋関数 + vitest 境界値テスト（DoD §10-1）                       | 伊藤   | 4           | 完了       |
+| TASK-002 | `WritingInput.tsx`：textarea×3（判断/理由/アクション）+ aria-label + 見出し + 例示 placeholder + 目安文字数補助                           | 山本   | 5           | レビュー中 |
 | TASK-003 | `WritingPreview.tsx`：3 ブロック並列プレビュー（React テキスト描画 / dangerouslySetInnerHTML 不使用 / DoD §10-2）                       | 山本   | 4           | 未着手     |
 | TASK-004 | `shortcut.ts` 改修：入力欄フォーカス中の A/B/C/Enter 誤発火防止（textarea 判定）+ vitest テスト追加                                      | 田中   | 3           | 未着手     |
 | TASK-005 | `App.tsx` 結線：優先度回答後に WritingInput → プレビュー表示。未入力でも次へ進めるフロー + 結線テスト                                    | 田中   | 3           | 未着手     |

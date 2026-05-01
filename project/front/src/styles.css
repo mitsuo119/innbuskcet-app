@@ -600,3 +600,61 @@ body {
   font-size: 1.05rem;
   line-height: 1;
 }
+
+/* ===== WritingInput (PBI-023 / TASK-002) ===== */
+
+.writing-input {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.writing-input__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.writing-input__label {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.writing-input__textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 5.5rem;
+}
+
+.writing-input__textarea:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
+
+.writing-input__textarea:disabled {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.writing-input__count {
+  align-self: flex-end;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.writing-input__count--over {
+  color: var(--color-danger-text);
+  font-weight: 700;
+}
