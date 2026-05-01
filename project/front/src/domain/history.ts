@@ -11,22 +11,41 @@ export interface HistoryItem {
   correctPriority: Priority;
 }
 
-/** 直近何件まで保持するか（PBI-016 受入基準） */
+/** 直近何件まで保持するか（PBI-016 受入基準。PBI-020 で表示件数 10/20 切替可） */
 export const MAX_HISTORY = 10;
+
+/** PBI-020 で選択可能な保持件数の選択肢 */
+export const HISTORY_LIMIT_OPTIONS = [10, 20] as const;
+export type HistoryLimit = (typeof HISTORY_LIMIT_OPTIONS)[number];
 
 /** 初期履歴（空配列・イミュータブル） */
 export const initialHistory: readonly HistoryItem[] = Object.freeze([]);
 
 /**
- * 回答結果を履歴に追加し、直近 MAX_HISTORY 件のみを保持した新しい配列を返す。
+ * 回答結果を履歴に追加し、直近 `max` 件のみを保持した新しい配列を返す。
  * - 純粋関数（入力配列を変更しない）。
  * - 古いものから捨てる（FIFO）。
- * - セッション内のみ保持する責務は呼び出し側（App 側 useState 等）に委ねる。
+ * - `max` 省略時は MAX_HISTORY (=10) を上限とする（PBI-016 既定動作）。
+ * - PBI-020 で 10/20 切替対応のため `max` を受け取れるよう拡張。
  */
-export function pushHistory(history: readonly HistoryItem[], item: HistoryItem): HistoryItem[] {
+export function pushHistory(
+  history: readonly HistoryItem[],
+  item: HistoryItem,
+  max: number = MAX_HISTORY,
+): HistoryItem[] {
   const next = [...history, item];
-  if (next.length > MAX_HISTORY) {
-    return next.slice(next.length - MAX_HISTORY);
+  if (next.length > max) {
+    return next.slice(next.length - max);
   }
   return next;
+}
+
+/**
+ * 既存履歴を新しい上限で切り詰める（履歴件数切替時の補正用・PBI-020）。
+ * - 末尾（新しい側）優先で残す。
+ * - max 以下なら同一参照を返さず新配列で返却（呼び出し側の不要な再描画を避ける場合は呼び側で参照比較する想定）。
+ */
+export function trimHistory(history: readonly HistoryItem[], max: number): HistoryItem[] {
+  if (history.length <= max) return [...history];
+  return history.slice(history.length - max);
 }

@@ -7,7 +7,7 @@ import { ModeSelector } from './ui/ModeSelector';
 import { ScoreCounter } from './ui/ScoreCounter';
 import { ThemeToggle } from './ui/ThemeToggle';
 import type { Case, Priority } from './domain/case';
-import { initialHistory, pushHistory, type HistoryItem } from './domain/history';
+import { initialHistory, pushHistory, trimHistory, type HistoryItem, type HistoryLimit, HISTORY_LIMIT_OPTIONS } from './domain/history';
 import { judge, type Judgement } from './domain/judge';
 import { loadCases } from './domain/loader';
 import { applyModeChange, initialMode } from './domain/mode';
@@ -34,6 +34,7 @@ export default function App() {
   const [score, setScore] = useState(initialScore);
   const [modeScores, setModeScores] = useState(initialModeScores);
   const [history, setHistory] = useState<readonly HistoryItem[]>(initialHistory);
+  const [historyLimit, setHistoryLimit] = useState<HistoryLimit>(10);
 
   const locked = judgement !== null;
 
@@ -52,11 +53,15 @@ export default function App() {
     setScore((prev) => addScore(prev, result));
     setModeScores((prev) => addModeScore(prev, current.correctPriority, result));
     setHistory((prev) =>
-      pushHistory(prev, {
-        caseId: current.id,
-        judgement: result,
-        correctPriority: current.correctPriority,
-      }),
+      pushHistory(
+        prev,
+        {
+          caseId: current.id,
+          judgement: result,
+          correctPriority: current.correctPriority,
+        },
+        historyLimit,
+      ),
     );
   };
 
@@ -92,6 +97,19 @@ export default function App() {
     setJudgement(null);
   };
 
+  /**
+   * 履歴表示件数の切替（PBI-020）。
+   * - 同値再選択は no-op。
+   * - 縮小（20 → 10）時は既存履歴を末尾優先で切り詰める（カウンタ・モードは非リセット）。
+   * - 拡大（10 → 20）時は履歴を維持し、以降のpushで上限が広がる。
+   * - セッション内のみ保持（永続化なし）。
+   */
+  const handleHistoryLimitChange = (next: HistoryLimit) => {
+    if (next === historyLimit) return;
+    setHistoryLimit(next);
+    setHistory((prev) => trimHistory(prev, next));
+  };
+
   // キーボードショートカット: A/B/C で回答即確定、Enter で次の問題
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -121,13 +139,30 @@ export default function App() {
           <h1>InBusket</h1>
           <ThemeToggle />
         </div>
-        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 004 Day 2）</p>
+        <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 004 Day 3）</p>
         <ScoreCounter score={score} modeScores={modeScores} currentMode={mode} />
       </header>
 
       <ModeSelector mode={mode} onChange={handleModeChange} />
 
-      <HistoryView history={history} />
+      <fieldset className="history-limit" aria-label="履歴表示件数">
+        <legend className="history-limit__legend">履歴表示件数</legend>
+        {HISTORY_LIMIT_OPTIONS.map((n) => (
+          <label key={n} className="history-limit__option">
+            <input
+              type="radio"
+              name="history-limit"
+              value={n}
+              checked={historyLimit === n}
+              onChange={() => handleHistoryLimitChange(n)}
+              aria-label={`直近${n}件を表示`}
+            />
+            <span>{n}件</span>
+          </label>
+        ))}
+      </fieldset>
+
+      <HistoryView history={history} maxDisplay={historyLimit} />
 
       {current ? (
         <>

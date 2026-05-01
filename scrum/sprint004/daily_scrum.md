@@ -222,3 +222,126 @@
 - TASK-007 を Day3 朝に完了 → TASK-008 着手で PBI-020 を Day3 内に完了見通し。
 - 一次情報確認方針（WCAG 2.1 AA / GitHub Primer トークン）が機能。Day3 もコントラスト比は a11y_checklist.md §4 手順で都度実測する。
 
+---
+
+## Day 3 - 2026-05-22（金）
+
+ファシリテーター: 高橋（SM） / 場所: オンライン / 開始: 09:30 / 終了: 09:42
+
+### 共有事項（朝イチ）
+
+- 高橋（SM）: 本日のメイン。TASK-003（A/B/C 記号併記、山本）/ TASK-007（履歴件数切替UI、中村）/ TASK-008（履歴件数切替テスト、中村）。Day2 終了時点で残タスク 6 / 残ポイント 3 の計画通り。
+- 高橋（SM）: handoff_for_helpers.md を 09:00 に山本・中村へ再共有済（A-8 適用）、09:25 受領確認。
+
+### 伊藤（開発者）
+
+- **昨日**: TASK-006（ScoreCounter モード別表示拡張）完了。
+- **今日**:
+  - 山本の TASK-003（AnswerButtons 記号併記）／中村の TASK-007/008（履歴件数切替）のレビュア兼任。
+  - 田中の TASK-004 結線テスト（PBI-019 最終結線）の支援。
+  - 余力で TASK-012（PBI-023〜028 リファインメント）の鈴木との論点整理を継続。
+- **障害物**: なし。
+
+### 田中（開発者）
+
+- **昨日**: TASK-011（PR チェックリスト文書化）完了、TASK-006 ペアレビュー完了。
+- **今日**:
+  - TASK-004（localStorage 永続化＋切替時状態保持の結線テスト、2h）に着手し Day3 中に完了させる。
+  - 中村の TASK-007/008 レビュア兼任。
+  - history.ts 拡張（pushHistory に max 引数追加・trimHistory 追加）の API 設計レビュー。
+- **障害物**: なし。
+
+### 山本（助っ人開発者）
+
+- **昨日**: TASK-002（styles.css のテーマ別 CSS Custom Properties 化）完了。
+- **今日**:
+  - TASK-003（AnswerButtons 記号併記、3h）に着手し午前中に完了させる。
+    - PRIORITIES に `symbol`（◎/○/△）と `name`（最優先/中優先/低優先）を追加。
+    - ボタン内に letter＋symbol＋name＋hint の4階層を表示。aria-label を `「A 最優先（緊急かつ重要）」` 形式に。
+    - 記号は `var(--color-primary)` 色を採用、選択時は `--color-text` に切替えコントラスト確保（AA 4.5:1 以上は a11y_checklist.md §4 で実測予定）。
+  - 完了後、Day4 で TASK-009（履歴コントラスト改修）に着手予定。
+- **障害物**: なし。一次情報として WCAG 2.1 AA SC 1.4.1（色の使用）と SC 1.4.11（非テキストコントラスト 3:1）を再確認、記号と本文両方で識別可能になることを確認済。
+
+### 中村（助っ人開発者）
+
+- **昨日**: TASK-007 骨格作成（推定 2.5h 進捗）。
+- **今日**:
+  - TASK-007（履歴件数 10/20 切替UI＋HistoryView 拡張＋セッション内保持、残 0.5h）を午前で完了。
+    - HistoryView に `maxDisplay?: number` プロパティ追加（デフォルト MAX_HISTORY=10）。
+    - App.tsx に `historyLimit: HistoryLimit (10|20)` state を追加し、ラジオボタン UI で切替（`fieldset` + `legend` + 各 input に `aria-label`）。
+    - history.ts を拡張し `pushHistory(prev, item, max)` の第3引数で上限を受け取れるように（既存挙動は省略時 10 で完全互換）。`trimHistory` を追加し縮小時の補正に使用。
+    - セッション内のみ保持（localStorage 不要）。リロードで 10件 復帰。
+  - TASK-008（履歴件数切替テスト、2h）に午後着手。
+    - HistoryView.test.tsx 新規作成（9件追加、合計 73 テスト）。
+    - maxDisplay=10 / maxDisplay=20 / 切詰め / 0件 / aria-live を網羅。
+    - history.ts 既定（max=10）下では maxDisplay=20 でも最大10件、pushHistory(max=20) で20件保持・表示できることを別ケースで確認（受入基準クリア）。
+    - trimHistory（20→10 切替時の末尾優先補正）も同ファイルでテスト。
+- **障害物**: なし。
+
+### 高橋（SM）
+
+- **昨日**: 助っ人2名 handoff フォローと TASK-002 完了後の手動コントラスト比測定ペア試行を実施。
+- **今日**:
+  - 助っ人 2 名の handoff フォロー継続。
+  - TASK-003 完了後に AnswerButtons の記号＋色＋テキスト3冗長化を a11y_checklist.md §5（色非依存識別）で再点検。
+  - 障害物検知監視と PBI-023〜028 リファインメントの場のセッティング（Day4 集中対応）。
+- **障害物**: なし。
+
+### 計画の調整
+
+- 順序確認: TASK-003（PBI-019）/ TASK-007・008（PBI-020）を Day3 で並列消化、TASK-004（PBI-019 最終結線）は Day3 後半 〜 Day4 朝。Day4 で TASK-009（PBI-022）に山本が集中、伊藤・鈴木で TASK-012 リファインメント。
+- バーンダウン目標: Day3 終了時点で残タスク 3 / 残ポイント 1（計画通り）。今日のキャパは合計約 13h（伊藤 3h / 田中 3h / 山本 3h / 中村 4h）。
+
+### 障害物
+
+- なし。`impediment_log.csv` への新規追加なし。
+
+---
+
+## Day 3 終了時インクリメント作成記録
+
+09:42 のデイリースクラム後、各担当が並行作業に着手。Day3 終了時点（18:00）の達成状況を以下に記録する。
+
+### 達成タスク（Done）
+
+| タスクID | タイトル                                                                       | 担当   | 実績(h) | 成果物                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| -------- | ------------------------------------------------------------------------------ | ------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TASK-003 | A/B/C 表示の色＋記号(◎/○/△)・テキスト併記対応                                 | 山本   | 3       | [project/front/src/ui/AnswerButtons.tsx](../../project/front/src/ui/AnswerButtons.tsx) を拡張し PRIORITIES に `symbol` と `name` を追加。ボタン内を letter（A/B/C）＋symbol（◎/○/△）＋name（最優先/中優先/低優先）＋hint（緊急かつ重要…）の4階層表示に。`aria-label` を `「A 最優先（緊急かつ重要）」` 形式へ。[styles.css](../../project/front/src/styles.css) に `.answer-buttons__letter` `.answer-buttons__symbol` `.answer-buttons__name` を新設し、記号は `var(--color-primary)` ベース／選択時は `var(--color-text)` でコントラスト切替。佐藤フィードバック4（色覚多様性配慮）を反映。 |
+| TASK-007 | 履歴件数 10/20 切替UI＋HistoryView 拡張＋セッション内保持                      | 中村   | 3       | [project/front/src/domain/history.ts](../../project/front/src/domain/history.ts) を拡張し `HISTORY_LIMIT_OPTIONS` `HistoryLimit` 型を追加、`pushHistory(prev, item, max=MAX_HISTORY)` で上限を引数化（既存テスト 8 件は完全互換維持）。`trimHistory(history, max)` を追加。[HistoryView.tsx](../../project/front/src/ui/HistoryView.tsx) に `maxDisplay?: number` プロパティ追加（既定 10）。[App.tsx](../../project/front/src/App.tsx) に `historyLimit` state ＋ラジオボタン `<fieldset>` UI 追加（`aria-label` 必須）。縮小時 `trimHistory` で末尾優先補正、カウンタ・モードは非リセット。[styles.css](../../project/front/src/styles.css) に `.history-limit` 系クラスを CSS 変数ベースで追加。 |
+| TASK-008 | 履歴件数切替UIテスト＋切替時の履歴・カウンタ非初期化テスト                     | 中村   | 2       | [project/front/src/ui/HistoryView.test.tsx](../../project/front/src/ui/HistoryView.test.tsx) を新規作成（9 件、合計 73 テスト）。①maxDisplay 省略時の MAX_HISTORY 等価動作 ②maxDisplay=10 で10件表示 ③history.ts 既定（max=10）下では maxDisplay=20 でも最大10件 ④`pushHistory(max=20)` で 20件保持・表示 ⑤切詰め時の末尾（最新）優先 ⑥0件時のガイド文 ⑦`aria-live="polite"` 維持 ⑧`trimHistory` ≤max ⑨`trimHistory` 20→10 末尾優先 を網羅。`react-dom/server.renderToStaticMarkup` ベースで外部testing依存ゼロ。 |
+
+### 進行中タスク（Day4 へ継続）
+
+- TASK-004（田中・2h 計画）: 17:30 時点で結線テスト雛形作成中（推定 1h 進捗）。Day4 朝までに完了見込み。
+- TASK-009（山本・3h 計画）: TASK-003 完了済のため Day4 朝着手。
+- TASK-012（鈴木・伊藤・3h 計画）: Day4 集中対応。
+
+### Day3 完成の定義（DoD）チェック - TASK-003 / TASK-007 / TASK-008 観点
+
+- 1-1 型エラーゼロ: ✅（`pnpm build` = `tsc -b && vite build` 成功 / dist/assets/index-*.js 170.12 kB）
+- 1-2 ESLint 0 エラー 0 警告: ✅（`pnpm lint` パス）
+- 1-3 ペアレビュー: ✅（TASK-003 は山本→伊藤レビュー、TASK-007/008 は中村↔田中相互レビュー）
+- 2-1 主要ロジックの単体テスト全件成功: ✅（`pnpm test` = 9 files / 73 tests passed、HistoryView 9 件新規追加で 64→73。既存 64 件は全件継続 PASS）
+- 2-2 受入基準の手動動作確認: ✅（A/B/Cボタンが記号◎/○/△＋名称＋ヒントで色非依存に識別可能、履歴件数 10⇔20 ラジオ切替でカウンタ・モード非初期化、20→10 縮小時に末尾10件のみ残ることを確認。Day4 で a11y チェックリスト全項目を最終点検）
+- 5-2 シークレット非ハードコード: ✅
+- 7-1 レスポンシブ: ✅（既存 `@media (max-width: 480px)` ブロック維持。`.history-limit` は `flex-wrap` で折返し対応）
+- 9-1 キーボード操作完結: ✅（ラジオボタンは Tab 移動＋ Space で選択切替、HTML ネイティブ挙動）
+- 9-2 フォーカス可視: ✅（`.history-limit__option input[type='radio']:focus-visible` で `var(--color-focus-ring)` アウトライン定義）
+- 9-3 適切な role/aria: ✅（`<fieldset>` ＋ `<legend>` ＋ 各 input に `aria-label`、AnswerButtons の `aria-label` を意味込み形式に変更）
+- 9-2 色のみで意味を伝えない: ✅（A/B/C ボタンに記号◎/○/△＋名称テキスト併記、履歴の○/×＋優先度文字併記と合わせ Sprint004 の 9-2 観点は全面解消）
+
+### 障害物（追加なし）
+
+- なし。`impediment_log.csv` への記録は不要。
+
+### Day4 申し送り（高橋まとめ）
+
+- PBI-020 は TASK-007・008 完了で受入基準クリア。Day4 朝の a11y 最終点検後に Done 判定。
+- PBI-019 は TASK-003 完了済、残 TASK-004（田中、進行中）。Day4 朝完了見込みで PBI-019 Done 判定可能。
+- PBI-022（履歴コントラスト改修・TASK-009）は Day4 朝から山本が着手、TASK-003 で確立した「色＋記号＋テキスト」3冗長化パターンを履歴セルにも適用予定。
+- TASK-012（PBI-023〜028 リファインメント）は Day4 午後に鈴木・伊藤で集中対応。
+- 73 テスト全件 PASS / lint 0 / build OK。Day3 時点でバーンダウンは計画通り（残3タスク・残1pt）。
+
+
+
+

@@ -3,6 +3,12 @@ import { MAX_HISTORY } from '../domain/history';
 
 interface Props {
   history: readonly HistoryItem[];
+  /**
+   * 表示する最大件数（PBI-020）。省略時は MAX_HISTORY(=10) と等価。
+   * - 末尾（新しい側）から `maxDisplay` 件のみを表示する。
+   * - 履歴配列のサイズ自体は呼び出し側（pushHistory の max 引数）で管理する。
+   */
+  maxDisplay?: number;
 }
 
 const judgementLabel = (j: HistoryItem['judgement']): string => (j === 'correct' ? '○' : '×');
@@ -11,22 +17,24 @@ const judgementAria = (j: HistoryItem['judgement']): string =>
   j === 'correct' ? '正解' : '不正解';
 
 /**
- * 直近10問の正誤履歴（PBI-016）。
+ * 直近の正誤履歴（PBI-016 / PBI-020 で表示件数切替対応）。
  * - 新しい回答ほど右に並ぶ（時系列・末尾が最新）
  * - 各セルは ○/× ＋ 正解優先度（A/B/C）を表示
  * - aria-live="polite" によりスクリーンリーダで読み上げ可能
  * - モバイル幅でも視認できるよう flex-wrap で折り返す
  * - 履歴 0 件時はガイド文を表示（カウンタとレイアウト両立）
  */
-export function HistoryView({ history }: Props) {
+export function HistoryView({ history, maxDisplay = MAX_HISTORY }: Props) {
+  const limit = Math.max(0, Math.floor(maxDisplay));
+  const visible = history.length > limit ? history.slice(history.length - limit) : history;
   return (
-    <section className="history-view" aria-label={`直近${MAX_HISTORY}問の正誤履歴`}>
-      <h2 className="history-view__title">直近{MAX_HISTORY}問の履歴</h2>
+    <section className="history-view" aria-label={`直近${limit}問の正誤履歴`}>
+      <h2 className="history-view__title">直近{limit}問の履歴</h2>
       <ol className="history-view__list" aria-live="polite" aria-relevant="additions">
-        {history.length === 0 ? (
+        {visible.length === 0 ? (
           <li className="history-view__empty">まだ履歴はありません</li>
         ) : (
-          history.map((item, index) => (
+          visible.map((item, index) => (
             <li
               key={`${item.caseId}-${index}`}
               className={

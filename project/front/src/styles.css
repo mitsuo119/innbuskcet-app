@@ -235,13 +235,37 @@ body {
 }
 
 .answer-buttons__label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
   font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1.1;
+}
+
+.answer-buttons__letter {
+  font-size: 1.5rem;
+}
+
+.answer-buttons__symbol {
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.answer-buttons__btn--selected .answer-buttons__symbol {
+  color: var(--color-text);
+}
+
+.answer-buttons__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
 .answer-buttons__hint {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
+  text-align: center;
 }
 
 .explanation {
@@ -431,6 +455,39 @@ body {
   border-color: var(--color-primary);
   background: var(--color-primary-bg);
   font-weight: 700;
+}
+
+/* ===== HistoryLimit (PBI-020) ===== */
+
+.history-limit {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin: 0 0 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.history-limit__legend {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  padding: 0 0.25rem;
+}
+
+.history-limit__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.history-limit__option input[type='radio']:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 @media (max-width: 480px) {
