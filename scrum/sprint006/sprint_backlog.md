@@ -38,14 +38,14 @@
 | TASK-003 | `ExplanationView.tsx` 更新：「正解は A」→「正解は A（最優先）— 即時着手すべき」表記＋スタイリング                       | 山本   | 2           | 完了       |
 | TASK-004 | `HistoryView.tsx` 更新：選択/正解表示に「A（最優先）」併記＋意味文を aria-label/title 属性に格納                        | 山本   | 3           | 完了       |
 | TASK-005 | `ModelAnswerView.tsx` 更新：模範比較ヘッダーの優先度バッジに「記号＋名称＋意味」を表示                                  | 田中→山本(DAY2横展開) | 2           | 完了       |
-| TASK-006 | コンポーネント表示テスト（priorityLabel 反映確認）+ a11y 検証（§9-3 SR 読み上げ「エー、最優先、即時着手すべき」）+ a11y_checklist.md 記録 | 田中   | 2           | 未着手     |
+| TASK-006 | コンポーネント表示テスト（priorityLabel 反映確認）+ a11y 検証（§9-3 SR 読み上げ「エー、最優先、即時着手すべき」）+ a11y_checklist.md 記録 | 田中   | 2           | 完了       |
 
 ### PBI-036: 学習スタイル切替（Quick/Deep）と記述欄任意化（3pt）
 
 | タスクID | タスク名                                                                                                                                          | 担当者 | 見積もり(h) | ステータス |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------- | ---------- |
-| TASK-007 | `domain/learningStyle.ts` 新設：`LearningStyle` 型（quick/deep/exam）+ localStorage I/O（`inbasket.learningStyle.v1`）+ スキーマ整合性検証 + 不整合時 `quick` フォールバック + vitest 境界値テスト（DoD §10-3） | 伊藤   | 4           | 未着手     |
-| TASK-008 | ヘッダー右上 ThemeToggle 隣にセグメントコントロール `[Quick(5分) | Deep(じっくり) | Exam(準備中)]` 新設 + aria-label「学習モード切替」+ Exam グレイアウト（disabled+tooltip） | 山本   | 4           | 未着手     |
+| TASK-007 | `domain/learningStyle.ts` 新設：`LearningStyle` 型（quick/deep。exam は将来拡張）+ localStorage I/O（`inbasket.learningStyle.v1`）+ スキーマ整合性検証 + 不整合時 `deep` フォールバック + vitest 境界値テスト（DoD §10-3） | 田中(伊藤→DAY3前倒し巻取) | 4 | 完了       |
+| TASK-008 | ヘッダー右上 ThemeToggle 隣にセグメントコントロール `[Quick(5分) | Deep(じっくり) | Exam(準備中)]` 新設 + aria-label「学習スタイル」+ Exam グレイアウト（disabled+tooltip） | 田中(骨格DAY3)→山本(仕上げDAY4) | 4 | 進行中     |
 | TASK-009 | Quick 時のフロー短縮：`WritingInput` / `WritingPreview` / `ModelAnswerView` を条件分岐で非表示制御（Deep の現行フロー維持）+ `App.tsx` 状態遷移整理 | 田中   | 4           | 未着手     |
 | TASK-010 | Deep 時の「今回は書かない」リンクボタン実装（クリックで textarea 群を折りたたみ・次問題で自動展開リセット）                                       | 田中   | 2           | 未着手     |
 | TASK-011 | モード切替時の確認ダイアログ：A/B/C 未確定時に「現在の入力内容を破棄してモード切替しますか?」OK/キャンセル                                          | 伊藤   | 2           | 未着手     |
@@ -103,6 +103,7 @@
 | Day 1（6/03 水） | 17         | 7          | TASK-001/007 着手・I/F 共有。priorityLabel と learningStyle のドメイン先行  |
 | Day 2（6/04 木） | 13         | 6          | TASK-001/007 完了。TASK-002/008/014 進行                                     |
 | Day 3（6/05 金） | 9          | 4          | PBI-035 主要実装完了。PBI-036 セグメントコントロール完成。A-20 起票          |
+| Day 3（実績）    | 6          | 2          | PBI-035 全タスク完了（TASK-006）+ PBI-036 ドメイン層（TASK-007）+ Toggle 骨格（TASK-008 先行）。バーンダウン計画を上回る進捗 |
 | Day 4（6/08 月） | 4          | 2          | PBI-036/037 主要実装完了。a11y 検証＋A-21 Ready 化                           |
 | Day 5（6/09 火） | 0          | 0          | 全 PBI Done / DoD 21 項目「はい」/ レビュー＋レトロ準備（TASK-020）          |
 

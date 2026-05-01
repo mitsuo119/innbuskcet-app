@@ -65,6 +65,10 @@ PR 単位で以下を記入する。
 | 3-9  | 記述入力（PBI-023）       | 各 textarea に `<label htmlFor>` ＋ `aria-label` ＋ `role="group"` 親要素 / 文字数カウンタ `aria-live="polite"`   | OK / NG / 該当なし |
 | 3-10 | 記述プレビュー（PBI-023） | `<dl>/<dt>/<dd>` セマンティクス ＋ セクションに `aria-label="記述内容のプレビュー"`                               | OK / NG / 該当なし |
 | 3-11 | 模範解答骨格（PBI-024）   | `<dl>/<dt>/<dd>` セマンティクス ＋ セクションに `aria-label="模範解答"` ／ 未整備時はテキストでプレースホルダ表示 | OK / NG / 該当なし |
+| 3-12 | A/B/C 意味ラベル（PBI-035 / 全画面統一）        | `priorityLabel.ts` の `formatPriorityLabel(key)` を経由し、`aria-label` に「A（最優先）即時着手すべき」等を格納（ExplanationView / HistoryView / ModelAnswerView / AnswerButtons） | OK / NG / 該当なし |
+| 3-13 | ExplanationView 正解表記（PBI-035）             | 「正解は A（最優先）— 即時着手すべき」を可視テキストで表示し、SR 読み上げが「エー、最優先、即時着手すべき」になる                                                                | OK / NG / 該当なし |
+| 3-14 | HistoryView 行内バッジ（PBI-035）               | 各履歴セルの `aria-label` に `formatPriorityLabel` 由来の意味文を格納＋ `title` 属性に併記（色非依存・記号 ◎/○/△ 併記）                                                          | OK / NG / 該当なし |
+| 3-15 | ModelAnswerView 優先度バッジ（PBI-035）         | ヘッダー右の優先度バッジに「記号＋名称＋意味」を表示し、バッジの `aria-label="正解優先度 A（最優先）即時着手すべき"` を格納                                                      | OK / NG / 該当なし |
 
 ---
 
@@ -106,6 +110,18 @@ PR 単位で以下を記入する。
 | 5-2 | 履歴 ○/× は **色＋形＋テキスト** で識別可能                | OK / NG / 該当なし |
 | 5-3 | 解説の正解/不正解は **色＋テキスト**（バッジ）で識別可能   | OK / NG / 該当なし |
 | 5-4 | エラー状態は色だけで伝えていない（アイコン・テキスト併用） | OK / NG / 該当なし |
+| 5-5 | A/B/C 意味ラベル（PBI-035）が **記号＋名称＋意味** をテキスト併記し、色だけに依存しない（ExplanationView / HistoryView / ModelAnswerView / AnswerButtons 全画面で統一） | OK / NG / 該当なし |
+
+---
+
+## 6. PBI-035 横展開メモ（Sprint006 DAY3 追記）
+
+PBI-035「A/B/C 回答の意味ラベル全画面統一表示」の横展開（TASK-003 / TASK-004 / TASK-005）に対する確認観点を 3 章 / 5 章に追加（3-12〜3-15 / 5-5）。横展開後の確認は以下の 4 画面で `priorityLabel.ts` を唯一の定義源として参照していることを目視＋テストで確認すること。
+
+- AnswerButtons.tsx（TASK-002 完了）
+- ExplanationView.tsx（TASK-003 完了）
+- HistoryView.tsx（TASK-004 完了）
+- ModelAnswerView.tsx（TASK-005 完了）
 
 ---
 

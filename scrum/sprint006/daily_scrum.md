@@ -219,3 +219,280 @@ PBI-035 の DoD 最終判定は TASK-006（コンポーネント表示テスト�
 - 山本: TASK-008 / TASK-009 の補助、PBI-036 / PBI-035 の整合性確認。
 - 中村: TASK-014（HistoryItem 拡張）本格着手。
 - 高橋: TASK-018（A-20）進行確認。
+
+---
+
+## DAY 3（2026-06-05 金）
+
+### 開催情報
+
+| 項目     | 内容                                            |
+| -------- | ----------------------------------------------- |
+| 時刻     | 09:30 - 09:45                                   |
+| ファシリ | 高橋（SM）                                      |
+| 参加者   | 伊藤・田中・山本・中村・高橋（SM）              |
+| スプリントゴール再確認 | 学習スタイル切替・記述任意化・A/B/C 意味ラベル全画面統一表示 |
+
+### 各メンバーの共有
+
+#### 田中（開発者）
+
+- **昨日やったこと**: `App.tsx` 状態遷移整理メモ更新（PBI-036 連動）。山本の TASK-005 横展開バッチを並走確認。
+- **今日やること**:
+  - TASK-006: PBI-035 横展開分の a11y 検証＋ `a11y_checklist.md` 記録
+  - TASK-007（`learningStyle.ts` 新設）を伊藤から巻き取り早期着手
+  - TASK-008（`LearningStyleToggle` 新設）を山本に先行して骨格作成
+- **障害物**: なし。
+
+#### 伊藤（開発者）
+
+- **昨日やったこと**: TASK-005 横展開のレビュー・PRマージ。
+- **今日やること**: TASK-018（A-20: PBI-033 分割起票）を鈴木と協働。TASK-007 / TASK-008 は田中が先行するため、TASK-009/011/012 の準備（`App.tsx` 状態遷移とモード切替確認ダイアログの I/F 案）。
+- **障害物**: なし。
+
+#### 山本（助っ人）
+
+- **昨日やったこと**: TASK-003 / TASK-004 / TASK-005 横展開完了。
+- **今日やること**: 田中作成の `LearningStyleToggle` をベースに DAY4 で TASK-008 仕上げ（セグメントコントロールの Exam グレイアウト追加・ヘッダー結線）。本日は CSS スタイリングと既存 `ThemeToggle` 隣配置の影響範囲調査。
+- **障害物**: なし。
+
+#### 中村（助っ人）
+
+- **昨日やったこと**: TASK-014 型拡張ドラフト最終化。
+- **今日やること**: 田中の `learningStyle.ts` 型確定を受けて TASK-014（`HistoryItem` 拡張）に本格着手。
+- **障害物**: なし（TASK-007 完了で解消）。
+
+#### 高橋（SM）
+
+- 田中による TASK-006 / TASK-007 / TASK-008 の前倒し並行着手はバーンダウン Day3 計画（残 9 タスク / 残 4pt）達成のための戦術判断。当初担当（伊藤=TASK-007, 山本=TASK-008）は記録に併記し透明性を担保。
+- 渡辺（セキュリティ）と DoD §10-3 適用範囲（`inbasket.learningStyle.v1` キー追加）を本日中に最終確認。
+
+### スプリントゴールへの進捗評価
+
+- **順調**: PBI-035 のドメイン＋全画面横展開が DAY2 で完了。本日 TASK-006（a11y 検証）で PBI-035 を Done 候補に。
+- **加速中**: 田中が TASK-007/008 を前倒し並行着手することで PBI-036 のドメイン＋ UI 骨格を DAY3 で着地。
+- **要観察**: PBI-036 の TASK-009（Quick フロー短縮）/ TASK-011（モード切替確認ダイアログ）/ TASK-012（永続化結線）を DAY4 に集中させるため、伊藤の I/F 準備が前提。
+
+### 障害物
+
+- なし（全員 Green）。
+
+---
+
+### 本日の作業ログ（田中）
+
+#### TASK-006: PBI-035 横展開分の a11y 検証 ✅ 完了
+
+- 更新ファイル: [project/docs/a11y_checklist.md](../../project/docs/a11y_checklist.md)
+  - 3 章「role / aria 属性（DoD §9-3）」に PBI-035 横展開分の確認項目 3-12 / 3-13 / 3-14 / 3-15 を追記。
+  - 5 章「色非依存（WCAG 1.4.1）」に項目 5-5（A/B/C 意味ラベルの記号＋名称＋意味の併記確認）を追記。
+  - 6 章「PBI-035 横展開メモ（Sprint006 DAY3 追記）」を新設し、AnswerButtons / ExplanationView / HistoryView / ModelAnswerView の 4 画面で `priorityLabel.ts` を唯一の定義源として参照することを記録。
+- `priorityLabel.ts` の唯一定義源原則（DRY）と SR 読み上げ「エー、最優先、即時着手すべき」（PBI-035 受入基準）を確認。
+
+#### TASK-007: `domain/learningStyle.ts` 新設 ✅ 完了
+
+- 実装ファイル: [project/front/src/domain/learningStyle.ts](../../project/front/src/domain/learningStyle.ts)
+  - 型 `LearningStyle = 'quick' | 'deep'`（`exam` はグレイアウト用として将来拡張・現時点では union から除外）
+  - 定数 `LEARNING_STYLES`（quick: { label: 'Quick', description: '優先順位のみ回答（隙間時間用）' } / deep: { label: 'Deep', description: '記述あり（じっくり練習）' }）
+  - 純粋関数 `loadLearningStyle()` / `saveLearningStyle(style)` / `isDeepMode(style)`
+  - localStorage キー `inbasket.learningStyle.v1`（DoD §10-3 適用範囲拡張・渡辺合意済）
+  - 不正値・キー未設定・`exam` などの想定外値・`localStorage` 不可環境すべて `'deep'` フォールバック（try/catch ラップ）
+- テスト: [project/front/src/domain/learningStyle.test.ts](../../project/front/src/domain/learningStyle.test.ts) 10 件すべて PASS
+  - LEARNING_STYLES 定数（1 件） / loadLearningStyle（4 件：空・quick・deep・不正値 3 種） / ラウンドトリップ（3 件） / isDeepMode（2 件）
+
+#### TASK-008（先行）: `LearningStyleToggle` コンポーネント新設 ✅ 完了（骨格）
+
+- 実装ファイル: [project/front/src/ui/LearningStyleToggle.tsx](../../project/front/src/ui/LearningStyleToggle.tsx)
+  - props: `style: LearningStyle` / `onChange: (style: LearningStyle) => void`
+  - Quick / Deep の 2 ボタンセグメントコントロール
+  - 親要素 `role="group"` ＋ `aria-label="学習スタイル"`（DoD §9-3）
+  - 選択中ボタンに `aria-pressed="true"` ＋ クラス `learning-style-toggle__btn--selected`
+  - ボタン `aria-label` は `ラベル：説明` 形式（例: `Quick：優先順位のみ回答（隙間時間用）`）
+  - 同値クリックでは `onChange` 非呼出（無駄な再レンダ抑止）
+  - `dangerouslySetInnerHTML` 不使用（DoD §10-2）
+- テスト: [project/front/src/ui/LearningStyleToggle.test.tsx](../../project/front/src/ui/LearningStyleToggle.test.tsx) 6 件すべて PASS
+  - role / aria-label / 2 ボタン描画 / aria-pressed（deep / quick） / onChange 呼出 / 同値クリックで非呼出 / aria-label 内容
+
+> 注: ヘッダー右上 `ThemeToggle` 隣への配置・Exam グレイアウト・`App.tsx` 結線は DAY4 で山本＋伊藤（TASK-008 仕上げ＋ TASK-012 結線）。本 DAY3 はドメイン層と再利用可能なトグル骨格＋テストを完成させ、依存タスク（TASK-009/011/012/014）の前提を整えた。
+
+### テスト・品質確認結果
+
+- `pnpm test`（vitest run）: **136 passed (15 files)** ─ learningStyle.test.ts 10 件＋ LearningStyleToggle.test.tsx 6 件で +16 件（120 → 136）。
+- `pnpm lint`（eslint）: エラー・警告ゼロ。
+- `pnpm exec tsc -b --noEmit`: 型エラーゼロ。
+
+### DoD チェック（PBI-035 / PBI-036 進捗）
+
+#### PBI-035（TASK-006 完了で 21 項目「はい」候補）
+
+| #    | 項目                                                                       | 状態 |
+| ---- | -------------------------------------------------------------------------- | ---- |
+| 1-1  | TS 型エラーゼロ                                                            | はい |
+| 1-2  | ESLint/Prettier エラー・警告ゼロ                                           | はい |
+| 2-1  | 主要ロジック単体テスト全件成功                                             | はい |
+| 3-x  | a11y_checklist.md に PBI-035 横展開項目（3-12〜3-15 / 5-5 / 6 章）を追記   | はい |
+| 7-x  | UI/UX: 全画面で A/B/C ラベル統一表示                                       | はい |
+| 9-2  | 色非依存（記号＋名称＋意味の併記）                                         | はい |
+| 9-3  | role / aria 属性                                                           | はい |
+| 10-2 | `dangerouslySetInnerHTML` 不使用                                        | はい |
+
+PBI-035 はスプリントレビューで Done 判定予定（残作業: 渡辺セキュリティ最終確認・PR レビュー）。
+
+#### PBI-036（TASK-007 / TASK-008 完了分）
+
+| #    | 項目                                                                       | 状態 |
+| ---- | -------------------------------------------------------------------------- | ---- |
+| 1-1  | TS 型エラーゼロ                                                            | はい |
+| 1-2  | ESLint エラー・警告ゼロ                                                    | はい |
+| 2-1  | 主要ロジック単体テスト（learningStyle: 10 件 / Toggle: 6 件）全件成功     | はい |
+| 9-3  | role="group" / aria-label / aria-pressed                                   | はい |
+| 10-2 | `dangerouslySetInnerHTML` 不使用                                        | はい |
+| 10-3 | localStorage 不正値フォールバック＋try/catch ラップ                        | はい |
+
+PBI-036 全体の DoD は TASK-009〜013 完了後に再判定。
+
+### 明日（DAY 4）に向けて
+
+- 山本: TASK-008 仕上げ（ヘッダー右上 `ThemeToggle` 隣配置・Exam グレイアウト追加・CSS）
+- 伊藤: TASK-009（Quick フロー短縮: `App.tsx` 条件分岐）+ TASK-011（モード切替確認ダイアログ）+ TASK-012（localStorage 永続化結線）
+- 田中: TASK-010（Deep 時「今回は書かない」リンクボタン）+ TASK-013（PBI-036 の a11y 検証＋記録）
+- 中村: TASK-014（`HistoryItem` 拡張）→ TASK-015（LearningStyle 別正答率集計）
+- 高橋: TASK-018（A-20）進行確認＋ TASK-020（佐藤デモシナリオ準備着手）
+---
+
+## DAY 3（2026-06-05 金）
+
+### 開催情報
+
+| 項目     | 内容                                            |
+| -------- | ----------------------------------------------- |
+| 時刻     | 09:30 - 09:45                                   |
+| ファシリ | 高橋（SM）                                      |
+| 参加者   | 伊藤・田中・山本・中村・高橋（SM）              |
+| スプリントゴール再確認 | 学習スタイル切替・記述任意化・A/B/C 意味ラベル全画面統一表示 |
+
+### 各メンバーの共有
+
+#### 田中（開発者）
+
+- **昨日やったこと**: `App.tsx` 状態遷移整理メモ更新（PBI-036 連動）。山本の TASK-005 横展開バッチを並走確認。
+- **今日やること**:
+  - TASK-006: PBI-035 横展開分の a11y 検証＋ `a11y_checklist.md` 記録
+  - TASK-007（`learningStyle.ts` 新設）を伊藤から巻き取り早期着手
+  - TASK-008（`LearningStyleToggle` 新設）を山本に先行して骨格作成
+- **障害物**: なし。
+
+#### 伊藤（開発者）
+
+- **昨日やったこと**: TASK-005 横展開のレビュー・PRマージ。
+- **今日やること**: TASK-018（A-20: PBI-033 分割起票）を鈴木と協働。TASK-007 / TASK-008 は田中が先行するため、TASK-009/011/012 の準備（`App.tsx` 状態遷移とモード切替確認ダイアログの I/F 案）。
+- **障害物**: なし。
+
+#### 山本（助っ人）
+
+- **昨日やったこと**: TASK-003 / TASK-004 / TASK-005 横展開完了。
+- **今日やること**: 田中作成の `LearningStyleToggle` をベースに DAY4 で TASK-008 仕上げ（セグメントコントロールの Exam グレイアウト追加・ヘッダー結線）。本日は CSS スタイリングと既存 `ThemeToggle` 隣配置の影響範囲調査。
+- **障害物**: なし。
+
+#### 中村（助っ人）
+
+- **昨日やったこと**: TASK-014 型拡張ドラフト最終化。
+- **今日やること**: 田中の `learningStyle.ts` 型確定を受けて TASK-014（`HistoryItem` 拡張）に本格着手。
+- **障害物**: なし（TASK-007 完了で解消）。
+
+#### 高橋（SM）
+
+- 田中による TASK-006 / TASK-007 / TASK-008 の前倒し並行着手はバーンダウン Day3 計画（残 9 タスク / 残 4pt）達成のための戦術判断。当初担当（伊藤=TASK-007, 山本=TASK-008）は記録に併記し透明性を担保。
+- 渡辺（セキュリティ）と DoD §10-3 適用範囲（`inbasket.learningStyle.v1` キー追加）を本日中に最終確認。
+
+### スプリントゴールへの進捗評価
+
+- **順調**: PBI-035 のドメイン＋全画面横展開が DAY2 で完了。本日 TASK-006（a11y 検証）で PBI-035 を Done 候補に。
+- **加速中**: 田中が TASK-007/008 を前倒し並行着手することで PBI-036 のドメイン＋ UI 骨格を DAY3 で着地。
+- **要観察**: PBI-036 の TASK-009（Quick フロー短縮）/ TASK-011（モード切替確認ダイアログ）/ TASK-012（永続化結線）を DAY4 に集中させるため、伊藤の I/F 準備が前提。
+
+### 障害物
+
+- なし（全員 Green）。
+
+---
+
+### 本日の作業ログ（田中）
+
+#### TASK-006: PBI-035 横展開分の a11y 検証 ✅ 完了
+
+- 更新ファイル: [project/docs/a11y_checklist.md](../../project/docs/a11y_checklist.md)
+  - 3 章「role / aria 属性（DoD §9-3）」に PBI-035 横展開分の確認項目 3-12 / 3-13 / 3-14 / 3-15 を追記。
+  - 5 章「色非依存（WCAG 1.4.1）」に項目 5-5（A/B/C 意味ラベルの記号＋名称＋意味の併記確認）を追記。
+  - 6 章「PBI-035 横展開メモ（Sprint006 DAY3 追記）」を新設し、AnswerButtons / ExplanationView / HistoryView / ModelAnswerView の 4 画面で `priorityLabel.ts` を唯一の定義源として参照することを記録。
+- `priorityLabel.ts` の唯一定義源原則（DRY）と SR 読み上げ「エー、最優先、即時着手すべき」（PBI-035 受入基準）を確認。
+
+#### TASK-007: `domain/learningStyle.ts` 新設 ✅ 完了
+
+- 実装ファイル: [project/front/src/domain/learningStyle.ts](../../project/front/src/domain/learningStyle.ts)
+  - 型 `LearningStyle = 'quick' | 'deep'`（`exam` はグレイアウト用として将来拡張・現時点では union から除外）
+  - 定数 `LEARNING_STYLES`（quick: { label: 'Quick', description: '優先順位のみ回答（隙間時間用）' } / deep: { label: 'Deep', description: '記述あり（じっくり練習）' }）
+  - 純粋関数 `loadLearningStyle()` / `saveLearningStyle(style)` / `isDeepMode(style)`
+  - localStorage キー `inbasket.learningStyle.v1`（DoD §10-3 適用範囲拡張・渡辺合意済）
+  - 不正値・キー未設定・`exam` などの想定外値・`localStorage` 不可環境すべて `'deep'` フォールバック（try/catch ラップ）
+- テスト: [project/front/src/domain/learningStyle.test.ts](../../project/front/src/domain/learningStyle.test.ts) 10 件すべて PASS
+  - LEARNING_STYLES 定数（1 件） / loadLearningStyle（4 件：空・quick・deep・不正値 3 種） / ラウンドトリップ（3 件） / isDeepMode（2 件）
+
+#### TASK-008（先行）: `LearningStyleToggle` コンポーネント新設 ✅ 完了（骨格）
+
+- 実装ファイル: [project/front/src/ui/LearningStyleToggle.tsx](../../project/front/src/ui/LearningStyleToggle.tsx)
+  - props: `style: LearningStyle` / `onChange: (style: LearningStyle) => void`
+  - Quick / Deep の 2 ボタンセグメントコントロール
+  - 親要素 `role="group"` ＋ `aria-label="学習スタイル"`（DoD §9-3）
+  - 選択中ボタンに `aria-pressed="true"` ＋ クラス `learning-style-toggle__btn--selected`
+  - ボタン `aria-label` は `ラベル：説明` 形式（例: `Quick：優先順位のみ回答（隙間時間用）`）
+  - 同値クリックでは `onChange` 非呼出（無駄な再レンダ抑止）
+  - `dangerouslySetInnerHTML` 不使用（DoD §10-2）
+- テスト: [project/front/src/ui/LearningStyleToggle.test.tsx](../../project/front/src/ui/LearningStyleToggle.test.tsx) 6 件すべて PASS
+  - role / aria-label / 2 ボタン描画 / aria-pressed（deep / quick） / onChange 呼出 / 同値クリックで非呼出 / aria-label 内容
+
+> 注: ヘッダー右上 `ThemeToggle` 隣への配置・Exam グレイアウト・`App.tsx` 結線は DAY4 で山本＋伊藤（TASK-008 仕上げ＋ TASK-012 結線）。本 DAY3 はドメイン層と再利用可能なトグル骨格＋テストを完成させ、依存タスク（TASK-009/011/012/014）の前提を整えた。
+
+### テスト・品質確認結果
+
+- `pnpm test`（vitest run）: **136 passed (15 files)** ─ learningStyle.test.ts 10 件＋ LearningStyleToggle.test.tsx 6 件で +16 件（120 → 136）。
+- `pnpm lint`（eslint）: エラー・警告ゼロ。
+- `pnpm exec tsc -b --noEmit`: 型エラーゼロ。
+
+### DoD チェック（PBI-035 / PBI-036 進捗）
+
+#### PBI-035（TASK-006 完了で 21 項目「はい」候補）
+
+| #    | 項目                                                                       | 状態 |
+| ---- | -------------------------------------------------------------------------- | ---- |
+| 1-1  | TS 型エラーゼロ                                                            | はい |
+| 1-2  | ESLint/Prettier エラー・警告ゼロ                                           | はい |
+| 2-1  | 主要ロジック単体テスト全件成功                                             | はい |
+| 3-x  | a11y_checklist.md に PBI-035 横展開項目（3-12〜3-15 / 5-5 / 6 章）を追記   | はい |
+| 7-x  | UI/UX: 全画面で A/B/C ラベル統一表示                                       | はい |
+| 9-2  | 色非依存（記号＋名称＋意味の併記）                                         | はい |
+| 9-3  | role / aria 属性                                                           | はい |
+| 10-2 | `dangerouslySetInnerHTML` 不使用                                        | はい |
+
+PBI-035 はスプリントレビューで Done 判定予定（残作業: 渡辺セキュリティ最終確認・PR レビュー）。
+
+#### PBI-036（TASK-007 / TASK-008 完了分）
+
+| #    | 項目                                                                       | 状態 |
+| ---- | -------------------------------------------------------------------------- | ---- |
+| 1-1  | TS 型エラーゼロ                                                            | はい |
+| 1-2  | ESLint エラー・警告ゼロ                                                    | はい |
+| 2-1  | 主要ロジック単体テスト（learningStyle: 10 件 / Toggle: 6 件）全件成功     | はい |
+| 9-3  | role="group" / aria-label / aria-pressed                                   | はい |
+| 10-2 | `dangerouslySetInnerHTML` 不使用                                        | はい |
+| 10-3 | localStorage 不正値フォールバック＋try/catch ラップ                        | はい |
+
+PBI-036 全体の DoD は TASK-009〜013 完了後に再判定。
+
+### 明日（DAY 4）に向けて
+
+- 山本: TASK-008 仕上げ（ヘッダー右上 `ThemeToggle` 隣配置・Exam グレイアウト追加・CSS）
+- 伊藤: TASK-009（Quick フロー短縮: `App.tsx` 条件分岐）+ TASK-011（モード切替確認ダイアログ）+ TASK-012（localStorage 永続化結線）
+- 田中: TASK-010（Deep 時「今回は書かない」リンクボタン）+ TASK-013（PBI-036 の a11y 検証＋記録）
+- 中村: TASK-014（`HistoryItem` 拡張）→ TASK-015（LearningStyle 別正答率集計）
+- 高橋: TASK-018（A-20）進行確認＋ TASK-020（佐藤デモシナリオ準備着手）
