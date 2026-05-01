@@ -3,3 +3,4 @@ sprint001,21,21,0,2026-04-29,2026-05-05,初スプリント。MVP学習サイク�
 sprint002,13,13,0,2026-05-06,2026-05-12,UX強化(PBI-010〜014)+vite/vitest依存更新(PBI-015)を計画通り完了。全PBI受入。DoD15項目「はい」(test25件成功/lint0/build成功/audit clean)。Day3で全PBI Done、Day4-5は凍結バッファ。
 sprint003,7,7,0,2026-05-13,2026-05-19,履歴・40件パターン完全網羅・難易度別フィルタ(PBI-016〜018)を計画通り完了。全PBI受入。DoD18項目「はい」(§9 a11y初適用/test52件成功/lint0/build成功 gzip55.79kB/audit clean)。Day3で全PBI Done、A-6でPBI-019差し込みは見送り合意。3スプリント平均 13.7pt。
 sprint004,6,6,0,2026-05-20,2026-05-26,テーマ切替/履歴件数/モード別正答率/履歴コントラスト(PBI-019〜022)を計画通り完了。全PBI受入。DoD18項目「はい」(test78件成功/lint0/build OK 170.11kB/audit クリーン)。Day4で全PBI Done、Day5は最終仕上げ。a11y/PRチェックリスト試行運用完了。4スプリント平均11.75pt。
+sprint005,6,6,0,2026-05-27,2026-06-02,PBI-023/024(記述UI/模範比較)完了。DoD §10初適用で10-1/10-2/10-3全て「はい」(writing.test 12件/loader.test 8件/ModelAnswerView.test 5件)。test 109件成功/lint 0/build OK gzip58.87kB/audit clean。全PBI受入。5スプリント連続障害物ゼロ。5スプリント平均10.6pt。
