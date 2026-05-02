@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  ACTION_KEYWORDS,
-  REASON_KEYWORDS,
-  countKeywordMatches,
-} from './feedbackKeywords';
+import { ACTION_KEYWORDS, REASON_KEYWORDS, countKeywordMatches } from './feedbackKeywords';
 
 describe('feedbackKeywords（PBI-029 / TASK-008）', () => {
   describe('辞書定義', () => {

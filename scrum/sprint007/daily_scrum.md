@@ -4,12 +4,12 @@
 
 ### 基本情報
 
-| 項目     | 内容                                                                      |
-| -------- | ------------------------------------------------------------------------- |
-| 日時     | 2026-06-10（水）09:30 - 09:45                                             |
-| 参加者   | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ）                     |
-| タイムボックス | 15分                                                                |
-| 沈黙チェック (A-30) | 未実施（Day2 / Day4 で初回実施予定）                          |
+| 項目                | 内容                                                  |
+| ------------------- | ----------------------------------------------------- |
+| 日時                | 2026-06-10（水）09:30 - 09:45                         |
+| 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ） |
+| タイムボックス      | 15分                                                  |
+| 沈黙チェック (A-30) | 未実施（Day2 / Day4 で初回実施予定）                  |
 
 ### 三つの問い
 
@@ -65,17 +65,17 @@
 
 ### Day 1 作業サマリ（伊藤・コミット内容）
 
-| 種別     | 内容                                                                                                          |
-| -------- | ------------------------------------------------------------------------------------------------------------- |
-| 新規     | `project/front/src/domain/examTimer.ts`（純粋関数 + sessionStorage I/O・DoD §10-1 / §10-3）                   |
-| 新規     | `project/front/src/domain/examTimer.test.ts`（vitest 20 件・境界値・ラウンドトリップ・不正 JSON/型 不一致）   |
-| 更新     | `project/front/src/domain/learningStyle.ts`（`LearningStyle` に `'exam'` 追加・`LEARNING_STYLES.exam` 追加）  |
-| 更新     | `project/front/src/domain/learningStyle.test.ts`（`'exam'` 受理ケース追加・フォールバック分岐更新）           |
-| 更新     | `project/front/src/ui/LearningStyleToggle.tsx`（ORDER に `'exam'` 追加・グレイアウト解除）                    |
-| 更新     | `project/front/src/ui/LearningStyleToggle.test.tsx`（3 ボタン化 / Exam クリックで onChange 検証）             |
-| 更新     | `project/front/src/domain/score.ts`（`initialLearningStyleScores.exam` 追加）                                 |
-| 更新     | `project/front/src/domain/score.test.ts`（exam 集計の初期値テスト更新）                                       |
-| テスト   | `pnpm test`：**16 ファイル / 166 件 全 PASS**（うち examTimer 20 件 / LearningStyleToggle 7 件 / learningStyle 11 件） |
+| 種別   | 内容                                                                                                                   |
+| ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| 新規   | `project/front/src/domain/examTimer.ts`（純粋関数 + sessionStorage I/O・DoD §10-1 / §10-3）                            |
+| 新規   | `project/front/src/domain/examTimer.test.ts`（vitest 20 件・境界値・ラウンドトリップ・不正 JSON/型 不一致）            |
+| 更新   | `project/front/src/domain/learningStyle.ts`（`LearningStyle` に `'exam'` 追加・`LEARNING_STYLES.exam` 追加）           |
+| 更新   | `project/front/src/domain/learningStyle.test.ts`（`'exam'` 受理ケース追加・フォールバック分岐更新）                    |
+| 更新   | `project/front/src/ui/LearningStyleToggle.tsx`（ORDER に `'exam'` 追加・グレイアウト解除）                             |
+| 更新   | `project/front/src/ui/LearningStyleToggle.test.tsx`（3 ボタン化 / Exam クリックで onChange 検証）                      |
+| 更新   | `project/front/src/domain/score.ts`（`initialLearningStyleScores.exam` 追加）                                          |
+| 更新   | `project/front/src/domain/score.test.ts`（exam 集計の初期値テスト更新）                                                |
+| テスト | `pnpm test`：**16 ファイル / 166 件 全 PASS**（うち examTimer 20 件 / LearningStyleToggle 7 件 / learningStyle 11 件） |
 
 ### 次回（Day 2）に向けた合意
 
@@ -92,11 +92,11 @@
 
 ### 基本情報
 
-| 項目                | 内容                                                  |
-| ------------------- | ----------------------------------------------------- |
-| 日時                | 2026-06-11（木）09:30 - 09:45                         |
-| 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ） |
-| タイムボックス      | 15分                                                  |
+| 項目                | 内容                                                                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 日時                | 2026-06-11（木）09:30 - 09:45                                                                                              |
+| 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ）                                                                      |
+| タイムボックス      | 15分                                                                                                                       |
 | 沈黙チェック (A-30) | **実施**（初回・SM 高橋から「困ってないけど時間がかかっている作業はある？」「PR が滞留しそうな兆しは？」を全員に問いかけ） |
 
 ### 三つの問い
@@ -163,16 +163,16 @@
 
 ### Day 2 作業サマリ
 
-| 種別     | 内容                                                                                                                  |
-| -------- | --------------------------------------------------------------------------------------------------------------------- |
-| 新規     | `project/front/src/ui/ExamTimer.tsx`（mm:ss 表示・残 5 分以下 warning・aria-live・DoD §9-2 / §9-3 / §10-2）           |
-| 新規     | `project/front/src/ui/ExamTimer.test.tsx`（vitest 7 件・fakeTimers 進行 / 警告閾値 / onTimeUp 一度のみ / アンマウント） |
-| 新規     | `project/front/src/domain/feedbackKeywords.ts`（REASON 3 観点 / ACTION 3 観点 / `countKeywordMatches` 純粋関数）       |
-| 新規     | `project/front/src/domain/feedbackKeywords.test.ts`（vitest 8 件・部分一致 / 重複加算 / 空文字 / 空配列 / 空キーワード境界値・DoD §10-1） |
-| 更新     | `project/front/src/ui/LearningStyleToggle.tsx`（`disabled` prop 追加・Exam 中の途中切替防止）                          |
-| 更新     | `project/front/src/App.tsx`（Exam 切替時の確認モーダル・`createExamSession` / `saveExamSession` 結線・候補不足時 alert フォールバック・Toggle 無効化） |
-| 更新     | `project/front/src/styles.css`（`.exam-timer` / `.exam-timer--warning` / `.learning-style-toggle__btn:disabled`）      |
-| テスト   | `pnpm test`：**18 ファイル / 181 件 全 PASS**（DAY1 比 +15 件・うち ExamTimer 7 / feedbackKeywords 8）                  |
+| 種別   | 内容                                                                                                                                                   |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 新規   | `project/front/src/ui/ExamTimer.tsx`（mm:ss 表示・残 5 分以下 warning・aria-live・DoD §9-2 / §9-3 / §10-2）                                            |
+| 新規   | `project/front/src/ui/ExamTimer.test.tsx`（vitest 7 件・fakeTimers 進行 / 警告閾値 / onTimeUp 一度のみ / アンマウント）                                |
+| 新規   | `project/front/src/domain/feedbackKeywords.ts`（REASON 3 観点 / ACTION 3 観点 / `countKeywordMatches` 純粋関数）                                       |
+| 新規   | `project/front/src/domain/feedbackKeywords.test.ts`（vitest 8 件・部分一致 / 重複加算 / 空文字 / 空配列 / 空キーワード境界値・DoD §10-1）              |
+| 更新   | `project/front/src/ui/LearningStyleToggle.tsx`（`disabled` prop 追加・Exam 中の途中切替防止）                                                          |
+| 更新   | `project/front/src/App.tsx`（Exam 切替時の確認モーダル・`createExamSession` / `saveExamSession` 結線・候補不足時 alert フォールバック・Toggle 無効化） |
+| 更新   | `project/front/src/styles.css`（`.exam-timer` / `.exam-timer--warning` / `.learning-style-toggle__btn:disabled`）                                      |
+| テスト | `pnpm test`：**18 ファイル / 181 件 全 PASS**（DAY1 比 +15 件・うち ExamTimer 7 / feedbackKeywords 8）                                                 |
 
 ### 次回（Day 3）に向けた合意
 
@@ -182,7 +182,6 @@
 4. 中村: TASK-013 残（case-016〜020）+ TASK-005（中断機能）+ TASK-006（時間切れ自動終了）。レビュー時間枠を Day2 終わりに調整済。
 5. 高橋（SM）: A-26 巻取判断（Day3-4）に向けて各タスクの進捗監視。Day4 で A-30 第 2 回実施。
 6. 鈴木（PO）: A-29 リファインメント朝イチで TASK-009 スコア合算質問を伊藤と詰める。
-
 
 ---
 
@@ -254,12 +253,12 @@
 
 ### Day 3 作業サマリ
 
-| 種別     | 内容                                                                                                           |
-| -------- | -------------------------------------------------------------------------------------------------------------- |
-| 新規     | `project/front/src/domain/feedback.ts`（評価ロジック純粋関数 4 種・FeedbackScore / FeedbackItem / WritingFeedback 型・DoD §10-1 / §10-2） |
-| 新規     | `project/front/src/domain/feedback.test.ts`（vitest 16 件・判断 5 ケース / reason 4 ケース / action 3 ケース / 統合 2 ケース・境界値含む） |
-| 更新     | `project/front/src/data/cases.json`（case-011〜020 に modelAnswer + scoringPoints[] 追加・全 10 件整備）       |
-| テスト   | `pnpm test`：**19 ファイル / 197 件 全 PASS**（DAY2 比 +16 件・うち feedback 16）                              |
+| 種別   | 内容                                                                                                                                       |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 新規   | `project/front/src/domain/feedback.ts`（評価ロジック純粋関数 4 種・FeedbackScore / FeedbackItem / WritingFeedback 型・DoD §10-1 / §10-2）  |
+| 新規   | `project/front/src/domain/feedback.test.ts`（vitest 16 件・判断 5 ケース / reason 4 ケース / action 3 ケース / 統合 2 ケース・境界値含む） |
+| 更新   | `project/front/src/data/cases.json`（case-011〜020 に modelAnswer + scoringPoints[] 追加・全 10 件整備）                                   |
+| テスト | `pnpm test`：**19 ファイル / 197 件 全 PASS**（DAY2 比 +16 件・うち feedback 16）                                                          |
 
 ### 次回（Day 4）に向けた合意
 
@@ -276,11 +275,11 @@
 
 ### 基本情報
 
-| 項目                | 内容                                                  |
-| ------------------- | ----------------------------------------------------- |
-| 日時                | 2026-06-15（月）09:30 - 09:45                         |
-| 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ） |
-| タイムボックス      | 15分                                                  |
+| 項目                | 内容                                                                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 日時                | 2026-06-15（月）09:30 - 09:45                                                                                                          |
+| 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ）                                                                                  |
+| タイムボックス      | 15分                                                                                                                                   |
 | 沈黙チェック (A-30) | **実施**（第 2 回・SM 高橋から「Day5 までに残タスクで気がかりな依存はある？」「PR レビュー枠で詰まりそうな箇所は？」を全員に問いかけ） |
 
 ### 三つの問い
@@ -350,12 +349,12 @@
 
 ### Day 4 作業サマリ
 
-| 種別     | 内容                                                                                                          |
-| -------- | ------------------------------------------------------------------------------------------------------------- |
-| 新規     | `project/front/src/ui/FeedbackView.tsx`（総合評価バッジ＋判断 1 行＋理由 3 観点＋アクション 3 観点・`<dl>`・`aria-label="AI評価フィードバック"`・DoD §10-2 `dangerouslySetInnerHTML` 不使用） |
-| 新規     | `project/front/src/ui/FeedbackView.test.tsx`（vitest 5 件・visible=false / feedback=null / overall=◎ / XSS 安全 / △ 修飾子クラス）  |
-| 更新     | `project/front/src/App.tsx`（`examSession` / `examIndex` / `writingFeedback` 状態追加・Exam 出題ループ・`ExamTimer` ヘッダー結線・`handleEvaluateWriting` ＋ AI ボタン・`finalizeExamSession` ／ `handleExamTimeUp` ／ Exam 中断確認・`Toggle disabled` 撤去） |
-| テスト   | `pnpm test`：**20 ファイル / 202 件 全 PASS**（DAY3 比 +5 件・FeedbackView 5）                              |
+| 種別   | 内容                                                                                                                                                                                                                                                           |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 新規   | `project/front/src/ui/FeedbackView.tsx`（総合評価バッジ＋判断 1 行＋理由 3 観点＋アクション 3 観点・`<dl>`・`aria-label="AI評価フィードバック"`・DoD §10-2 `dangerouslySetInnerHTML` 不使用）                                                                  |
+| 新規   | `project/front/src/ui/FeedbackView.test.tsx`（vitest 5 件・visible=false / feedback=null / overall=◎ / XSS 安全 / △ 修飾子クラス）                                                                                                                             |
+| 更新   | `project/front/src/App.tsx`（`examSession` / `examIndex` / `writingFeedback` 状態追加・Exam 出題ループ・`ExamTimer` ヘッダー結線・`handleEvaluateWriting` ＋ AI ボタン・`finalizeExamSession` ／ `handleExamTimeUp` ／ Exam 中断確認・`Toggle disabled` 撤去） |
+| テスト | `pnpm test`：**20 ファイル / 202 件 全 PASS**（DAY3 比 +5 件・FeedbackView 5）                                                                                                                                                                                 |
 
 ### 次回（Day 5）に向けた合意
 
@@ -372,12 +371,12 @@
 
 ### 基本情報
 
-| 項目                | 内容                                                                                          |
-| ------------------- | --------------------------------------------------------------------------------------------- |
-| 日時                | 2026-06-16（火）09:30 - 09:45                                                                 |
-| 参加者              | 開発者: 伊藤（DAY5 リード）・田中・山本・中村 / SM: 高橋（ファシリ・DoD 確認・完了判定）       |
-| タイムボックス      | 15分                                                                                          |
-| 沈黙チェック (A-30) | 不要（Day2 / Day4 計 2 回実施済・Sprint007 で 2 回運用化を満たし達成）                         |
+| 項目                | 内容                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| 日時                | 2026-06-16（火）09:30 - 09:45                                                            |
+| 参加者              | 開発者: 伊藤（DAY5 リード）・田中・山本・中村 / SM: 高橋（ファシリ・DoD 確認・完了判定） |
+| タイムボックス      | 15分                                                                                     |
+| 沈黙チェック (A-30) | 不要（Day2 / Day4 計 2 回実施済・Sprint007 で 2 回運用化を満たし達成）                   |
 
 ### 三つの問い
 
@@ -436,51 +435,51 @@
 
 ### DoD 21 項目 全確認（伊藤・高橋ペア確認）
 
-| 章                       | 項目                                                                                | 判定 | 根拠                                                                                                    |
-| ------------------------ | ----------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------- |
-| §1 コード品質            | 1-1 TS 型エラー 0                                                                   | はい | `pnpm exec tsc -b --noEmit` 出力なし                                                                    |
-| §1                       | 1-2 ESLint 警告 0                                                                   | はい | `pnpm lint` 出力なし                                                                                    |
-| §1                       | 1-3 チーム内ペアレビュー完了                                                        | はい | TASK-009/010/011 の PR 全件レビュー済（伊藤・田中・山本・中村相互）                                      |
-| §2 テスト                | 2-1 主要ロジック単体テスト全件成功                                                  | はい | `pnpm test` 20 ファイル / 202 件 全 PASS                                                                |
-| §2                       | 2-2 受入基準を満たす手動動作確認                                                    | はい | Day4 中村の手動 Exam 起動→中断→時間切れ確認 + Day5 田中の NVDA 経路確認                                  |
-| §3 ドキュメント          | 3-1 README 起動手順                                                                 | はい | 既存 README.md に `pnpm install` / `pnpm dev` 記載済（変更不要）                                        |
-| §3                       | 3-2 案件データ JSON スキーマ説明                                                    | はい | 既存 `project/front/README.md` の cases.json 説明に整合（scoringPoints は将来拡張用で loader 検証外注記） |
-| §4 動作確認              | 4-1 Chrome で動作                                                                   | はい | Day4 / Day5 で Chrome 最新版で起動確認                                                                  |
-| §4                       | 4-2 出題→回答→解説→次問サイクル破綻なし                                             | はい | Quick/Deep/Exam 3 モードで疎通確認                                                                      |
-| §5 セキュリティ          | 5-1 `pnpm audit` High/Critical なし                                                 | はい | `No known vulnerabilities found`                                                                        |
-| §5                       | 5-2 シークレットなし                                                                | はい | grep で AKIA / SECRET / TOKEN 等のハードコード無し（既存方針継続）                                       |
-| §6 パフォーマンス        | 6-1 出題切替体感 1 秒以内                                                           | はい | dist 196.68kB / gzip 64.56kB・初期ロード後はメモリ内ランダム選択で即時                                  |
-| §7 UI/UX                 | 7-1 レスポンシブ                                                                    | はい | `.exam-timer` の flex-wrap・WritingInput の縦積みでスマホ幅崩れなし                                      |
-| §7                       | 7-2 主要操作 1〜2 タップ                                                            | はい | A/B/C 回答 / 「AIに見てもらう」 / 「次の問題」 全て 1 タップ                                            |
-| §8 データ                | 8-1 案件データ JSON で管理                                                          | はい | cases.json + loader.ts スキーマ検証                                                                     |
-| §9 アクセシビリティ      | 9-1 主要操作キーボード完結                                                          | はい | NVDA で Toggle → 確認モーダル → タイマー → 回答 → AI ボタン → FeedbackView 経路確認                     |
-| §9                       | 9-2 フォーカス可視                                                                  | はい | `:focus-visible` 既存ルール継続・新規要素も継承                                                         |
-| §9                       | 9-3 role / aria 属性                                                                | はい | ExamTimer `role="timer"` / FeedbackView `aria-label="AI評価フィードバック"` / AI ボタン `aria-label`     |
-| §10 入力検証・データ保護 | **10-1 境界値テスト**                                                               | はい | examTimer 20 件 / feedback 16 件 / feedbackKeywords 8 件・空文字 / 極端短文 / 不正型を網羅              |
-| §10                      | **10-2 dangerouslySetInnerHTML 不使用（XSS）**                                      | はい | `FeedbackView.test.tsx` で `<script>` / `onerror` 入力のエスケープを vitest で機械検証                  |
-| §10                      | **10-3 sessionStorage / localStorage スキーマ整合**                                 | はい | examTimer の `loadExamSession` で必須キー / 型 / 不正 JSON を全境界値テストでフォールバック確認          |
+| 章                       | 項目                                                | 判定 | 根拠                                                                                                      |
+| ------------------------ | --------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------- |
+| §1 コード品質            | 1-1 TS 型エラー 0                                   | はい | `pnpm exec tsc -b --noEmit` 出力なし                                                                      |
+| §1                       | 1-2 ESLint 警告 0                                   | はい | `pnpm lint` 出力なし                                                                                      |
+| §1                       | 1-3 チーム内ペアレビュー完了                        | はい | TASK-009/010/011 の PR 全件レビュー済（伊藤・田中・山本・中村相互）                                       |
+| §2 テスト                | 2-1 主要ロジック単体テスト全件成功                  | はい | `pnpm test` 20 ファイル / 202 件 全 PASS                                                                  |
+| §2                       | 2-2 受入基準を満たす手動動作確認                    | はい | Day4 中村の手動 Exam 起動→中断→時間切れ確認 + Day5 田中の NVDA 経路確認                                   |
+| §3 ドキュメント          | 3-1 README 起動手順                                 | はい | 既存 README.md に `pnpm install` / `pnpm dev` 記載済（変更不要）                                          |
+| §3                       | 3-2 案件データ JSON スキーマ説明                    | はい | 既存 `project/front/README.md` の cases.json 説明に整合（scoringPoints は将来拡張用で loader 検証外注記） |
+| §4 動作確認              | 4-1 Chrome で動作                                   | はい | Day4 / Day5 で Chrome 最新版で起動確認                                                                    |
+| §4                       | 4-2 出題→回答→解説→次問サイクル破綻なし             | はい | Quick/Deep/Exam 3 モードで疎通確認                                                                        |
+| §5 セキュリティ          | 5-1 `pnpm audit` High/Critical なし                 | はい | `No known vulnerabilities found`                                                                          |
+| §5                       | 5-2 シークレットなし                                | はい | grep で AKIA / SECRET / TOKEN 等のハードコード無し（既存方針継続）                                        |
+| §6 パフォーマンス        | 6-1 出題切替体感 1 秒以内                           | はい | dist 196.68kB / gzip 64.56kB・初期ロード後はメモリ内ランダム選択で即時                                    |
+| §7 UI/UX                 | 7-1 レスポンシブ                                    | はい | `.exam-timer` の flex-wrap・WritingInput の縦積みでスマホ幅崩れなし                                       |
+| §7                       | 7-2 主要操作 1〜2 タップ                            | はい | A/B/C 回答 / 「AIに見てもらう」 / 「次の問題」 全て 1 タップ                                              |
+| §8 データ                | 8-1 案件データ JSON で管理                          | はい | cases.json + loader.ts スキーマ検証                                                                       |
+| §9 アクセシビリティ      | 9-1 主要操作キーボード完結                          | はい | NVDA で Toggle → 確認モーダル → タイマー → 回答 → AI ボタン → FeedbackView 経路確認                       |
+| §9                       | 9-2 フォーカス可視                                  | はい | `:focus-visible` 既存ルール継続・新規要素も継承                                                           |
+| §9                       | 9-3 role / aria 属性                                | はい | ExamTimer `role="timer"` / FeedbackView `aria-label="AI評価フィードバック"` / AI ボタン `aria-label`      |
+| §10 入力検証・データ保護 | **10-1 境界値テスト**                               | はい | examTimer 20 件 / feedback 16 件 / feedbackKeywords 8 件・空文字 / 極端短文 / 不正型を網羅                |
+| §10                      | **10-2 dangerouslySetInnerHTML 不使用（XSS）**      | はい | `FeedbackView.test.tsx` で `<script>` / `onerror` 入力のエスケープを vitest で機械検証                    |
+| §10                      | **10-3 sessionStorage / localStorage スキーマ整合** | はい | examTimer の `loadExamSession` で必須キー / 型 / 不正 JSON を全境界値テストでフォールバック確認           |
 
 → **DoD 21 項目 全件「はい」判定 完了。Sprint007 の 3 PBI 全件 Done。**
 
 ### Day 5 全品質確認 実行結果（伊藤）
 
-| コマンド                        | 結果                                                                                                |
-| ------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `pnpm test`                     | **20 ファイル / 202 件 全 PASS**（DAY4 と同件数・新規追加なし・回帰なし）                          |
-| `pnpm lint`                     | **警告 0 / エラー 0**                                                                               |
-| `pnpm exec tsc -b --noEmit`     | **型エラー 0**                                                                                      |
-| `pnpm build`                    | **dist 生成成功**（index.html 0.43kB / index-XXX.css 14.55kB / index-XXX.js 196.68kB / gzip 64.56kB） |
-| `pnpm audit`                    | **No known vulnerabilities found**（DEP0169 は pnpm cli 由来でアプリ依存関係外）                    |
+| コマンド                    | 結果                                                                                                  |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `pnpm test`                 | **20 ファイル / 202 件 全 PASS**（DAY4 と同件数・新規追加なし・回帰なし）                             |
+| `pnpm lint`                 | **警告 0 / エラー 0**                                                                                 |
+| `pnpm exec tsc -b --noEmit` | **型エラー 0**                                                                                        |
+| `pnpm build`                | **dist 生成成功**（index.html 0.43kB / index-XXX.css 14.55kB / index-XXX.js 196.68kB / gzip 64.56kB） |
+| `pnpm audit`                | **No known vulnerabilities found**（DEP0169 は pnpm cli 由来でアプリ依存関係外）                      |
 
 ### Day 5 作業サマリ（伊藤コミット範囲）
 
-| 種別     | 内容                                                                                                          |
-| -------- | ------------------------------------------------------------------------------------------------------------- |
-| 更新     | `project/front/src/ui/WritingInput.tsx`（リロード消失注意書き `<p class="writing-input__notice">` 追加）       |
-| 更新     | `project/front/src/styles.css`（`.writing-input__notice` 追加・両テーマ AA コントラスト）                       |
-| 更新     | `project/docs/a11y_checklist.md`（6-B. PBI-027 / PBI-029 横展開メモ・3-20〜3-27 / 5-7 / 5-8 追加）              |
-| 更新     | `scrum/sprint007/daily_scrum.md`（DAY5 記録・スプリントゴール達成確認・DoD 21 項目 全確認）                     |
-| 更新     | `scrum/sprint007/sprint_backlog.md`（全タスクステータス更新）                                                  |
+| 種別 | 内容                                                                                                     |
+| ---- | -------------------------------------------------------------------------------------------------------- |
+| 更新 | `project/front/src/ui/WritingInput.tsx`（リロード消失注意書き `<p class="writing-input__notice">` 追加） |
+| 更新 | `project/front/src/styles.css`（`.writing-input__notice` 追加・両テーマ AA コントラスト）                |
+| 更新 | `project/docs/a11y_checklist.md`（6-B. PBI-027 / PBI-029 横展開メモ・3-20〜3-27 / 5-7 / 5-8 追加）       |
+| 更新 | `scrum/sprint007/daily_scrum.md`（DAY5 記録・スプリントゴール達成確認・DoD 21 項目 全確認）              |
+| 更新 | `scrum/sprint007/sprint_backlog.md`（全タスクステータス更新）                                            |
 
 ### 検査と適応（スクラムガイド 2020）
 
@@ -499,4 +498,3 @@
 3. PBI-030 / PBI-025 / PBI-026 / PBI-031 / PBI-032 / PBI-028 / PBI-038 は Sprint008 以降候補（プランニング時に再優先付け）。
 
 ---
-

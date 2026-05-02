@@ -135,10 +135,7 @@ function scoreToNum(s: FeedbackScore): number {
  * - 判断 / 理由 / アクションの各観点を評価し、総合スコア（平均値ベース）を算出。
  * - avg >= 1.6: ◎ / avg >= 0.8: ○ / それ未満: △
  */
-export function evaluateWriting(
-  entry: WritingEntry,
-  correctPriority: string,
-): WritingFeedback {
+export function evaluateWriting(entry: WritingEntry, correctPriority: string): WritingFeedback {
   const judgment = evaluateJudgment(entry.judgment, correctPriority);
   const reason = evaluateReason(entry.reason);
   const action = evaluateAction(entry.action);

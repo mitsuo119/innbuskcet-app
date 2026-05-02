@@ -20,7 +20,11 @@ const ORDER: readonly LearningStyle[] = ['quick', 'deep', 'exam'] as const;
  * - キーボード: Tab で各ボタンに到達、Space/Enter で選択（HTML button 既定）。
  * - `dangerouslySetInnerHTML` 不使用（DoD §10-2）。
  */
-export function LearningStyleToggle({ style, onChange, disabled = false }: LearningStyleToggleProps) {
+export function LearningStyleToggle({
+  style,
+  onChange,
+  disabled = false,
+}: LearningStyleToggleProps) {
   return (
     <div role="group" aria-label="学習スタイル" className="learning-style-toggle">
       {ORDER.map((key) => {

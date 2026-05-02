@@ -223,9 +223,7 @@ export default function App() {
     if (next === learningStyle) return;
     // Exam 中に他モードへ切替る場合は中断確認を出す（PBI-027 / TASK-005）。
     if (learningStyle === 'exam' && examSession) {
-      const ok = window.confirm(
-        'Examを中断します。進捗は失われます。よろしいですか？',
-      );
+      const ok = window.confirm('Examを中断します。進捗は失われます。よろしいですか？');
       if (!ok) return;
       clearExamSession();
       setExamSession(null);
@@ -244,9 +242,7 @@ export default function App() {
       if (!ok) return;
     }
     if (next === 'exam') {
-      const ok = window.confirm(
-        'Examモード: 20問・90分タイマーが開始されます。よろしいですか？',
-      );
+      const ok = window.confirm('Examモード: 20問・90分タイマーが開始されます。よろしいですか？');
       if (!ok) {
         // キャンセル時は明示的に Deep に戻す（PBI-027 / TASK-002）。
         setLearningStyle('deep');
@@ -320,10 +316,7 @@ export default function App() {
         <div className="app-header__top">
           <h1>InBusket</h1>
           <div className="app-header__controls">
-            <LearningStyleToggle
-              style={learningStyle}
-              onChange={handleLearningStyleChange}
-            />
+            <LearningStyleToggle style={learningStyle} onChange={handleLearningStyleChange} />
             <ThemeToggle />
           </div>
         </div>

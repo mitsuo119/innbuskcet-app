@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  evaluateAction,
-  evaluateJudgment,
-  evaluateReason,
-  evaluateWriting,
-} from './feedback';
+import { evaluateAction, evaluateJudgment, evaluateReason, evaluateWriting } from './feedback';
 import type { WritingEntry } from './writing';
 
 describe('evaluateJudgment', () => {
