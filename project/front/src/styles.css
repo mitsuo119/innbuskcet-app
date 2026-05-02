@@ -645,6 +645,60 @@ body {
   background: var(--color-primary);
 }
 
+.learning-style-toggle__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== ExamTimer (PBI-027 / TASK-003) =====
+ * - mm:ss を等幅で表示（時刻が前後で揺れないよう font-variant-numeric: tabular-nums）。
+ * - 残 5 分以下は warning スタイルで色変更＋「残りわずか」テキスト併記（DoD §9-2 色のみ依存しない）。
+ * - モバイル幅でも崩れないよう flex-wrap + 最小フォントサイズ。
+ */
+
+.exam-timer {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+
+.exam-timer__caption {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.exam-timer__value {
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.exam-timer__badge {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: var(--color-on-danger);
+  color: var(--color-danger-text);
+  border: 1px solid var(--color-danger);
+}
+
+.exam-timer--warning {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.exam-timer--warning .exam-timer__caption {
+  color: var(--color-danger-text);
+}
+
 /* ===== WritingInput skip link (PBI-036 / TASK-010) ===== */
 
 .writing-input__skip-row {

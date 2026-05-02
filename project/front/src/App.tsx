@@ -39,6 +39,12 @@ import {
 } from './domain/score';
 import { resolveShortcut, isEditableTarget } from './domain/shortcut';
 import { createEmptyWritingEntry, isWritingEntryEmpty, type WritingEntry } from './domain/writing';
+import {
+  clearExamSession,
+  createExamSession,
+  saveExamSession,
+  type ExamSession,
+} from './domain/examTimer';
 
 export default function App() {
   const allCases = useMemo<Case[]>(() => loadCases(), []);
@@ -55,9 +61,11 @@ export default function App() {
   const [writingEntry, setWritingEntry] = useState<WritingEntry>(() => createEmptyWritingEntry());
   const [learningStyle, setLearningStyle] = useState<LearningStyle>(() => loadLearningStyle());
   const [learningStyleScores, setLearningStyleScores] = useState(initialLearningStyleScores);
+  const [examSession, setExamSession] = useState<ExamSession | null>(null);
 
   const locked = judgement !== null;
   const isDeep = isDeepMode(learningStyle);
+  const isExam = learningStyle === 'exam';
 
   const handleSelect = (priority: Priority) => {
     if (locked || !current) return;
@@ -136,17 +144,49 @@ export default function App() {
   };
 
   /**
-   * 学習スタイル切替（PBI-036 / TASK-009/012）。
+   * 学習スタイル切替（PBI-036 / PBI-027）。
    * - 同値再選択は no-op。
    * - WritingEntry が空でない（Deep で記述あり）の場合は確認ダイアログ。
+   * - `'exam'` への切替時は「Examモード: 20問・90分タイマーが開始されます。よろしいですか？」を確認し、
+   *   OK 時に `createExamSession` で 20 問固定セッションを生成して `saveExamSession` で sessionStorage に保存する。
+   *   キャンセル時は `'deep'` に戻す（PBI-027 / TASK-002）。
+   * - Exam 中は `LearningStyleToggle` を無効化するため、原則ここから他モードへ切替されない。
    * - 切替時は WritingEntry をリセットし、localStorage へ永続化する。
-   * - カウンタ・履歴・現問題はモード切替（filter）と独立に維持。
    */
   const handleLearningStyleChange = (next: LearningStyle) => {
     if (next === learningStyle) return;
     if (!isWritingEntryEmpty(writingEntry)) {
       const ok = window.confirm('現在の入力内容を破棄してモード切替しますか?');
       if (!ok) return;
+    }
+    if (next === 'exam') {
+      const ok = window.confirm(
+        'Examモード: 20問・90分タイマーが開始されます。よろしいですか？',
+      );
+      if (!ok) {
+        // キャンセル時は明示的に Deep に戻す（PBI-027 / TASK-002）。
+        setLearningStyle('deep');
+        saveLearningStyle('deep');
+        setWritingEntry(createEmptyWritingEntry());
+        return;
+      }
+      const allCaseIds = allCases.map((c) => c.id);
+      try {
+        const session = createExamSession(allCaseIds);
+        setExamSession(session);
+        saveExamSession(session);
+      } catch {
+        // 候補不足など。Exam 起動を諦め Deep に戻す（A-23 安全側フォールバック）。
+        window.alert('Examモードの開始に必要な問題数が不足しています。Deepモードを継続します。');
+        setLearningStyle('deep');
+        saveLearningStyle('deep');
+        setWritingEntry(createEmptyWritingEntry());
+        return;
+      }
+    } else {
+      // Exam 以外への切替時は念のため sessionStorage の Exam 残骸を掃除する。
+      setExamSession(null);
+      clearExamSession();
     }
     setLearningStyle(next);
     saveLearningStyle(next);
@@ -186,7 +226,11 @@ export default function App() {
         <div className="app-header__top">
           <h1>InBusket</h1>
           <div className="app-header__controls">
-            <LearningStyleToggle style={learningStyle} onChange={handleLearningStyleChange} />
+            <LearningStyleToggle
+              style={learningStyle}
+              onChange={handleLearningStyleChange}
+              disabled={isExam && examSession !== null}
+            />
             <ThemeToggle />
           </div>
         </div>

@@ -85,3 +85,100 @@
 4. 中村: TASK-013 進行（loader.ts 整合性確認）+ TASK-005 / TASK-006 着手（伊藤の `examTimer` I/F 確定済み）。
 5. 高橋（SM）: **A-30 沈黙チェック初回実施**（Day2）。中断・再開仕様（出題インデックス保持）の田中・中村すり合わせを Day1 終わりに 5 分セット。
 6. 鈴木（PO）: 不在（Day3-4 のリファインメント A-27 / A-29 / A-31 準備）。
+
+---
+
+## DAY 2 — 2026-06-11（木）
+
+### 基本情報
+
+| 項目                | 内容                                                  |
+| ------------------- | ----------------------------------------------------- |
+| 日時                | 2026-06-11（木）09:30 - 09:45                         |
+| 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ） |
+| タイムボックス      | 15分                                                  |
+| 沈黙チェック (A-30) | **実施**（初回・SM 高橋から「困ってないけど時間がかかっている作業はある？」「PR が滞留しそうな兆しは？」を全員に問いかけ） |
+
+### 三つの問い
+
+#### 伊藤（開発者）
+
+- **昨日**: TASK-001（`domain/examTimer.ts` + 20 件テスト）完了 / TASK-002 のうち `LearningStyle = 'exam'` アクティベート完了。
+- **今日**:
+  - **TASK-008**: `domain/feedbackKeywords.ts` 新設（REASON 3 観点 / ACTION 3 観点 + `countKeywordMatches` 純粋関数 + vitest 8 件・空文字／空配列／空キーワード境界値含む・DoD §10-1）。**完了**。
+  - **TASK-009 着手**: `domain/feedback.ts` 評価ロジック純粋関数の I/F 確定（`evaluateFeedback(writingEntry, scoringPoints, modelAnswer)` 雛形・3 ブロック × 4 観点 × ◎/○/△ の判定マップ草稿）。山本へ FeedbackView の props シグネチャを夕方に共有予定。
+- **障害物**: なし。
+- **A-30 への応答**: 「TASK-009 のスコア合算アルゴリズム（部分一致 vs scoringPoints[] 部分一致の重み付け）が未確定。Day3 の合流時に PO 鈴木へ確認する」。
+
+#### 田中（開発者）
+
+- **昨日**: PBI-027 の `App.tsx` 状態遷移整理メモ作成。
+- **今日**:
+  - **TASK-002 残**: 山本の追加した `LearningStyleToggle.disabled` プロパティを使い、`App.tsx` で Exam 切替時 `window.confirm("Examモード: 20問・90分タイマーが開始されます。よろしいですか？")` を実装。OK で `createExamSession` + `saveExamSession`、キャンセルで `'deep'` に戻す動線を結線。Exam 中は Toggle を無効化。**山本が代行で着手・完了**（田中は TASK-004 に集中）。
+  - **TASK-004 進行**: Exam セッション状態管理（`examSession` 状態 / `App.tsx` 出題ループ拡張・Quick/Deep 履歴非汚染）の骨格を実装。Day3 で `pickNextCaseByMode` から独立した出題ハンドラ完成予定。
+- **障害物**: なし。
+- **A-30 への応答**: 「TASK-007 a11y 検証はキーボード経路（Toggle → 確認モーダル → タイマー開始）の SR 読み上げ順序を実機確認したい。Day3 朝に 30 分確保したい」→ SM 高橋が場をセット。
+
+#### 山本（助っ人開発者）
+
+- **昨日**: TASK-003 スケルトン（mm:ss 表示）。
+- **今日**:
+  - **TASK-003 完了**: `ui/ExamTimer.tsx` 本実装（`getRemainingSeconds` / `formatTime` 連携・`setInterval` 毎秒更新・`useEffect` クリーンアップ・残 5 分以下で warning スタイル + 「残りわずか」テキスト併記（DoD §9-2 色のみ依存しない）・`role="timer"` / `aria-label="残り時間"` / `aria-live="polite"`・`dangerouslySetInnerHTML` 不使用 DoD §10-2）+ vitest 7 件（fakeTimers 進行 / 警告閾値 / 残 0 秒で `onTimeUp` 一度だけ呼ばれる / アンマウントで interval クリーンアップ）。
+  - **TASK-002 田中代行**: `LearningStyleToggle` に `disabled` プロパティ追加 + `App.tsx` の `handleLearningStyleChange` を Exam 分岐対応（確認モーダル / キャンセル時 Deep 戻し / 候補不足時の安全フォールバック alert）。
+- **障害物**: なし。
+- **A-30 への応答**: 「TASK-003 の警告スタイルはモバイル幅で `flex-wrap` を効かせて崩れを回避済み。実機検証は Day4 の a11y 検証セッションに統合可」。
+
+#### 中村（助っ人開発者）
+
+- **昨日**: TASK-013 着手（case-011〜020 modelAnswer 下書き）。
+- **今日**:
+  - **TASK-013 進行**: case-011〜015 の modelAnswer + scoringPoints[] を確定。loader.ts スキーマ整合性確認（既存 cases.json と同形）。Day3 朝に case-016〜020 を完了予定。
+  - **TASK-005/006 着手**: 伊藤の `examTimer` I/F が確定したので、中断ボタン UI 雛形 + 時間切れ自動終了処理の純粋関数化検討に入った。`onTimeUp` は山本の `ExamTimer` から流れてくる契約で合意済み。
+- **障害物**: なし。
+- **A-30 への応答**: 「PR 滞留兆しなし。TASK-013 / TASK-005 のレビュー依頼が Day3 に集中する見込み。伊藤・田中とレビュー時間枠を共有したい」→ SM 高橋がデイリー後にスロット調整。
+
+### スプリントゴールへの進捗
+
+- **Day 2 進捗**:
+  - **PBI-027** UI 主要部品（`ExamTimer.tsx`）が完成し、確認モーダル・Toggle 無効化までの起動経路が結線完了。Exam モード起動の主要パスがエンドツーエンドでつながった（出題ループは TASK-004 で Day3 完成予定）。
+  - **PBI-029** キーワード辞書（TASK-008）が完成し、TASK-009 評価ロジックの I/F が確定。山本の TASK-010（FeedbackView）着手に必要なシグネチャは Day2 夕方に共有合意。
+  - DoD §10-1（境界値）/ §10-2（XSS 不使用）/ §10-3（sessionStorage Exam 保存）の適用範囲は順調。
+- **計画上の Day2 マイルストーン（残タスク 14 / 残ポイント 6）に対する実績**:
+  - TASK-001/008 完了 ✅、TASK-003 完了 ✅（前倒し）、TASK-002 完了 ✅（前倒し）、TASK-009 進行 ✅、TASK-013 進行 ✅、TASK-005/006 着手 ✅。
+  - 残タスク **11** / 残ポイント **6**（Day2 計画 14 タスクに対し 3 タスク先行）。
+
+### A-30 沈黙チェック実施記録
+
+- **問いかけ**: 「困ってないけど時間がかかっている作業はある？」「PR が滞留しそうな兆しは？」（高橋 SM・全員へ）。
+- **抽出された潜在課題**:
+  1. 伊藤: TASK-009 のスコア合算アルゴリズム（部分一致重み付け）が未確定 → Day3 で PO 鈴木へ確認（A-29 リファインメントに統合）。
+  2. 田中: TASK-007 a11y 検証（Exam 起動経路 SR 読み上げ順序）の実機確認時間が未確保 → Day3 朝に 30 分確保（高橋が場をセット）。
+  3. 中村: TASK-013 / TASK-005 のレビュー依頼が Day3 に集中する見込み → 伊藤・田中とレビュー時間枠を Day2 終わりに調整。
+- **A-30 効果**: 沈黙していたら Day3-4 で顕在化していた可能性が高い 3 件を Day2 中に表出化。SM 高橋・PO 鈴木のリファインメント枠（A-29）に確実に流せる状態を作れた。
+
+### 検査と適応（スクラムガイド 2020）
+
+- 計画調整は不要。TASK-002 / TASK-003 を Day2 で完了させたことで、Day3 は TASK-004（Exam 出題ループ）/ TASK-009（評価ロジック）/ TASK-010（FeedbackView）/ TASK-013 残（case-016〜020）に集中できる。
+- A-26（巻取上限ガイド）は Day3-4 戦術判断時に運用。TASK-005/006 は中村が単独で進行可能と判断され、現時点で巻取不要。
+
+### Day 2 作業サマリ
+
+| 種別     | 内容                                                                                                                  |
+| -------- | --------------------------------------------------------------------------------------------------------------------- |
+| 新規     | `project/front/src/ui/ExamTimer.tsx`（mm:ss 表示・残 5 分以下 warning・aria-live・DoD §9-2 / §9-3 / §10-2）           |
+| 新規     | `project/front/src/ui/ExamTimer.test.tsx`（vitest 7 件・fakeTimers 進行 / 警告閾値 / onTimeUp 一度のみ / アンマウント） |
+| 新規     | `project/front/src/domain/feedbackKeywords.ts`（REASON 3 観点 / ACTION 3 観点 / `countKeywordMatches` 純粋関数）       |
+| 新規     | `project/front/src/domain/feedbackKeywords.test.ts`（vitest 8 件・部分一致 / 重複加算 / 空文字 / 空配列 / 空キーワード境界値・DoD §10-1） |
+| 更新     | `project/front/src/ui/LearningStyleToggle.tsx`（`disabled` prop 追加・Exam 中の途中切替防止）                          |
+| 更新     | `project/front/src/App.tsx`（Exam 切替時の確認モーダル・`createExamSession` / `saveExamSession` 結線・候補不足時 alert フォールバック・Toggle 無効化） |
+| 更新     | `project/front/src/styles.css`（`.exam-timer` / `.exam-timer--warning` / `.learning-style-toggle__btn:disabled`）      |
+| テスト   | `pnpm test`：**18 ファイル / 181 件 全 PASS**（DAY1 比 +15 件・うち ExamTimer 7 / feedbackKeywords 8）                  |
+
+### 次回（Day 3）に向けた合意
+
+1. 伊藤: TASK-009（`domain/feedback.ts` 評価ロジック）本実装。スコア合算アルゴリズム（部分一致重み付け）を朝イチで PO 鈴木に確認。
+2. 田中: TASK-004（Exam 出題ループ完成）+ TASK-007 a11y 検証（朝 30 分・高橋セット済）。
+3. 山本: TASK-010（`ui/FeedbackView.tsx`）着手。伊藤の TASK-009 I/F を受けて骨格実装。
+4. 中村: TASK-013 残（case-016〜020）+ TASK-005（中断機能）+ TASK-006（時間切れ自動終了）。レビュー時間枠を Day2 終わりに調整済。
+5. 高橋（SM）: A-26 巻取判断（Day3-4）に向けて各タスクの進捗監視。Day4 で A-30 第 2 回実施。
+6. 鈴木（PO）: A-29 リファインメント朝イチで TASK-009 スコア合算質問を伊藤と詰める。
