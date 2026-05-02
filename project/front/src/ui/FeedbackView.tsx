@@ -19,13 +19,22 @@ function scoreModifier(score: FeedbackScore): string {
   return score === '◎' ? 'good' : score === '○' ? 'ok' : 'ng';
 }
 
+/** suggestion 行に付与する id を観点ごとに生成（aria-describedby 用）。 */
+function suggestionId(category: string): string {
+  return `feedback-suggestion-${category}`;
+}
+
 /**
  * 観点別評価項目を `<dl>` の dt/dd で描画する。
  * - dt: 観点名 + スコアバッジ
  * - dd: 定型コメント（テキストノードのみ・XSS 安全）
+ * - △ 評価で `item.suggestion` が存在する場合のみ改善提案行を追加表示（PBI-040 / TASK-008）。
+ *   `dangerouslySetInnerHTML` 不使用（DoD §10-2）/ aria-describedby で SR にも明示（DoD §9-3）。
  */
 function FeedbackItemRow({ item }: { item: FeedbackItem }) {
   const mod = scoreModifier(item.score);
+  const hasSuggestion = typeof item.suggestion === 'string' && item.suggestion.length > 0;
+  const sid = hasSuggestion ? suggestionId(item.category) : undefined;
   return (
     <div className="feedback-view__item">
       <dt className="feedback-view__term">
@@ -37,7 +46,22 @@ function FeedbackItemRow({ item }: { item: FeedbackItem }) {
           {item.score}
         </span>
       </dt>
-      <dd className="feedback-view__desc">{item.comment}</dd>
+      <dd className="feedback-view__desc" aria-describedby={sid}>
+        {item.comment}
+      </dd>
+      {hasSuggestion && (
+        <dd
+          id={sid}
+          className="feedback-view__suggestion"
+          aria-label={`改善提案: ${item.suggestion}`}
+        >
+          <span className="feedback-view__suggestion-icon" aria-hidden="true">
+            💡
+          </span>
+          <span className="feedback-view__suggestion-label">改善提案:</span>{' '}
+          <span className="feedback-view__suggestion-text">{item.suggestion}</span>
+        </dd>
+      )}
     </div>
   );
 }

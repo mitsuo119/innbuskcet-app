@@ -620,6 +620,7 @@ body {
   padding: 0.35rem 0.85rem;
   cursor: pointer;
   line-height: 1.2;
+  position: relative;
 }
 
 .learning-style-toggle__btn + .learning-style-toggle__btn {
@@ -1072,3 +1073,52 @@ body {
   outline: 2px solid var(--color-accent, #2563eb);
   outline-offset: 2px;
 }
+
+/* ===== FeedbackView ���P��čs�iPBI-040 / TASK-008�j ===== */
+.feedback-view__suggestion {
+  margin: 0.35rem 0 0;
+  padding: 0.45rem 0.7rem;
+  border-left: 3px solid var(--color-accent, #2563eb);
+  background: var(--color-surface-muted, rgba(37, 99, 235, 0.08));
+  color: var(--color-text);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: baseline;
+}
+
+.feedback-view__suggestion-icon {
+  font-size: 1rem;
+}
+
+.feedback-view__suggestion-label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.feedback-view__suggestion-text {
+  word-break: break-word;
+}
+
+@media (prefers-color-scheme: dark) {
+  .feedback-view__suggestion {
+    background: rgba(96, 165, 250, 0.12);
+  }
+}
+
+/* ===== LearningStyleToggle �c�[���`�b�v�p sr-only�iPBI-036b / TASK-010�j ===== */
+.learning-style-toggle__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+

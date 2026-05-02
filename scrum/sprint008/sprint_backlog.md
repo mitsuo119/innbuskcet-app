@@ -51,14 +51,14 @@
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ----------- | ---------- |
 | TASK-006 | `domain/feedbackKeywords.ts` に観点別（5W1H / 委任 / フォロー / 論理 / 具体性 等）の △→◎ 改善提案テンプレートコメント辞書を追加 + 辞書更新ルール（A-42）を冒頭コメントに明文化                                                                               | 田中   | 3           | 完了       |
 | TASK-007 | `domain/feedback.ts` の `FeedbackItem` 型に `suggestion?: string` 追加 + `evaluateReason` / `evaluateAction` / `evaluateJudgment` で △ 評価時のみ該当観点の改善提案コメントを `suggestion` に格納（◎/○ 時は未設定）+ vitest 境界値含む 8 件以上（DoD §10-1） | 田中   | 3           | 完了       |
-| TASK-008 | `ui/FeedbackView.tsx` に改善提案行を視覚的に区別して追加表示（例:「💡 改善提案: 〜があると◎になります」）+ `dangerouslySetInnerHTML` 不使用テキストノード描画（DoD §10-2）+ aria-describedby SR 対応（DoD §9-3）+ ライト/ダーク両テーマ AA                   | 中村   | 2           | 未着手     |
+| TASK-008 | `ui/FeedbackView.tsx` に改善提案行を視覚的に区別して追加表示（例:「💡 改善提案: 〜があると◎になります」）+ `dangerouslySetInnerHTML` 不使用テキストノード描画（DoD §10-2）+ aria-describedby SR 対応（DoD §9-3）+ ライト/ダーク両テーマ AA                   | 中村   | 2           | 完了       |
 | TASK-009 | feedbackKeywords / feedback / FeedbackView の追加 vitest テスト（△ 時 suggestion 有 / ◎○ 時 suggestion 無 / 全観点カバレッジ / XSS エスケープ機械検証 `<script>` `onerror`）                                                                                 | 山本   | 3           | 未着手     |
 
 ### PBI-036b: LearningStyleToggle のツールチップ説明（1pt）
 
 | タスクID | タスク名                                                                                                                                                                                                                                                                                              | 担当者 | 見積もり(h) | ステータス |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------- | ---------- |
-| TASK-010 | `ui/LearningStyleToggle.tsx` の Quick/Deep/Exam 各ボタンに `title` 属性 + `aria-describedby` ツールチップ追加（Quick=説明重視型学習(5分・回答のみ) / Deep=じっくり型学習(記述あり) / Exam=本番模試(20問90分)）+ ライト/ダーク両テーマ AA + キーボードフォーカス表示 + モバイル(touch) aria-label 対応 | 中村   | 2           | 未着手     |
+| TASK-010 | `ui/LearningStyleToggle.tsx` の Quick/Deep/Exam 各ボタンに `title` 属性 + `aria-describedby` ツールチップ追加（Quick=説明重視型学習(5分・回答のみ) / Deep=じっくり型学習(記述あり) / Exam=本番模試(20問90分)）+ ライト/ダーク両テーマ AA + キーボードフォーカス表示 + モバイル(touch) aria-label 対応 | 中村   | 2           | 完了       |
 | TASK-011 | LearningStyleToggle ツールチップの vitest テスト（title / aria-describedby 属性存在確認・各 3 ボタン分）                                                                                                                                                                                              | 山本   | 1           | 未着手     |
 
 ### 横断タスク（プロセス改善・リファインメント）
@@ -132,3 +132,4 @@
 | 2026-06-17 | Sprint008 スプリントバックログ作成（PBI-033b/030/040/036b 計 7pt / 20 タスク） | 高橋エージェント |
 | 2026-06-17 | DAY1: TASK-002（ExamResultView.tsx 新設）/ TASK-004（App.tsx 結線）完了        | 伊藤             |
 | 2026-06-19 | DAY3: TASK-006（SUGGESTION_TEMPLATES + A-42 ルールコメント）/ TASK-007（FeedbackItem.suggestion + evaluateXxx 更新・248 PASS）完了 | 田中             |
+| 2026-06-20 | DAY4: TASK-008（FeedbackView 改善提案行 + styles.css 追加・aria-describedby）/ TASK-010（LearningStyleToggle title + aria-describedby + sr-only 追加）完了・vitest 248 PASS / tsc / eslint 0 件 | 中村             |
