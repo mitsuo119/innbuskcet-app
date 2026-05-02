@@ -292,11 +292,92 @@ _未入力_
 
 ### 三つの問い
 
-_未入力_
+#### 伊藤（開発者）
+
+- **昨日**: TASK-008 / TASK-010（FeedbackView 改善提案行・LearningStyleToggle ツールチップ）完了 / TASK-009 / TASK-011 完了で 261 PASS
+- **今日**: 統合テスト・DoD 21 項目確認・ビルド確認・横断 TASK-012〜019 完了・成果物最終化（sprint_backlog / product_backlog / velocity / daily_scrum）
+- **障害物**: なし
+
+#### 田中・山本・中村
+
+- 昨日までの担当 PBI / TASK は全件完了。Day5 はレビュー対応とレトロ準備に充当。
+- 障害物: なし。
 
 ### スプリントゴール達成判定
 
-_未入力_
+**ゴール**: Exam 終了後にスコアと弱点を確認し、AI の改善提案で次の学習アクションが明確になる学習サイクルを実現する → **🟢 達成**
+
+| PBI       | 結果 | 備考                                                                              |
+| --------- | ---- | --------------------------------------------------------------------------------- |
+| PBI-033b  | ✅   | case-021〜030 に modelAnswer + scoringPoints 追加（A/B/C 30% 維持・loader 整合）  |
+| PBI-030   | ✅   | ExamResultView 新設（A/B/C 別正答率 + 所要時間 + 各問正誤一覧 + 3 ボタン）        |
+| PBI-040   | ✅   | FeedbackItem.suggestion + SUGGESTION_TEMPLATES + FeedbackView 改善提案行          |
+| PBI-036b  | ✅   | LearningStyleToggle に title + aria-describedby ツールチップ + sr-only            |
+
+### Day5 統合確認結果
+
+- **テスト**: `pnpm exec vitest run` → **23 files / 261 tests PASS**（Sprint007 比 +59 件）
+- **型**: `pnpm exec tsc -b --noEmit` → **0 件**
+- **Lint**: `pnpm exec eslint .` → **0 件**
+- **ビルド**: `pnpm build` → **成功**
+  - `dist/index.html` 0.43 kB（gzip **0.31 kB**）
+  - `dist/assets/index-*.css` 16.77 kB（gzip **3.13 kB**）
+  - `dist/assets/index-*.js` 211.18 kB（gzip **68.30 kB**）
+  - 合計 gzip 約 **71.74 kB**（Sprint007 64.56 kB から +7.18 kB / ExamResultView + suggestion + ツールチップ追加分）
+
+### DoD（21 項目）全 PBI チェック結果
+
+| #     | 基準                                  | PBI-033b | PBI-030 | PBI-040 | PBI-036b |
+| ----- | ------------------------------------- | -------- | ------- | ------- | -------- |
+| 1-1   | TS 型エラー 0                          | ✅       | ✅      | ✅      | ✅       |
+| 1-2   | ESLint エラー / 警告 0                 | ✅       | ✅      | ✅      | ✅       |
+| 1-3   | ペアレビュー完了                       | ✅       | ✅      | ✅      | ✅       |
+| 2-1   | 主要ロジック単体テスト全件 PASS        | ✅ (loader) | ✅ (examResult 25 件) | ✅ (feedback 27 件) | ✅ (LearningStyleToggle 11 件) |
+| 2-2   | 受入基準 手動動作確認                  | ✅       | ✅      | ✅      | ✅       |
+| 3-1   | README 起動手順                        | ✅ (変更なし) | ✅ | ✅ | ✅       |
+| 3-2   | cases.json スキーマ説明                | ✅       | ✅      | ✅      | ✅       |
+| 4-1   | 最新 Chrome 動作                       | ✅       | ✅      | ✅      | ✅       |
+| 4-2   | 出題→回答→解説→次問サイクル            | ✅       | ✅      | ✅      | ✅       |
+| 5-1   | pnpm audit High/Critical 0             | ✅       | ✅      | ✅      | ✅       |
+| 5-2   | シークレット未ハードコード             | ✅       | ✅      | ✅      | ✅       |
+| 6-1   | 出題切替 1 秒以内                      | ✅       | ✅      | ✅      | ✅       |
+| 7-1   | スマホ〜PC 幅レスポンシブ              | ✅       | ✅      | ✅      | ✅       |
+| 7-2   | 主要操作 1〜2 タップ                   | ✅       | ✅      | ✅      | ✅       |
+| 8-1   | cases.json 管理                        | ✅       | ✅      | ✅      | ✅       |
+| 9-1   | キーボード完結                         | ✅       | ✅      | ✅      | ✅       |
+| 9-2   | フォーカス可視                         | ✅       | ✅      | ✅      | ✅       |
+| 9-3   | role / aria 適切                       | ✅       | ✅ (aria-label="Exam結果") | ✅ (aria-describedby) | ✅ (title + aria-describedby + sr-only) |
+| 10-1  | 入力検証 + 境界値テスト                | ✅ (loader 12 件) | ✅ (examResult 25 件) | ✅ (feedback 27 件 + feedbackKeywords 12 件) | ✅       |
+| 10-2  | dangerouslySetInnerHTML 不使用         | ✅       | ✅      | ✅      | ✅       |
+| 10-3  | 永続化スキーマ整合性                   | ✅ (loader.ts) | ✅ | ✅ | ✅ (inbasket.learningStyle.v1) |
+
+**結果**: 全 4 PBI × 21 項目 = **84 / 84 項目「はい」**。Sprint008 全 PBI 完成。
+
+### 横断タスク完了結果
+
+| TASK     | 内容                                                                                       | 結果                                          |
+| -------- | ------------------------------------------------------------------------------------------ | --------------------------------------------- |
+| TASK-012 | A-35 巻取上限ガイド 2 スプリント目運用                                                     | ✅ DAY1 / DAY3 / DAY4 で巻取運用記録あり     |
+| TASK-013 | A-36 沈黙チェック 2 回                                                                     | ✅ DAY2 / DAY4 で実施・中村 TASK-001 着手抽出 |
+| TASK-014 | A-39 役割切替すり合わせ枠（Day3 終わり）                                                   | ✅ SM デフォルトセット済                      |
+| TASK-015 | A-44 障害物起票判定 3 軸 試行                                                              | ✅ DAY1 で 3 軸試行・新規起票 0               |
+| TASK-016 | priorityLabel パターン横展開判定                                                           | ✅ filterMode/learningStyleLabel に重複あり → **PBI-042 として Sprint009 候補に起票** |
+| TASK-017 | pr_checklist.md にドメイン関数契約 × データ型整合観点追加                                  | ✅ §9.5 セクション追加（v0.4.0）              |
+| TASK-018 | feedbackKeywords.ts A-42 ルール冒頭明文化                                                  | ✅ 既に記載済（DAY3 田中対応）を確認          |
+| TASK-019 | PBI-041 Exam 中断・再開 4 シナリオ ユーザテスト計画                                        | ✅ PBI-041 AC に 4 シナリオ追記               |
+
+### Sprint008 ベロシティ
+
+- 計画: 7pt / 実績: **7pt** / 持ち越し: 0pt
+- 完了 PBI: PBI-033b（1）+ PBI-030（3）+ PBI-040（2）+ PBI-036b（1）= **7pt**
+- 障害物: 0 件（**8 スプリント連続障害物ゼロ**）
+- 8 スプリント平均: **9.25pt**
+
+### Sprint009 申し送り
+
+- PBI-042（共通ラベル定義源パターン横展開・filterMode / learningStyleLabel）を新規起票（Low / 2pt / Refinement）
+- PBI-041（Exam 中断・再開 UX）AC に 4 シナリオユーザテスト計画追記済
+- 既存 Sprint009 候補: PBI-038（ConfirmDialog）/ PBI-031 / PBI-032 / PBI-025 / PBI-026 / PBI-028 / PBI-033c
 
 ---
 
