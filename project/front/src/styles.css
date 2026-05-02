@@ -961,3 +961,114 @@ body {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+
+/* ------------------------------------------------------------------
+   ExamResult（PBI-030 / Sprint008 DAY1 着手分）
+   - 正答率 / 所要時間 / A/B/C 別正答数の 3 ブロック構成
+   - モバイル幅対応・両テーマ AA は TASK-003 (DAY3 以降) で仕上げ
+   ------------------------------------------------------------------ */
+.exam-result {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.exam-result__heading {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.exam-result__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin: 0;
+}
+
+.exam-result__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 8rem;
+}
+
+.exam-result__stat dt {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, var(--color-text));
+}
+
+.exam-result__stat dd {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.exam-result__stat strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.exam-result__sub {
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted, var(--color-text));
+}
+
+.exam-result__breakdown-heading {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.exam-result__priority-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.exam-result__priority-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.exam-result__priority-row dt,
+.exam-result__priority-row dd {
+  margin: 0;
+}
+
+.exam-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.exam-result__btn {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.exam-result__btn--primary {
+  background: var(--color-accent, #2563eb);
+  color: #fff;
+  border-color: transparent;
+}
+
+.exam-result__btn:focus-visible {
+  outline: 2px solid var(--color-accent, #2563eb);
+  outline-offset: 2px;
+}

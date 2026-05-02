@@ -10,38 +10,96 @@
 | ------------------- | ----------------------------------------------------- |
 | 日時                | 2026-06-17（水）09:30 - 09:45                         |
 | 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ） |
-| タイムボックス      | 15分                                                  |
+| タイムボックス      | 15分（実: 14分）                                      |
 | 沈黙チェック (A-36) | 未実施（Day2 / Day4 で 2 回目運用予定）               |
+| A-35 巻取上限ガイド | 各自 3 タスク／4h 目安に収まることを朝会冒頭で確認    |
+| A-44 障害物起票判定 | 3 軸ドラフト試行：DAY1 は新規起票なし                 |
 
 ### 三つの問い
 
 #### 伊藤（開発者）
 
-- **昨日（プランニング）やったこと**: _未入力_
-- **今日やること**: TASK-001（ExamResult.tsx UI）/ TASK-007（ConfirmDialog.tsx 基本実装）/ TASK-016（feedbackKeywords △→◎ 辞書追加）着手予定
-- **障害物**: _未入力_
+- **昨日（プランニング）やったこと**: Sprint007 完了処理 / DoE 担当分整理（Sprint008 受け持ち PBI-030 / PBI-040 の入口確認）
+- **今日やること**:
+  - TASK-001（`ui/ExamResult.tsx` UI 基本実装・3.5h）
+  - TASK-014（学習スタイル Toggle ツールチップ aria-label/補助・1h）※ TASK-015 と担当を入替（朝会で田中と合意）
+  - TASK-016（`feedbackKeywords.ts` △→◎ 辞書追加 着手・2h）
+  - 合計 6.5h（A-35 巻取上限ガイド 3 タスク／4h 枠内に収まる範囲で並行進行）
+- **障害物**: なし
+- **メモ**: 田中とは ExamResult / ConfirmDialog の I/F すり合わせを DAY2 朝に 15 分セット
 
 #### 田中（開発者）
 
-- **昨日（プランニング）やったこと**: _未入力_
-- **今日やること**: TASK-008（ConfirmDialog 3 ユースケース定義整理）/ TASK-014（Toggle ツールチップ追加）着手予定
-- **障害物**: _未入力_
+- **昨日（プランニング）やったこと**: Sprint007 完了処理 / テスト補強観点（PBI-030 集計関数の境界値テスト 8 件のテーブル下書き）
+- **今日やること**:
+  - TASK-002（`domain/examResult.ts` 集計純粋関数・2.5h）
+  - TASK-008（ConfirmDialog 3 ユースケース定義整理・1.5h）
+  - TASK-015（ツールチップ CSS 着手・1h）※ TASK-014 と担当を入替（朝会で伊藤と合意）
+  - 合計 5h
+- **障害物**: なし
+- **質問**: ExamResult と ConfirmDialog の I/F 打ち合わせは DAY2 で OK？ → SM 高橋: DAY2 朝 15 分にスロット確保
 
 #### 山本（助っ人開発者）
 
-- **昨日**: handoff_for_helpers.md（Day0）確認予定
-- **今日**: TASK-009（ConfirmDialog.test.tsx）スケルトン作成予定
-- **障害物**: _未入力_
+- **昨日**: `handoff_for_helpers.md`（Day0）確認 / Sprint007 助っ人モード継続
+- **今日やること**:
+  - TASK-009（`ConfirmDialog.test.tsx` スケルトン + 10 件着手・2h）
+  - TASK-012（`cases.json` case-021〜030 modelAnswer 下書き・2h）
+  - 合計 4h
+- **障害物**: cases.json の `scoringPoints` フィールド形式を確認したい
+  - → 中村に DAY1 中に確認してもらい、午前中にスナップショット共有予定（情報共有で解消可・障害物起票せず・A-44 判定）
 
 #### 中村（助っ人開発者）
 
-- **昨日**: handoff_for_helpers.md（Day0）確認予定
-- **今日**: TASK-012（cases.json case-021〜030 modelAnswer 下書き）着手予定
-- **障害物**: _未入力_
+- **昨日**: `handoff_for_helpers.md`（Day0）確認 / Sprint007 a11y・テスト改善継続
+- **今日やること**:
+  - TASK-012 前提確認（cases.json 構造スナップショット作成・0.5h）→ 山本に午前中共有
+  - TASK-004（`ExamResult.test.tsx` UI テスト 8 件のうち DAY1 で 1〜2 件着手・2h）
+  - TASK-018（`feedback.test.ts` △→◎ 境界値テスト下書き・1.5h）
+  - 合計 4h
+- **障害物**: なし
+- **質問**: PBI-040「△ → ◎ 昇格パターン」のキーワードは feedbackKeywords.ts にデータを持たせる？
+  - → 伊藤: TASK-016 で `UPGRADE_KEYWORDS` として骨格を切る（今日の DAY1 着手分でスタブ追加予定）
 
 ### スプリントゴールへの進捗
 
-_未入力_
+**スプリントゴール**: Exam 結果画面 + ConfirmDialog 統一 + キーワードサジェストで完全 Exam 体験
+
+| PBI       | DAY1 着手内容                                                    | 状況       |
+| --------- | ---------------------------------------------------------------- | ---------- |
+| PBI-030   | UI 基本実装（伊藤）/ 集計関数（田中）/ テスト着手（中村）        | 🟢 On Track |
+| PBI-038   | 3 ユースケース定義（田中）/ テストスケルトン（山本）             | 🟢 On Track |
+| PBI-033b  | scoringPoints 形式確認（中村）→ modelAnswer 下書き（山本）       | 🟢 On Track |
+| PBI-036b  | aria-label/CSS 着手（伊藤・田中で担当入替）                       | 🟢 On Track |
+| PBI-040   | UPGRADE_KEYWORDS スタブ + 更新ルールのコメント着手（伊藤）       | 🟢 On Track |
+
+**総合**: 🟢 On Track（基本 UI・ロジック・テスト基盤が DAY1〜DAY2 で揃う見込み）。
+
+### 障害物の検査（A-44 ドラフト 3 軸試行）
+
+DAY1 で挙がった懸念に対して 3 軸で起票要否を判定：
+
+| 懸念                                            | ①ゴール阻害 | ②支援/交渉が必要 | ③本日中に解消不可 | 起票  |
+| ----------------------------------------------- | ----------- | ---------------- | ----------------- | ----- |
+| cases.json `scoringPoints` 形式（山本→中村）    | No          | No（情報共有）   | No                | 不要  |
+
+**結論**: 新規障害物の起票なし（A-44 試行記録：3 軸すべて No → 起票しない）。
+
+### 翌日（DAY2）の計画調整
+
+- **DAY2 朝 15 分**: 伊藤・田中で「ExamResult / ConfirmDialog が App.tsx で同居する場合の state 管理」をすり合わせ（SM がスロット確保）
+- **DAY2 進めるタスク**: TASK-005（App.tsx 統合）/ TASK-010（window.confirm 置換）/ TASK-009 残（ConfirmDialog テスト）
+- **A-36 沈黙チェック 1 回目**: DAY2 デイリーで実施
+- **A-35 巻取判断**: DAY3 で 1 回目運用
+- **A-39 役割切替すり合わせ枠**: DAY3 終わり 5 分（SM デフォルトセット済み）
+
+### DAY1 開発成果物（記録）
+
+- 新規: `src/domain/examResult.ts` / `src/domain/examResult.test.ts`（3 件）
+- 新規: `src/ui/ExamResult.tsx` / `src/ui/ExamResult.test.tsx`（1 件）
+- 追加: `src/domain/feedbackKeywords.ts` に `UPGRADE_KEYWORDS` スタブ + 更新ルールコメント（A-42 運用準備）
+- 追加: `src/styles.css` に `.exam-result*` セクション
+- テスト総数: 202 → **206 PASS**（新規 4 件・lint / tsc --noEmit クリア）
 
 ---
 
