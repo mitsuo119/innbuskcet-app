@@ -7,17 +7,19 @@
  * - 評価ロジックはランダム性なし（同入力→同出力）。
  */
 
-import { ACTION_KEYWORDS, REASON_KEYWORDS, countKeywordMatches } from './feedbackKeywords';
+import { ACTION_KEYWORDS, REASON_KEYWORDS, SUGGESTION_TEMPLATES, countKeywordMatches } from './feedbackKeywords';
 import type { WritingEntry } from './writing';
 
 /** 評価スコア記号（3 段階）。 */
 export type FeedbackScore = '◎' | '○' | '△';
 
-/** 観点別の評価項目（カテゴリ名 / スコア / 定型コメント）。 */
+/** 観点別の評価項目（カテゴリ名 / スコア / 定型コメント / △ 時の改善提案）。 */
 export interface FeedbackItem {
   category: string;
   score: FeedbackScore;
   comment: string;
+  /** △ 評価時の △→◎ 改善提案コメント（◎ / ○ 時は未設定）。PBI-040 / TASK-007。 */
+  suggestion?: string;
 }
 
 /** 記述全体のフィードバック（判断 / 理由 / アクション + 総合）。 */
@@ -62,6 +64,7 @@ export function evaluateJudgment(userJudgment: string, correctPriority: string):
       category,
       score: '△',
       comment: '判断（A / B / C）が読み取れません。模範解答を確認してください。',
+      suggestion: SUGGESTION_TEMPLATES['判断'],
     };
   }
   const diff = Math.abs(priorityIndex(user) - priorityIndex(correct));
@@ -79,6 +82,7 @@ export function evaluateJudgment(userJudgment: string, correctPriority: string):
     category,
     score: '△',
     comment: '判断に大きなずれがあります。模範解答を確認してください。',
+    suggestion: SUGGESTION_TEMPLATES['判断'],
   };
 }
 
@@ -105,7 +109,9 @@ export function evaluateReason(text: string): FeedbackItem[] {
   return Object.entries(REASON_KEYWORDS).map(([category, keywords]) => {
     const count = countKeywordMatches(safe, keywords);
     const score = countToScore(count);
-    return { category, score, comment: commentFor(category, score) };
+    const item: FeedbackItem = { category, score, comment: commentFor(category, score) };
+    if (score === '△') item.suggestion = SUGGESTION_TEMPLATES[category];
+    return item;
   });
 }
 
@@ -121,7 +127,9 @@ export function evaluateAction(text: string): FeedbackItem[] {
     const matches = countKeywordMatches(safe, keywords);
     const effective = matches + lengthBonus;
     const score = countToScore(effective);
-    return { category, score, comment: commentFor(category, score) };
+    const item: FeedbackItem = { category, score, comment: commentFor(category, score) };
+    if (score === '△') item.suggestion = SUGGESTION_TEMPLATES[category];
+    return item;
   });
 }
 

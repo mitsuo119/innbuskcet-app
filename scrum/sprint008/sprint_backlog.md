@@ -49,8 +49,8 @@
 
 | タスクID | タスク名                                                                                                                                                                                                                                                     | 担当者 | 見積もり(h) | ステータス |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ----------- | ---------- |
-| TASK-006 | `domain/feedbackKeywords.ts` に観点別（5W1H / 委任 / フォロー / 論理 / 具体性 等）の △→◎ 改善提案テンプレートコメント辞書を追加 + 辞書更新ルール（A-42）を冒頭コメントに明文化                                                                               | 田中   | 3           | 未着手     |
-| TASK-007 | `domain/feedback.ts` の `FeedbackItem` 型に `suggestion?: string` 追加 + `evaluateReason` / `evaluateAction` / `evaluateJudgment` で △ 評価時のみ該当観点の改善提案コメントを `suggestion` に格納（◎/○ 時は未設定）+ vitest 境界値含む 8 件以上（DoD §10-1） | 田中   | 3           | 未着手     |
+| TASK-006 | `domain/feedbackKeywords.ts` に観点別（5W1H / 委任 / フォロー / 論理 / 具体性 等）の △→◎ 改善提案テンプレートコメント辞書を追加 + 辞書更新ルール（A-42）を冒頭コメントに明文化                                                                               | 田中   | 3           | 完了       |
+| TASK-007 | `domain/feedback.ts` の `FeedbackItem` 型に `suggestion?: string` 追加 + `evaluateReason` / `evaluateAction` / `evaluateJudgment` で △ 評価時のみ該当観点の改善提案コメントを `suggestion` に格納（◎/○ 時は未設定）+ vitest 境界値含む 8 件以上（DoD §10-1） | 田中   | 3           | 完了       |
 | TASK-008 | `ui/FeedbackView.tsx` に改善提案行を視覚的に区別して追加表示（例:「💡 改善提案: 〜があると◎になります」）+ `dangerouslySetInnerHTML` 不使用テキストノード描画（DoD §10-2）+ aria-describedby SR 対応（DoD §9-3）+ ライト/ダーク両テーマ AA                   | 中村   | 2           | 未着手     |
 | TASK-009 | feedbackKeywords / feedback / FeedbackView の追加 vitest テスト（△ 時 suggestion 有 / ◎○ 時 suggestion 無 / 全観点カバレッジ / XSS エスケープ機械検証 `<script>` `onerror`）                                                                                 | 山本   | 3           | 未着手     |
 
@@ -131,3 +131,4 @@
 | ---------- | ------------------------------------------------------------------------------ | ---------------- |
 | 2026-06-17 | Sprint008 スプリントバックログ作成（PBI-033b/030/040/036b 計 7pt / 20 タスク） | 高橋エージェント |
 | 2026-06-17 | DAY1: TASK-002（ExamResultView.tsx 新設）/ TASK-004（App.tsx 結線）完了        | 伊藤             |
+| 2026-06-19 | DAY3: TASK-006（SUGGESTION_TEMPLATES + A-42 ルールコメント）/ TASK-007（FeedbackItem.suggestion + evaluateXxx 更新・248 PASS）完了 | 田中             |

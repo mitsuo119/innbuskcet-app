@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { evaluateAction, evaluateJudgment, evaluateReason, evaluateWriting } from './feedback';
+import { SUGGESTION_TEMPLATES } from './feedbackKeywords';
 import type { WritingEntry } from './writing';
 
 describe('evaluateJudgment', () => {
@@ -100,5 +101,90 @@ describe('evaluateWriting (統合)', () => {
     const fb = evaluateWriting(entry, 'A');
     expect(fb.overall).toBe('△');
     expect(fb.judgment.score).toBe('△');
+  });
+});
+
+describe('FeedbackItem.suggestion（PBI-040 / TASK-007 △→◎ 改善提案）', () => {
+  // --- evaluateJudgment ---
+  it('judgment ◎（一致）は suggestion が undefined', () => {
+    const r = evaluateJudgment('Aランクで対応', 'A');
+    expect(r.score).toBe('◎');
+    expect(r.suggestion).toBeUndefined();
+  });
+
+  it('judgment ○（1 段差）は suggestion が undefined', () => {
+    const r = evaluateJudgment('Bランクで対応', 'A');
+    expect(r.score).toBe('○');
+    expect(r.suggestion).toBeUndefined();
+  });
+
+  it('judgment △（2 段差）は suggestion に「判断」テンプレートが設定される', () => {
+    const r = evaluateJudgment('Cランクで対応', 'A');
+    expect(r.score).toBe('△');
+    expect(r.suggestion).toBe(SUGGESTION_TEMPLATES['判断']);
+  });
+
+  it('judgment △（読み取り不能）も suggestion に「判断」テンプレートが設定される', () => {
+    const r = evaluateJudgment('未記入', 'A');
+    expect(r.score).toBe('△');
+    expect(r.suggestion).toBe(SUGGESTION_TEMPLATES['判断']);
+  });
+
+  // --- evaluateReason ---
+  it('reason 全観点 △ のとき各観点の suggestion が SUGGESTION_TEMPLATES と一致する', () => {
+    const r = evaluateReason('特に何もなし');
+    expect(r).toHaveLength(3);
+    for (const item of r) {
+      expect(item.score).toBe('△');
+      expect(item.suggestion).toBe(SUGGESTION_TEMPLATES[item.category]);
+      expect(item.suggestion).toBeTypeOf('string');
+    }
+  });
+
+  it('reason ◎ になった観点は suggestion が undefined', () => {
+    const r = evaluateReason('誰がいつどこで対応するかを明確にする');
+    const fiveW1H = r.find((x) => x.category === '5W1H');
+    expect(fiveW1H?.score).toBe('◎');
+    expect(fiveW1H?.suggestion).toBeUndefined();
+  });
+
+  it('reason ○ になった観点も suggestion が undefined', () => {
+    const r = evaluateReason('緊急性が高いため');
+    const yusen = r.find((x) => x.category === '優先度');
+    expect(yusen?.score).toBe('○');
+    expect(yusen?.suggestion).toBeUndefined();
+  });
+
+  // --- evaluateAction ---
+  it('action 全観点 △ のとき各観点の suggestion が SUGGESTION_TEMPLATES と一致する', () => {
+    const r = evaluateAction('対応する');
+    expect(r).toHaveLength(3);
+    for (const item of r) {
+      expect(item.score).toBe('△');
+      expect(item.suggestion).toBe(SUGGESTION_TEMPLATES[item.category]);
+    }
+  });
+
+  it('action ◎ の観点（キーワード 3 件以上）は suggestion が undefined', () => {
+    const r = evaluateAction('依頼し相談し連絡する');
+    const inin = r.find((x) => x.category === '委任');
+    expect(inin?.score).toBe('◎');
+    expect(inin?.suggestion).toBeUndefined();
+  });
+
+  // --- 横断 ---
+  it('SUGGESTION_TEMPLATES は全観点（5W1H/優先度/論理/委任/フォロー/具体性/判断）を網羅している', () => {
+    for (const key of ['5W1H', '優先度', '論理', '委任', 'フォロー', '具体性', '判断']) {
+      expect(SUGGESTION_TEMPLATES[key]).toBeTypeOf('string');
+      expect(SUGGESTION_TEMPLATES[key].length).toBeGreaterThan(0);
+    }
+  });
+
+  it('evaluateWriting 経由でも △ 観点に suggestion が伝播する', () => {
+    const entry: WritingEntry = { judgment: '', reason: '', action: '' };
+    const fb = evaluateWriting(entry, 'A');
+    expect(fb.judgment.suggestion).toBe(SUGGESTION_TEMPLATES['判断']);
+    expect(fb.reason.every((x) => x.suggestion === SUGGESTION_TEMPLATES[x.category])).toBe(true);
+    expect(fb.action.every((x) => x.suggestion === SUGGESTION_TEMPLATES[x.category])).toBe(true);
   });
 });
