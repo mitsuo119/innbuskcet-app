@@ -17,6 +17,12 @@ export interface HistoryItem {
    * 既存履歴互換のため optional。未指定は Sprint006 以前のレコードを示す。
    */
   learningStyle?: LearningStyle;
+  /**
+   * ユーザが回答した優先度（PBI-030 / Sprint008 TASK-002）。
+   * - 既存履歴互換のため optional。Sprint007 以前のレコードでは未設定。
+   * - ExamResultView での「回答／正解」並列表示に使用する。
+   */
+  answeredPriority?: Priority;
 }
 
 /** 直近何件まで保持するか（PBI-016 受入基準。PBI-020 で表示件数 10/20 切替可） */

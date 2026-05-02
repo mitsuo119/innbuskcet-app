@@ -72,11 +72,15 @@ export function evaluateByPriority(
   if (!Array.isArray(correctPriorities) || !Array.isArray(userPriorities)) {
     return EMPTY_BREAKDOWN;
   }
-  const len = Math.min(correctPriorities.length, userPriorities.length);
+  // Array.isArray は narrow 後に any[] へ広げてしまうため、
+  // 静的型を維持するために再キャストする（DoD §10-1 / TS 仕様への対処）。
+  const correctArr = correctPriorities as readonly Priority[];
+  const userArr = userPriorities as readonly Priority[];
+  const len = Math.min(correctArr.length, userArr.length);
   const acc = emptyBreakdown();
   for (let i = 0; i < len; i++) {
-    const cp = correctPriorities[i];
-    const up = userPriorities[i];
+    const cp = correctArr[i];
+    const up = userArr[i];
     if (cp !== 'A' && cp !== 'B' && cp !== 'C') continue;
     acc[cp].total += 1;
     if (cp === up) acc[cp].correct += 1;
@@ -107,8 +111,7 @@ export function buildExamResultSummary(
 ): ExamResultSummary {
   const byPriority = evaluateByPriority(correctPriorities, userPriorities);
   const correctCount = byPriority.A.correct + byPriority.B.correct + byPriority.C.correct;
-  const totalQuestions =
-    byPriority.A.total + byPriority.B.total + byPriority.C.total;
+  const totalQuestions = byPriority.A.total + byPriority.B.total + byPriority.C.total;
   const safeElapsed =
     Number.isFinite(elapsedSeconds) && elapsedSeconds > 0 ? Math.floor(elapsedSeconds) : 0;
   return {

@@ -12,6 +12,7 @@ import { WritingInput } from './ui/WritingInput';
 import { WritingPreview } from './ui/WritingPreview';
 import { ExamTimer } from './ui/ExamTimer';
 import { FeedbackView } from './ui/FeedbackView';
+import { ExamResultView } from './ui/ExamResultView';
 import type { Case, Priority } from './domain/case';
 import { evaluateWriting, type WritingFeedback } from './domain/feedback';
 import {
@@ -69,6 +70,21 @@ export default function App() {
   const [examSession, setExamSession] = useState<ExamSession | null>(null);
   /** Exam モードでの現在の出題インデックス（0 始まり・examSession.questionIds に対応）。 */
   const [examIndex, setExamIndex] = useState<number>(0);
+  /**
+   * Exam セッション中の回答履歴（出題順・PBI-030 / Sprint008 TASK-002）。
+   * 既存 `history` は表示件数 10/20 で切り詰められるため、Exam 振り返り表示専用に
+   * 別 state として保持する。Exam 終了 → ExamResultView 表示時に参照される。
+   */
+  const [examAnswers, setExamAnswers] = useState<readonly HistoryItem[]>([]);
+  /**
+   * Exam 終了時に表示する結果画面用スナップショット（PBI-030 / Sprint008 TASK-004）。
+   * - `null` の間は通常 UI（出題画面）を表示する。
+   * - 値がセットされたタイミングで ExamResultView を排他表示する。
+   */
+  const [examResult, setExamResult] = useState<{
+    session: ExamSession;
+    history: readonly HistoryItem[];
+  } | null>(null);
   /** AI 評価フィードバック表示用 state（PBI-029 / TASK-011・新ケース移動でリセット）。 */
   const [writingFeedback, setWritingFeedback] = useState<WritingFeedback | null>(null);
 
@@ -99,10 +115,24 @@ export default function App() {
           judgement: result,
           correctPriority: current.correctPriority,
           learningStyle,
+          answeredPriority: answer,
         },
         historyLimit,
       ),
     );
+    // Exam モード中は別 state に出題順で蓄積し、結果画面で参照する（PBI-030 / TASK-002）。
+    if (isExam && examSession) {
+      setExamAnswers((prev) => [
+        ...prev,
+        {
+          caseId: current.id,
+          judgement: result,
+          correctPriority: current.correctPriority,
+          learningStyle,
+          answeredPriority: answer,
+        },
+      ]);
+    }
   };
 
   const handleNext = () => {
@@ -110,7 +140,7 @@ export default function App() {
     if (isExam && examSession) {
       const nextIdx = examIndex + 1;
       if (nextIdx >= examSession.questionIds.length) {
-        finalizeExamSession('Examモード完了！お疲れ様でした。');
+        finalizeExamSession();
         return;
       }
       setExamIndex(nextIdx);
@@ -131,28 +161,47 @@ export default function App() {
   };
 
   /**
-   * Exam セッションを終了させ Deep モードへ復帰させる共通処理（PBI-027 / TASK-005-006）。
-   * - sessionStorage をクリアし、examSession / index / writingFeedback を初期化。
-   * - alert で簡易にユーザへ通知し、Deep モードとして 1 問目を提示する。
+   * Exam セッションを終了させ ExamResultView を表示する（PBI-030 / Sprint008 TASK-004）。
+   * - sessionStorage をクリアし、出題用 state を初期化する。
+   * - examResult に session/answers のスナップショットを保存し ExamResultView を表示する。
+   * - learningStyle は Exam のまま据え置き、結果画面の「Deep で学習に戻る」で Deep へ復帰する。
    */
-  const finalizeExamSession = (message: string) => {
+  const finalizeExamSession = () => {
+    if (!examSession) return;
+    const snapshot = {
+      session: examSession,
+      history: examAnswers,
+    };
     clearExamSession();
     setExamSession(null);
     setExamIndex(0);
     setWritingFeedback(null);
+    setSelected(null);
+    setJudgement(null);
+    setWritingEntry(createEmptyWritingEntry());
+    setExamResult(snapshot);
+  };
+
+  /**
+   * ExamResultView「Deep で学習に戻る」ハンドラ（PBI-030 / Sprint008 TASK-004）。
+   * - learningStyle を 'deep' にリセットし、examSession / examAnswers / examResult を全クリアする。
+   * - Quick / Deep 履歴非汚染のため、表示用 history は変更せずそのまま残す。
+   */
+  const handleBackToStudyFromExamResult = () => {
+    setExamResult(null);
+    setExamAnswers([]);
     setLearningStyle('deep');
     saveLearningStyle('deep');
     setSelected(null);
     setJudgement(null);
     setWritingEntry(createEmptyWritingEntry());
     setCurrent(pickNextCaseByMode(allCases, undefined, mode));
-    window.alert(message);
   };
 
   /** ExamTimer からの時間切れコールバック（PBI-027 / TASK-006）。 */
   const handleExamTimeUp = () => {
     if (!examSession) return;
-    finalizeExamSession('時間終了！お疲れ様でした。');
+    finalizeExamSession();
   };
 
   /**
@@ -228,6 +277,8 @@ export default function App() {
       clearExamSession();
       setExamSession(null);
       setExamIndex(0);
+      setExamAnswers([]);
+      setExamResult(null);
       setWritingFeedback(null);
       setLearningStyle(next);
       saveLearningStyle(next);
@@ -255,6 +306,8 @@ export default function App() {
         const session = createExamSession(allCaseIds);
         setExamSession(session);
         setExamIndex(0);
+        setExamAnswers([]);
+        setExamResult(null);
         saveExamSession(session);
         // 初問を questionIds[0] で上書きする。
         const firstId = session.questionIds[0];
@@ -275,6 +328,8 @@ export default function App() {
       // Exam 以外への切替時は念のため sessionStorage の Exam 残骸を掃除する。
       setExamSession(null);
       setExamIndex(0);
+      setExamAnswers([]);
+      setExamResult(null);
       clearExamSession();
     }
     setLearningStyle(next);
@@ -333,102 +388,112 @@ export default function App() {
         )}
       </header>
 
-      <ModeSelector mode={mode} onChange={handleModeChange} />
-
-      <fieldset className="history-limit" aria-label="履歴表示件数">
-        <legend className="history-limit__legend">履歴表示件数</legend>
-        {HISTORY_LIMIT_OPTIONS.map((n) => (
-          <label key={n} className="history-limit__option">
-            <input
-              type="radio"
-              name="history-limit"
-              value={n}
-              checked={historyLimit === n}
-              onChange={() => handleHistoryLimitChange(n)}
-              aria-label={`直近${n}件を表示`}
-            />
-            <span>{n}件</span>
-          </label>
-        ))}
-      </fieldset>
-
-      <HistoryView history={history} maxDisplay={historyLimit} />
-
-      {current ? (
+      {examResult ? (
+        <ExamResultView
+          session={examResult.session}
+          history={examResult.history}
+          onBackToStudy={handleBackToStudyFromExamResult}
+        />
+      ) : (
         <>
-          <CaseView caseItem={current} />
-          {isDeep && (
-            <WritingInput
-              entry={writingEntry}
-              onChange={setWritingEntry}
-              disabled={locked}
-              onSkip={isWritingEntryEmpty(writingEntry) ? undefined : handleSkipWriting}
-            />
-          )}
-          {isDeep && !isWritingEntryEmpty(writingEntry) && (
-            <div className="writing-input__ai-row">
-              <button
-                type="button"
-                className="writing-input__ai"
-                onClick={handleEvaluateWriting}
-                aria-label="AIに評価を依頼する"
-              >
-                AIに見てもらう
-              </button>
-            </div>
-          )}
-          <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
-          {judgement && selected && (
+          <ModeSelector mode={mode} onChange={handleModeChange} />
+
+          <fieldset className="history-limit" aria-label="履歴表示件数">
+            <legend className="history-limit__legend">履歴表示件数</legend>
+            {HISTORY_LIMIT_OPTIONS.map((n) => (
+              <label key={n} className="history-limit__option">
+                <input
+                  type="radio"
+                  name="history-limit"
+                  value={n}
+                  checked={historyLimit === n}
+                  onChange={() => handleHistoryLimitChange(n)}
+                  aria-label={`直近${n}件を表示`}
+                />
+                <span>{n}件</span>
+              </label>
+            ))}
+          </fieldset>
+
+          <HistoryView history={history} maxDisplay={historyLimit} />
+
+          {current ? (
             <>
+              <CaseView caseItem={current} />
               {isDeep && (
+                <WritingInput
+                  entry={writingEntry}
+                  onChange={setWritingEntry}
+                  disabled={locked}
+                  onSkip={isWritingEntryEmpty(writingEntry) ? undefined : handleSkipWriting}
+                />
+              )}
+              {isDeep && !isWritingEntryEmpty(writingEntry) && (
+                <div className="writing-input__ai-row">
+                  <button
+                    type="button"
+                    className="writing-input__ai"
+                    onClick={handleEvaluateWriting}
+                    aria-label="AIに評価を依頼する"
+                  >
+                    AIに見てもらう
+                  </button>
+                </div>
+              )}
+              <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
+              {judgement && selected && (
                 <>
-                  <WritingPreview
-                    entry={writingEntry}
-                    isEmpty={isWritingEntryEmpty(writingEntry)}
+                  {isDeep && (
+                    <>
+                      <WritingPreview
+                        entry={writingEntry}
+                        isEmpty={isWritingEntryEmpty(writingEntry)}
+                      />
+                      <ModelAnswerView
+                        modelAnswer={current.modelAnswer}
+                        visible={!!judgement}
+                        correctPriority={current.correctPriority}
+                      />
+                      <FeedbackView feedback={writingFeedback} visible={writingFeedback !== null} />
+                    </>
+                  )}
+                  <ExplanationView
+                    caseItem={current}
+                    answer={selected}
+                    judgement={judgement}
+                    onRetry={handleRetry}
                   />
-                  <ModelAnswerView
-                    modelAnswer={current.modelAnswer}
-                    visible={!!judgement}
-                    correctPriority={current.correctPriority}
-                  />
-                  <FeedbackView feedback={writingFeedback} visible={writingFeedback !== null} />
                 </>
               )}
-              <ExplanationView
-                caseItem={current}
-                answer={selected}
-                judgement={judgement}
-                onRetry={handleRetry}
-              />
             </>
+          ) : (
+            <p>該当する優先度の案件がありません。モードを切替えてください。</p>
           )}
+
+          <div className="actions">
+            {!locked ? (
+              <button
+                type="button"
+                onClick={() => handleSubmit()}
+                disabled={selected === null || !current}
+              >
+                回答する
+              </button>
+            ) : (
+              <button type="button" onClick={handleNext} disabled={allCases.length === 0}>
+                次の問題（Enter）
+              </button>
+            )}
+          </div>
+
+          <footer className="app-footer" aria-label="キーボードショートカット">
+            <small>
+              ショートカット: <kbd>A</kbd> / <kbd>B</kbd> / <kbd>C</kbd> で回答、<kbd>Enter</kbd>{' '}
+              で次の問題
+            </small>
+          </footer>
         </>
-      ) : (
-        <p>該当する優先度の案件がありません。モードを切替えてください。</p>
       )}
-
-      <div className="actions">
-        {!locked ? (
-          <button
-            type="button"
-            onClick={() => handleSubmit()}
-            disabled={selected === null || !current}
-          >
-            回答する
-          </button>
-        ) : (
-          <button type="button" onClick={handleNext} disabled={allCases.length === 0}>
-            次の問題（Enter）
-          </button>
-        )}
-      </div>
-
-      <footer className="app-footer" aria-label="キーボードショートカット">
-        <small>
-          ショートカット: <kbd>A</kbd> / <kbd>B</kbd> / <kbd>C</kbd> で回答、<kbd>Enter</kbd>{' '}
-          で次の問題
-        </small>
-      </footer>
     </main>
   );
 }

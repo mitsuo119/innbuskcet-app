@@ -101,6 +101,28 @@ DAY1 で挙がった懸念に対して 3 軸で起票要否を判定：
 - 追加: `src/styles.css` に `.exam-result*` セクション
 - テスト総数: 202 → **206 PASS**（新規 4 件・lint / tsc --noEmit クリア）
 
+### DAY1 終了時 実績更新（伊藤・sprint_backlog.md TASK ID 基準）
+
+- ✅ **TASK-002 完了**: `ui/ExamResultView.tsx` 新設（`session: ExamSession` / `history: HistoryItem[]` / `onBackToStudy` プロップ）
+  - 総合正答率 + A/B/C 別正答率（PRIORITY_LABELS 使用）+ 所要時間（formatTime）+ 各問正誤一覧 + 「Deep で学習に戻る」ボタン
+  - ルート `<section role="region" aria-label="Exam結果">`（DoD §9-3）
+  - `dangerouslySetInnerHTML` 不使用（DoD §10-2）
+  - 集計は `domain/examResult.ts` の `buildExamResultSummary` 純粋関数に委譲
+- ✅ **TASK-004 完了**: `App.tsx` 結線
+  - `examAnswers` / `examResult` state 追加（Quick/Deep 履歴非汚染のための分離保持）
+  - `finalizeExamSession` から既存 `alert()` を撤去 → ExamResultView 排他表示に変更
+  - `examSession === null` & `examResult !== null` のとき ExamResultView を main 内で排他描画
+  - 「Deep で学習に戻る」押下で `learningStyle='deep'` / `examSession=null` / `examAnswers=[]` / `examResult=null` リセット
+- 付随対応:
+  - `domain/history.ts` `HistoryItem` に `answeredPriority?: Priority` 追加（既存履歴互換）+ `App.tsx` 提出時に格納
+  - `domain/examResult.ts` `evaluateByPriority` の `Array.isArray` narrow 後 `any[]` 化に伴う TS7053 を cast で解消（pre-existing build エラー）
+  - `src/styles.css` `.exam-result` セクション先頭コメントが CP932 で書かれており vite ビルド時 `Could not load src/styles.css: stream did not contain valid UTF-8` を起こしていたため UTF-8 で書き直し
+- 検証結果:
+  - `pnpm exec vitest run` → 22 files / **206 tests PASS**
+  - `pnpm build` → tsc + vite 共にエラーなし
+- 残: TASK-001（中村）/ TASK-003（山本）/ TASK-005（田中）は担当者依存
+
+
 ---
 
 ## DAY 2 — 2026-06-18（木）
