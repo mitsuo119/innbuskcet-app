@@ -7,18 +7,16 @@ export interface LearningStyleToggleProps {
   onChange: (style: LearningStyle) => void;
 }
 
-const ORDER: readonly LearningStyle[] = ['quick', 'deep'] as const;
+const ORDER: readonly LearningStyle[] = ['quick', 'deep', 'exam'] as const;
 
 /**
- * 学習スタイル切替トグル（PBI-036 / TASK-008）。
+ * 学習スタイル切替トグル（PBI-036 / PBI-027）。
  *
- * - セグメントコントロール形式（Quick / Deep の 2 ボタン）。
+ * - セグメントコントロール形式（Quick / Deep / Exam の 3 ボタン）。
  * - 選択中ボタンに `aria-pressed="true"` を付与（DoD §9-3）。
  * - 親コンテナは `role="group"` + `aria-label="学習スタイル"`。
  * - キーボード: Tab で各ボタンに到達、Space/Enter で選択（HTML button 既定）。
  * - `dangerouslySetInnerHTML` 不使用（DoD §10-2）。
- *
- * 注: `exam` モードのグレイアウト UI は別タスクで追加予定。
  */
 export function LearningStyleToggle({ style, onChange }: LearningStyleToggleProps) {
   return (

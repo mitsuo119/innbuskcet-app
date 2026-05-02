@@ -71,10 +71,11 @@ export const ALL_MODES: readonly FilterMode[] = FILTER_MODES;
 /** 学習スタイル別スコア（PBI-037 / TASK-015） */
 export type LearningStyleScores = Record<LearningStyle, Score>;
 
-/** 初期学習スタイル別スコア（quick/deep ともに 0/0） */
+/** 初期学習スタイル別スコア（quick/deep/exam ともに 0/0） */
 export const initialLearningStyleScores: LearningStyleScores = {
   quick: { total: 0, correct: 0 },
   deep: { total: 0, correct: 0 },
+  exam: { total: 0, correct: 0 },
 };
 
 /**

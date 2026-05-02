@@ -18,11 +18,13 @@ describe('learningStyle（PBI-036 / TASK-007）', () => {
   });
 
   describe('LEARNING_STYLES 定数', () => {
-    it('quick / deep の label と description を持つ', () => {
+    it('quick / deep / exam の label と description を持つ', () => {
       expect(LEARNING_STYLES.quick.label).toBe('Quick');
       expect(LEARNING_STYLES.quick.description).toBe('優先順位のみ回答（隙間時間用）');
       expect(LEARNING_STYLES.deep.label).toBe('Deep');
       expect(LEARNING_STYLES.deep.description).toBe('記述あり（じっくり練習）');
+      expect(LEARNING_STYLES.exam.label).toBe('Exam');
+      expect(LEARNING_STYLES.exam.description).toBe('20問90分・本番想定');
     });
   });
 
@@ -41,9 +43,12 @@ describe('learningStyle（PBI-036 / TASK-007）', () => {
       expect(loadLearningStyle()).toBe('deep');
     });
 
-    it('不正値（"exam" / 任意文字列 / 空文字）はすべて "deep" にフォールバックする', () => {
+    it('localStorage に "exam" が保存されていれば "exam" を返す（PBI-027 アクティベート）', () => {
       window.localStorage.setItem(STORAGE_KEY, 'exam');
-      expect(loadLearningStyle()).toBe('deep');
+      expect(loadLearningStyle()).toBe('exam');
+    });
+
+    it('不正値（任意文字列 / 空文字）はすべて "deep" にフォールバックする', () => {
       window.localStorage.setItem(STORAGE_KEY, 'INVALID');
       expect(loadLearningStyle()).toBe('deep');
       window.localStorage.setItem(STORAGE_KEY, '');

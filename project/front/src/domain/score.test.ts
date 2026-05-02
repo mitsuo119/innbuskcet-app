@@ -116,10 +116,11 @@ describe('addModeScore() / ratePercent() (PBI-021)', () => {
 });
 
 describe('addLearningStyleScore() (PBI-037 / TASK-015)', () => {
-  it('initialLearningStyleScores は quick/deep ともに 0/0', () => {
+  it('initialLearningStyleScores は quick/deep/exam ともに 0/0', () => {
     expect(initialLearningStyleScores).toEqual({
       quick: { total: 0, correct: 0 },
       deep: { total: 0, correct: 0 },
+      exam: { total: 0, correct: 0 },
     });
   });
 

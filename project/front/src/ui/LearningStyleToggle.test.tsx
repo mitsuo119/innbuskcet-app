@@ -23,7 +23,7 @@ describe('LearningStyleToggle（PBI-036 / TASK-008）', () => {
     container.remove();
   });
 
-  it('role="group" と aria-label="学習スタイル" を持ち、2つのボタンを描画する', () => {
+  it('role="group" と aria-label="学習スタイル" を持ち、3つのボタン（Quick/Deep/Exam）を描画する', () => {
     act(() => {
       root.render(<LearningStyleToggle style="deep" onChange={() => {}} />);
     });
@@ -31,7 +31,11 @@ describe('LearningStyleToggle（PBI-036 / TASK-008）', () => {
     expect(group).not.toBeNull();
     expect(group!.getAttribute('aria-label')).toBe('学習スタイル');
     const btns = container.querySelectorAll('button');
-    expect(btns.length).toBe(2);
+    expect(btns.length).toBe(3);
+    const labels = Array.from(btns).map((b) => b.textContent);
+    expect(labels.some((t) => t?.includes('Quick'))).toBe(true);
+    expect(labels.some((t) => t?.includes('Deep'))).toBe(true);
+    expect(labels.some((t) => t?.includes('Exam'))).toBe(true);
   });
 
   it('選択中のボタンのみ aria-pressed="true" を持つ（style="deep"）', () => {
@@ -91,5 +95,22 @@ describe('LearningStyleToggle（PBI-036 / TASK-008）', () => {
     const labels = btns.map((b) => b.getAttribute('aria-label'));
     expect(labels.some((l) => l?.includes('Quick') && l.includes('優先順位のみ'))).toBe(true);
     expect(labels.some((l) => l?.includes('Deep') && l.includes('記述あり'))).toBe(true);
+    expect(labels.some((l) => l?.includes('Exam') && l.includes('20問90分'))).toBe(true);
+  });
+
+  it('Exam 未選択時、クリックで onChange("exam") が呼ばれる（グレイアウト解除確認）', () => {
+    const onChange = vi.fn<(s: LearningStyle) => void>();
+    act(() => {
+      root.render(<LearningStyleToggle style="deep" onChange={onChange} />);
+    });
+    const examBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Exam'),
+    ) as HTMLButtonElement;
+    expect(examBtn).toBeDefined();
+    expect(examBtn.disabled).toBe(false);
+    act(() => {
+      examBtn.click();
+    });
+    expect(onChange).toHaveBeenCalledWith('exam');
   });
 });

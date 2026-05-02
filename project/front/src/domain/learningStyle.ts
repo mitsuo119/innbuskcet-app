@@ -1,13 +1,11 @@
 /**
- * 学習スタイル（PBI-036）。
+ * 学習スタイル（PBI-036 / PBI-027）。
  *
  * - `quick`: 優先順位（A/B/C）のみ回答する隙間時間学習用フロー。
  * - `deep`: 記述あり（じっくり練習）。本格的な合格答案の型を反復する現行フロー。
- *
- * `exam` は本試験形式（時間制限・連続出題）として将来拡張予定。
- * UI 上はグレイアウト表示で存在のみ示し、型レベルでは現時点では含めない。
+ * - `exam`: 本試験形式（20 問 90 分・連続出題・タイマー付き）。Sprint007 で活性化。
  */
-export type LearningStyle = 'quick' | 'deep';
+export type LearningStyle = 'quick' | 'deep' | 'exam';
 
 /** UI 表示用メタ情報。 */
 export interface LearningStyleMeta {
@@ -15,7 +13,7 @@ export interface LearningStyleMeta {
   readonly description: string;
 }
 
-/** Quick / Deep の表示メタ（DoD §3 / §7）。 */
+/** Quick / Deep / Exam の表示メタ（DoD §3 / §7）。 */
 export const LEARNING_STYLES: Readonly<Record<LearningStyle, LearningStyleMeta>> = {
   quick: {
     label: 'Quick',
@@ -24,6 +22,10 @@ export const LEARNING_STYLES: Readonly<Record<LearningStyle, LearningStyleMeta>>
   deep: {
     label: 'Deep',
     description: '記述あり（じっくり練習）',
+  },
+  exam: {
+    label: 'Exam',
+    description: '20問90分・本番想定',
   },
 } as const;
 
@@ -34,7 +36,7 @@ const DEFAULT_LEARNING_STYLE: LearningStyle = 'deep';
 const STORAGE_KEY = 'inbasket.learningStyle.v1';
 
 function isLearningStyle(value: unknown): value is LearningStyle {
-  return value === 'quick' || value === 'deep';
+  return value === 'quick' || value === 'deep' || value === 'exam';
 }
 
 /**
