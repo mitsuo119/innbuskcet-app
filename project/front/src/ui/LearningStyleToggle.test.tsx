@@ -113,4 +113,59 @@ describe('LearningStyleToggle（PBI-036 / TASK-008）', () => {
     });
     expect(onChange).toHaveBeenCalledWith('exam');
   });
+
+  describe('ツールチップ（PBI-036b / TASK-010）', () => {
+    function renderToggle(style: LearningStyle = 'deep') {
+      act(() => {
+        root.render(<LearningStyleToggle style={style} onChange={() => {}} />);
+      });
+    }
+
+    function findBtn(label: string): HTMLButtonElement {
+      const btn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes(label),
+      ) as HTMLButtonElement | undefined;
+      expect(btn).toBeDefined();
+      return btn as HTMLButtonElement;
+    }
+
+    it('Quick ボタンに非空の title 属性が設定されている', () => {
+      renderToggle();
+      const btn = findBtn('Quick');
+      const title = btn.getAttribute('title');
+      expect(title).not.toBeNull();
+      expect((title ?? '').length).toBeGreaterThan(0);
+      expect(title).toContain('速習');
+    });
+
+    it('Deep ボタンに非空の title 属性が設定されている', () => {
+      renderToggle();
+      const btn = findBtn('Deep');
+      const title = btn.getAttribute('title');
+      expect(title).not.toBeNull();
+      expect((title ?? '').length).toBeGreaterThan(0);
+      expect(title).toContain('じっくり');
+    });
+
+    it('Exam ボタンに非空の title 属性が設定されている', () => {
+      renderToggle();
+      const btn = findBtn('Exam');
+      const title = btn.getAttribute('title');
+      expect(title).not.toBeNull();
+      expect((title ?? '').length).toBeGreaterThan(0);
+      expect(title).toContain('20問90分');
+    });
+
+    it('各ボタンに aria-describedby が設定され、参照先 hidden span のテキストが title と一致する', () => {
+      renderToggle();
+      for (const label of ['Quick', 'Deep', 'Exam']) {
+        const btn = findBtn(label);
+        const id = btn.getAttribute('aria-describedby');
+        expect(id).not.toBeNull();
+        const tip = container.querySelector(`#${id}`);
+        expect(tip).not.toBeNull();
+        expect(tip!.textContent).toBe(btn.getAttribute('title'));
+      }
+    });
+  });
 });

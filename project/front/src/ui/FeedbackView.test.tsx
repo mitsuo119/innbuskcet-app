@@ -112,4 +112,119 @@ describe('FeedbackView（PBI-029 / TASK-010）', () => {
     const overallBadge = container.querySelector('.feedback-view__overall-badge');
     expect(overallBadge!.className).toContain('feedback-view__overall-badge--ng');
   });
+
+  describe('改善提案行（PBI-040 / TASK-008）', () => {
+    it('△評価で suggestion がある場合、「💡 改善提案:」が表示される', () => {
+      const fb = makeFeedback({
+        judgment: {
+          category: '判断',
+          score: '△',
+          comment: '判断に大きなずれがあります。',
+          suggestion: '優先度（A / B / C）の判断根拠を明記してください。',
+        },
+        overall: '△',
+      });
+      act(() => {
+        root.render(<FeedbackView feedback={fb} visible={true} />);
+      });
+      const suggestion = container.querySelector('.feedback-view__suggestion');
+      expect(suggestion).not.toBeNull();
+      expect(suggestion!.textContent).toContain('💡');
+      expect(suggestion!.textContent).toContain('改善提案:');
+      expect(suggestion!.textContent).toContain('優先度（A / B / C）の判断根拠を明記してください。');
+    });
+
+    it('◎評価で suggestion が undefined のとき、改善提案行は表示されない', () => {
+      const fb = makeFeedback({
+        judgment: { category: '判断', score: '◎', comment: '判断が正解と一致しています。' },
+      });
+      act(() => {
+        root.render(<FeedbackView feedback={fb} visible={true} />);
+      });
+      // 全 7 観点が ◎/○ のため改善提案行は 0 件
+      const suggestions = container.querySelectorAll('.feedback-view__suggestion');
+      expect(suggestions.length).toBe(0);
+    });
+
+    it('○評価で suggestion が undefined のとき、改善提案行は表示されない', () => {
+      const fb = makeFeedback({
+        judgment: { category: '判断', score: '○', comment: '判断は概ね妥当ですが、優先度を再考してください。' },
+        reason: [
+          { category: '5W1H', score: '○', comment: '5W1H 部分含む。' },
+          { category: '優先度', score: '○', comment: '優先度 部分含む。' },
+          { category: '論理', score: '○', comment: '論理 部分含む。' },
+        ],
+        action: [
+          { category: '委任', score: '○', comment: '委任 部分含む。' },
+          { category: 'フォロー', score: '○', comment: 'フォロー 部分含む。' },
+          { category: '具体性', score: '○', comment: '具体性 部分含む。' },
+        ],
+        overall: '○',
+      });
+      act(() => {
+        root.render(<FeedbackView feedback={fb} visible={true} />);
+      });
+      const suggestions = container.querySelectorAll('.feedback-view__suggestion');
+      expect(suggestions.length).toBe(0);
+    });
+
+    it('XSS 安全: suggestion に <script> や onerror を含んでも DOM にタグが生成されない', () => {
+      const malicious = '<script>alert(99)</script><img src=x onerror="alert(1)">';
+      const fb = makeFeedback({
+        judgment: {
+          category: '判断',
+          score: '△',
+          comment: '判断に大きなずれがあります。',
+          suggestion: malicious,
+        },
+        overall: '△',
+      });
+      act(() => {
+        root.render(<FeedbackView feedback={fb} visible={true} />);
+      });
+      // <script> や <img> タグは生成されずテキストノードとして描画される
+      expect(container.querySelector('script')).toBeNull();
+      expect(container.querySelector('img')).toBeNull();
+      const suggestion = container.querySelector('.feedback-view__suggestion');
+      expect(suggestion).not.toBeNull();
+      expect(suggestion!.textContent).toContain('<script>alert(99)</script>');
+      expect(suggestion!.textContent).toContain('onerror');
+    });
+
+    it('複数 FeedbackItem のうち △ のもののみ改善提案行が表示される', () => {
+      const fb = makeFeedback({
+        judgment: { category: '判断', score: '◎', comment: '判断が正解と一致しています。' },
+        reason: [
+          { category: '5W1H', score: '◎', comment: '5W1H 十分。' },
+          {
+            category: '優先度',
+            score: '△',
+            comment: '優先度の観点が不足しています。',
+            suggestion: '優先根拠を添えると◎になります。',
+          },
+          { category: '論理', score: '◎', comment: '論理 十分。' },
+        ],
+        action: [
+          { category: '委任', score: '◎', comment: '委任 十分。' },
+          {
+            category: 'フォロー',
+            score: '△',
+            comment: 'フォローの観点が不足しています。',
+            suggestion: 'フォローアップ時期を明記してください。',
+          },
+          { category: '具体性', score: '◎', comment: '具体性 十分。' },
+        ],
+        overall: '○',
+      });
+      act(() => {
+        root.render(<FeedbackView feedback={fb} visible={true} />);
+      });
+      const suggestions = container.querySelectorAll('.feedback-view__suggestion');
+      // △ が 2 件のため改善提案行も 2 件
+      expect(suggestions.length).toBe(2);
+      const texts = Array.from(suggestions).map((el) => el.textContent ?? '');
+      expect(texts.some((t) => t.includes('優先根拠を添える'))).toBe(true);
+      expect(texts.some((t) => t.includes('フォローアップ時期'))).toBe(true);
+    });
+  });
 });

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ACTION_KEYWORDS, REASON_KEYWORDS, countKeywordMatches } from './feedbackKeywords';
+import {
+  ACTION_KEYWORDS,
+  REASON_KEYWORDS,
+  SUGGESTION_TEMPLATES,
+  SUGGESTION_TEMPLATES_VERSION,
+  countKeywordMatches,
+} from './feedbackKeywords';
 
 describe('feedbackKeywords（PBI-029 / TASK-008）', () => {
   describe('辞書定義', () => {
@@ -47,6 +53,36 @@ describe('feedbackKeywords（PBI-029 / TASK-008）', () => {
 
     it('部分一致でカウントする（"いつまでに" 内の "いつ" を 1 件として数える）', () => {
       expect(countKeywordMatches('いつまでに完了させるかを決める', ['いつ'])).toBe(1);
+    });
+  });
+
+  describe('SUGGESTION_TEMPLATES（PBI-040 / TASK-006）', () => {
+    it('SUGGESTION_TEMPLATES が定義されている（オブジェクト・1件以上）', () => {
+      expect(SUGGESTION_TEMPLATES).toBeDefined();
+      expect(typeof SUGGESTION_TEMPLATES).toBe('object');
+      expect(Object.keys(SUGGESTION_TEMPLATES).length).toBeGreaterThan(0);
+    });
+
+    it('必須 7 観点キー（5W1H / 優先度 / 論理 / 委任 / フォロー / 具体性 / 判断）が全て存在する', () => {
+      const required = ['5W1H', '優先度', '論理', '委任', 'フォロー', '具体性', '判断'];
+      for (const key of required) {
+        expect(SUGGESTION_TEMPLATES[key]).toBeDefined();
+      }
+    });
+
+    it('各値が空文字でない非空文字列である', () => {
+      for (const [key, value] of Object.entries(SUGGESTION_TEMPLATES)) {
+        expect(typeof value).toBe(`string`);
+        expect(value.length).toBeGreaterThan(0);
+        // key 名にも参照可能（型ガード）
+        expect(key.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('SUGGESTION_TEMPLATES_VERSION が定義されている（非空文字列）', () => {
+      expect(SUGGESTION_TEMPLATES_VERSION).toBeDefined();
+      expect(typeof SUGGESTION_TEMPLATES_VERSION).toBe('string');
+      expect((SUGGESTION_TEMPLATES_VERSION as string).length).toBeGreaterThan(0);
     });
   });
 });
