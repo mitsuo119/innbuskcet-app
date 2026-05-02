@@ -43,7 +43,7 @@
 | TASK-002 | `ui/ExamResultView.tsx` コンポーネント新設：正答数・正答率（全体/A/B/C 別）・所要時間（mm:ss）・各問正誤一覧表示 + ルート要素 `aria-label="Exam結果"`（DoD §9-3）+ ライト/ダーク両テーマ AA + モバイル幅対応（DoD §7-1）             | 伊藤   | 4           | 完了       |
 | TASK-003 | ExamResultView 集計純粋関数の vitest 単体テスト（全体正答率 / A/B/C 別正答率 / 0問時の境界値 / 全問正解 / 全問誤答 / 未回答誤答扱い 等 8 件以上・DoD §10-1）                                                                        | 山本   | 3           | 未着手     |
 | TASK-004 | `App.tsx` に Exam 結果画面の表示ロジック追加：`finalizeExamSession` 後に ExamResultView を表示し既存 `alert()` を置換 +「Deep で学習に戻る」「もう一度チャレンジ」「トップへ戻る」3 ボタン結線（PBI-037 整合・Quick/Deep 履歴非汚染） | 伊藤   | 3           | 完了       |
-| TASK-005 | ExamResultView の a11y / 統合テスト（キーボード完結 §9-1 / SR 読み上げ §9-3 / `dangerouslySetInnerHTML` 不使用 §10-2 / 退化動作確認 PBI-025/026 未実装時の該当ブロック非表示）+ a11y_checklist.md 6-C セクション記録                  | 田中   | 2           | 未着手     |
+| TASK-005 | ExamResultView の a11y / 統合テスト（キーボード完結 §9-1 / SR 読み上げ §9-3 / `dangerouslySetInnerHTML` 不使用 §10-2 / 退化動作確認 PBI-025/026 未実装時の該当ブロック非表示）+ a11y_checklist.md 6-C セクション記録                  | 田中   | 2           | 完了       |
 
 ### PBI-040: AI 評価フィードバックの改善提案コメント追加（2pt）
 
