@@ -22,11 +22,7 @@ const ORDER: readonly LearningStyle[] = ['quick', 'deep'] as const;
  */
 export function LearningStyleToggle({ style, onChange }: LearningStyleToggleProps) {
   return (
-    <div
-      role="group"
-      aria-label="学習スタイル"
-      className="learning-style-toggle"
-    >
+    <div role="group" aria-label="学習スタイル" className="learning-style-toggle">
       {ORDER.map((key) => {
         const meta = LEARNING_STYLES[key];
         const selected = style === key;

@@ -107,9 +107,7 @@ describe('HistoryView（PBI-037 学習スタイルバッジ）', () => {
   });
 
   it('learningStyle 未設定の履歴にはバッジが表示されない（後方互換）', () => {
-    const history: HistoryItem[] = [
-      { caseId: 'c1', judgement: 'correct', correctPriority: 'C' },
-    ];
+    const history: HistoryItem[] = [{ caseId: 'c1', judgement: 'correct', correctPriority: 'C' }];
     const html = renderToStaticMarkup(<HistoryView history={history} />);
     expect(html).not.toContain('[Q]');
     expect(html).not.toContain('[D]');

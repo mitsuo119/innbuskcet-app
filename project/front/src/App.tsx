@@ -229,9 +229,7 @@ export default function App() {
               entry={writingEntry}
               onChange={setWritingEntry}
               disabled={locked}
-              onSkip={
-                isWritingEntryEmpty(writingEntry) ? undefined : handleSkipWriting
-              }
+              onSkip={isWritingEntryEmpty(writingEntry) ? undefined : handleSkipWriting}
             />
           )}
           <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
@@ -239,7 +237,10 @@ export default function App() {
             <>
               {isDeep && (
                 <>
-                  <WritingPreview entry={writingEntry} isEmpty={isWritingEntryEmpty(writingEntry)} />
+                  <WritingPreview
+                    entry={writingEntry}
+                    isEmpty={isWritingEntryEmpty(writingEntry)}
+                  />
                   <ModelAnswerView
                     modelAnswer={current.modelAnswer}
                     visible={!!judgement}

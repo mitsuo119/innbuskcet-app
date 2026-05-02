@@ -41,11 +41,7 @@ export function HistoryView({ history, maxDisplay = MAX_HISTORY }: Props) {
             const label = PRIORITY_LABELS[item.correctPriority];
             const priorityAria = formatPriorityLabel(item.correctPriority);
             const styleBadge =
-              item.learningStyle === 'quick'
-                ? 'Q'
-                : item.learningStyle === 'deep'
-                  ? 'D'
-                  : null;
+              item.learningStyle === 'quick' ? 'Q' : item.learningStyle === 'deep' ? 'D' : null;
             const styleAria =
               item.learningStyle === 'quick'
                 ? ' Quickモード'

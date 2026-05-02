@@ -60,9 +60,10 @@ export function ScoreCounter({
   const ariaLabelBase = showMode
     ? `${modeLabel} 正答 ${target.correct} / 出題 ${target.total}（正答率 ${formatRate(target)}）`
     : '正答数 / 出題数';
-  const ariaLabel = showStyle && styleTarget
-    ? `${ariaLabelBase}。${styleLabel}モード 正答 ${styleTarget.correct} / 出題 ${styleTarget.total}（正答率 ${formatRate(styleTarget)}）`
-    : ariaLabelBase;
+  const ariaLabel =
+    showStyle && styleTarget
+      ? `${ariaLabelBase}。${styleLabel}モード 正答 ${styleTarget.correct} / 出題 ${styleTarget.total}（正答率 ${formatRate(styleTarget)}）`
+      : ariaLabelBase;
 
   return (
     <div className="score-counter" aria-live="polite" aria-label={ariaLabel}>
