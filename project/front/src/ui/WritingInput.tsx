@@ -106,6 +106,7 @@ export function WritingInput({ entry, onChange, disabled = false, onSkip }: Prop
           </div>
         );
       })}
+      <p className="writing-input__notice">※ 入力内容はページ再読み込みで消去されます。</p>
     </div>
   );
 }

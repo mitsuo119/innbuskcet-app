@@ -844,6 +844,12 @@ body {
   font-weight: 700;
 }
 
+.writing-input__notice {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
 /* ===== WritingPreview (PBI-023 / TASK-003) ===== */
 
 .writing-preview {
