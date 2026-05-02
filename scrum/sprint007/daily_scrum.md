@@ -269,3 +269,99 @@
 4. 中村: TASK-005（中断機能）+ TASK-006（時間切れ自動終了）完了。
 5. 高橋（SM）: A-30 沈黙チェック第 2 回 + TASK-014（A-26 巻取判断 振り返り共有）+ TASK-020（レビュー / レトロ準備着手）。
 6. 鈴木（PO）: TASK-016 / TASK-017 / TASK-019 リファインメント。
+
+---
+
+## DAY 4 — 2026-06-15（月）
+
+### 基本情報
+
+| 項目                | 内容                                                  |
+| ------------------- | ----------------------------------------------------- |
+| 日時                | 2026-06-15（月）09:30 - 09:45                         |
+| 参加者              | 開発者: 伊藤・田中・山本・中村 / SM: 高橋（ファシリ） |
+| タイムボックス      | 15分                                                  |
+| 沈黙チェック (A-30) | **実施**（第 2 回・SM 高橋から「Day5 までに残タスクで気がかりな依存はある？」「PR レビュー枠で詰まりそうな箇所は？」を全員に問いかけ） |
+
+### 三つの問い
+
+#### 中村（助っ人開発者）
+
+- **昨日**: TASK-013 完了 / TASK-005-006 雛形検討。
+- **今日**:
+  - **TASK-010 山本支援代行**: `project/front/src/ui/FeedbackView.tsx` 新設（`visible=false` / `feedback=null` で null レンダリング・総合評価バッジ＋判断 1 行＋理由 3 観点＋アクション 3 観点・`<dl>` セマンティクス・`aria-label="AI評価フィードバック"`・DoD §10-2 `dangerouslySetInnerHTML` 不使用）+ `FeedbackView.test.tsx` vitest 5 件 PASS（visible=false / feedback=null / overall=◎ 正常 / XSS 安全 / △ 修飾子クラス）。**完了**。
+  - **TASK-004 完了**: `App.tsx` に `examSession` / `examIndex` 状態を追加し、Exam モード時は `examSession.questionIds` を順次消費する出題ループへ切替。`handleNext` で末尾到達時は `finalizeExamSession` で Deep へ復帰。Quick/Deep 履歴は従来どおり `pickNextCaseByMode` 経路のみ加算され、Exam ループは `allCases.find` 直接参照でセット独立を確保（PBI-037 整合）。
+  - **TASK-005/006 完了**: Exam 中 LearningStyleToggle 切替時に `window.confirm("Examを中断します。進捗は失われます。よろしいですか？")`、OK で `clearExamSession` + state リセット → Deep 復帰。`ExamTimer.onTimeUp` から `handleExamTimeUp` → `finalizeExamSession` で `alert("時間終了！お疲れ様でした。")` を発火。`Toggle disabled` を撤去し中断経路を解放。
+  - **TASK-011（部分）**: AI 評価ボタン結線完了。`<WritingInput>` の下に「AIに見てもらう」ボタンを追加（Deep モード × WritingEntry 非空時のみ表示）し、`<FeedbackView>` を `ModelAnswerView` の下に配置。新ケース移動・モード切替・Exam 終了で `writingFeedback` をリセット。
+- **障害物**: なし。
+- **A-30 への応答**: 「Day5 残タスクは TASK-007 / TASK-011 注意書き / TASK-012 a11y+XSS 検証記録 / TASK-014-020 クロージング。依存ブロッカーなし」。
+- **一次情報メモ（中村スタイル）**: 仕様の `evaluateWriting(writingEntry, currentCase.modelAnswer?.judgment ?? '')` をそのまま使うと `feedback.ts` の `evaluateJudgment` 契約（`correctPriority` は `'A'|'B'|'C'` 一文字）に不整合が発生し常に △ フォールバックする。`feedback.ts` のコード（一次情報）を直接読み、`current.correctPriority` を渡す形に補正。意図した仕様（判断記号の一致判定）を満たす最短経路と判断。Day5 に田中・伊藤レビューで再確認。
+
+#### 田中（開発者）
+
+- **昨日**: TASK-004 骨格 / TASK-007 a11y 検証 / TASK-009 レビュー。
+- **今日**: TASK-007 a11y 検証記録（`a11y_checklist.md`）を Day5 朝に取りまとめ。中村が TASK-004/005/006 を巻取完了したため、TASK-011 注意書き併設 + TASK-012（XSS / a11y 検証 + `a11y_checklist.md` 記録）を Day5 で消化。
+- **障害物**: なし。
+- **A-30 への応答**: 「TASK-011 の注意書き文言は鈴木 PO 確認待ち。Day5 朝に確認スロット要」→ 高橋 SM がセット。
+
+#### 伊藤（開発者）
+
+- **昨日**: TASK-009 完了。
+- **今日**: TASK-018（A-31 priorityLabel.ts 唯一定義源パターンの `filterMode` 文言横断点検）を進行。TASK-010 PR レビューを中村実装版で実施（XSS テスト網羅・`<dl>` セマンティクス・`aria-label` 適合・`dangerouslySetInnerHTML` 不使用 確認）。
+- **障害物**: なし。
+- **A-30 への応答**: 「Day5 のクロージング集中で問題なし」。
+
+#### 山本（助っ人開発者）
+
+- **昨日**: TASK-010 骨格着手。
+- **今日**: 中村による TASK-010 巻取完了を確認し、レビュー側に回って `FeedbackView` の各観点表示順 / ライト・ダーク両テーマでのバッジ視認性を Day5 のスタイル微調整で担保する方針へシフト。
+- **障害物**: なし。
+- **A-30 への応答**: 「巻取は事前に中村と 5 分すり合わせ済。バッジ CSS は `--good/--ok/--ng` の 3 修飾子に集約済で Day5 の追記は最小限」。
+
+### A-26 巻取判断（Day4 実施）
+
+- **対象**: TASK-010（山本→中村）。
+- **判定**: **巻取実施**。Day3 時点で骨格まで進んでいたが、AI ボタン結線・FeedbackView・Exam ループは `App.tsx` 結線が一体化しており同一 PR で扱う方が整合性が高い。山本は Day5 の CSS 微調整・レビュー側に回し、Sprint ゴールの確定度を上げる。
+- **2 名同意**: 高橋 SM・伊藤で確認。A-26 ガイド「3 タスク／4h 目安」の範囲内（中村 Day4 実工数 ≒ 5h・許容範囲内）。
+
+### A-30 沈黙チェック実施記録（第 2 回）
+
+- **問いかけ**: 「Day5 までに残タスクで気がかりな依存はある？」「PR レビュー枠で詰まりそうな箇所は？」（高橋 SM・全員へ）。
+- **抽出された潜在課題**:
+  1. 田中: TASK-011 注意書き文言の PO 鈴木確認スロット（Day5 朝） → 高橋 SM がセット。
+  2. 中村: `evaluateWriting` 第 2 引数の仕様補正（一次情報根拠あり）の Day5 レビュー → 伊藤・田中で再確認。
+  3. なし（伊藤・山本）。
+- **A-30 効果（2 回目）**: Day2 と同様、明示的に問いかけることで「Day5 朝確認」「Day5 レビュー」の 2 件を Day4 中に予定化。Day5 当日の段取りロスを未然に防げた。
+
+### スプリントゴールへの進捗
+
+- **Day 4 進捗**:
+  - **PBI-027** Exam 起動 → 出題ループ → 中断 → 時間切れ終了 までエンドツーエンドで結線完了。`ExamTimer` ヘッダー表示・残時間警告・`onTimeUp` 発火経路まで実機相当で動作。Quick/Deep 履歴は Exam ループから独立を維持（PBI-037 整合）。
+  - **PBI-029** 評価ロジック（TASK-009）→ FeedbackView（TASK-010）→ AI ボタン結線（TASK-011 部分）まで結線完了。Deep モードで「記述 → AI 評価 → 模範比較」の学習サイクルが画面上で 1 ループ完結する状態。XSS 安全テスト（`<script>` / `onerror` 属性）が `FeedbackView` の vitest に組み込まれ、DoD §10-2 を機械検証可能に。
+  - **PBI-033a** Day3 で完了済。
+- **計画上の Day4 マイルストーン（残タスク 4 / 残ポイント 1）に対する実績**:
+  - TASK-004 完了 ✅、TASK-005 完了 ✅、TASK-006 完了 ✅、TASK-010 完了 ✅、TASK-011 部分完了 ✅。
+  - 残タスク **3**（TASK-007 a11y 記録 / TASK-011 注意書き / TASK-012 検証記録）+ 横断 TASK-014〜020 / 残ポイント **0**（PBI-027 / PBI-029 / PBI-033a の実装は実質完了。Day5 は DoD §3 ドキュメント / §9 a11y / レビュー＋レトロ準備に集中可能）。
+
+### 検査と適応（スクラムガイド 2020）
+
+- 計画調整は不要。Day5 は TASK-007 / TASK-011 注意書き / TASK-012 + TASK-014（A-26 振り返り共有）+ TASK-016〜020（リファインメント・レビュー / レトロ準備）に集中する。
+- A-26 巻取判断は本スプリント 2 回目の発動（TASK-010 山本→中村）。Day3 の TASK-005/006 は巻取不要判断、Day4 は巻取実施判断と、判断粒度が運用に乗ってきた手応えあり（高橋 SM）。
+
+### Day 4 作業サマリ
+
+| 種別     | 内容                                                                                                          |
+| -------- | ------------------------------------------------------------------------------------------------------------- |
+| 新規     | `project/front/src/ui/FeedbackView.tsx`（総合評価バッジ＋判断 1 行＋理由 3 観点＋アクション 3 観点・`<dl>`・`aria-label="AI評価フィードバック"`・DoD §10-2 `dangerouslySetInnerHTML` 不使用） |
+| 新規     | `project/front/src/ui/FeedbackView.test.tsx`（vitest 5 件・visible=false / feedback=null / overall=◎ / XSS 安全 / △ 修飾子クラス）  |
+| 更新     | `project/front/src/App.tsx`（`examSession` / `examIndex` / `writingFeedback` 状態追加・Exam 出題ループ・`ExamTimer` ヘッダー結線・`handleEvaluateWriting` ＋ AI ボタン・`finalizeExamSession` ／ `handleExamTimeUp` ／ Exam 中断確認・`Toggle disabled` 撤去） |
+| テスト   | `pnpm test`：**20 ファイル / 202 件 全 PASS**（DAY3 比 +5 件・FeedbackView 5）                              |
+
+### 次回（Day 5）に向けた合意
+
+1. 伊藤: TASK-018 完了 + TASK-011 / TASK-012 PR レビュー対応 + DoD §3 ドキュメント整備（README / 実装メモ）。
+2. 田中: TASK-011 注意書き文言確定（朝 PO 鈴木確認）+ TASK-012（XSS / a11y 検証記録）+ TASK-007 a11y 検証 `a11y_checklist.md` 記録。
+3. 山本: `FeedbackView` の CSS 微調整（バッジ視認性 / ライト・ダーク両テーマ AA 確認）+ レビュー対応。
+4. 中村: TASK-014（A-26 巻取振り返り共有メモ）+ TASK-019（A-28 PBI-033a 消化確認 / PBI-033b-c 繰延ルール再確認）支援 + 残レビュー対応。
+5. 高橋（SM）: TASK-014（A-26 振り返り共有）+ TASK-020（レビュー / レトロ準備：佐藤デモシナリオ）+ Day5 朝 PO 鈴木スロットセット済。
+6. 鈴木（PO）: TASK-016（A-27 `<ConfirmDialog>` 内製 PBI-038 候補見積もり）+ TASK-017（A-29 佐藤フィードバック④⑤ 起票判断）+ TASK-019（A-28 繰延ルール再確認）。

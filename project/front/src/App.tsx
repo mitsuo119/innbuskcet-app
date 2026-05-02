@@ -10,7 +10,10 @@ import { ThemeToggle } from './ui/ThemeToggle';
 import { ModelAnswerView } from './ui/ModelAnswerView';
 import { WritingInput } from './ui/WritingInput';
 import { WritingPreview } from './ui/WritingPreview';
+import { ExamTimer } from './ui/ExamTimer';
+import { FeedbackView } from './ui/FeedbackView';
 import type { Case, Priority } from './domain/case';
+import { evaluateWriting, type WritingFeedback } from './domain/feedback';
 import {
   initialHistory,
   pushHistory,
@@ -46,6 +49,8 @@ import {
   type ExamSession,
 } from './domain/examTimer';
 
+/** Exam モードを終了し Deep へ戻すための状態リセット用ヘルパは setter を直接呼ぶ。 */
+
 export default function App() {
   const allCases = useMemo<Case[]>(() => loadCases(), []);
   const [mode, setMode] = useState<FilterMode>(initialMode);
@@ -62,6 +67,10 @@ export default function App() {
   const [learningStyle, setLearningStyle] = useState<LearningStyle>(() => loadLearningStyle());
   const [learningStyleScores, setLearningStyleScores] = useState(initialLearningStyleScores);
   const [examSession, setExamSession] = useState<ExamSession | null>(null);
+  /** Exam モードでの現在の出題インデックス（0 始まり・examSession.questionIds に対応）。 */
+  const [examIndex, setExamIndex] = useState<number>(0);
+  /** AI 評価フィードバック表示用 state（PBI-029 / TASK-011・新ケース移動でリセット）。 */
+  const [writingFeedback, setWritingFeedback] = useState<WritingFeedback | null>(null);
 
   const locked = judgement !== null;
   const isDeep = isDeepMode(learningStyle);
@@ -97,10 +106,66 @@ export default function App() {
   };
 
   const handleNext = () => {
+    // Exam モード: questionIds を順番に消費。最終問を越えたらセッション終了。
+    if (isExam && examSession) {
+      const nextIdx = examIndex + 1;
+      if (nextIdx >= examSession.questionIds.length) {
+        finalizeExamSession('Examモード完了！お疲れ様でした。');
+        return;
+      }
+      setExamIndex(nextIdx);
+      const nextId = examSession.questionIds[nextIdx];
+      const next = allCases.find((c) => c.id === nextId) ?? null;
+      setCurrent(next);
+      setSelected(null);
+      setJudgement(null);
+      setWritingEntry(createEmptyWritingEntry());
+      setWritingFeedback(null);
+      return;
+    }
     setCurrent(pickNextCaseByMode(allCases, current?.id, mode));
     setSelected(null);
     setJudgement(null);
     setWritingEntry(createEmptyWritingEntry());
+    setWritingFeedback(null);
+  };
+
+  /**
+   * Exam セッションを終了させ Deep モードへ復帰させる共通処理（PBI-027 / TASK-005-006）。
+   * - sessionStorage をクリアし、examSession / index / writingFeedback を初期化。
+   * - alert で簡易にユーザへ通知し、Deep モードとして 1 問目を提示する。
+   */
+  const finalizeExamSession = (message: string) => {
+    clearExamSession();
+    setExamSession(null);
+    setExamIndex(0);
+    setWritingFeedback(null);
+    setLearningStyle('deep');
+    saveLearningStyle('deep');
+    setSelected(null);
+    setJudgement(null);
+    setWritingEntry(createEmptyWritingEntry());
+    setCurrent(pickNextCaseByMode(allCases, undefined, mode));
+    window.alert(message);
+  };
+
+  /** ExamTimer からの時間切れコールバック（PBI-027 / TASK-006）。 */
+  const handleExamTimeUp = () => {
+    if (!examSession) return;
+    finalizeExamSession('時間終了！お疲れ様でした。');
+  };
+
+  /**
+   * 「AI に見てもらう」ボタンハンドラ（PBI-029 / TASK-011）。
+   * - 現在の WritingEntry と current.correctPriority を evaluateWriting に渡し評価結果を反映。
+   * - feedback.ts の契約上 correctPriority は 'A'|'B'|'C' 一文字を要求するため、
+   *   modelAnswer.judgment（長文）ではなく current.correctPriority を一次情報として使用する。
+   */
+  const handleEvaluateWriting = () => {
+    if (!current) return;
+    if (isWritingEntryEmpty(writingEntry)) return;
+    const result = evaluateWriting(writingEntry, current.correctPriority);
+    setWritingFeedback(result);
   };
 
   /**
@@ -128,6 +193,7 @@ export default function App() {
     setSelected(null);
     setJudgement(null);
     setWritingEntry(createEmptyWritingEntry());
+    setWritingFeedback(null);
   };
 
   /**
@@ -155,6 +221,24 @@ export default function App() {
    */
   const handleLearningStyleChange = (next: LearningStyle) => {
     if (next === learningStyle) return;
+    // Exam 中に他モードへ切替る場合は中断確認を出す（PBI-027 / TASK-005）。
+    if (learningStyle === 'exam' && examSession) {
+      const ok = window.confirm(
+        'Examを中断します。進捗は失われます。よろしいですか？',
+      );
+      if (!ok) return;
+      clearExamSession();
+      setExamSession(null);
+      setExamIndex(0);
+      setWritingFeedback(null);
+      setLearningStyle(next);
+      saveLearningStyle(next);
+      setSelected(null);
+      setJudgement(null);
+      setWritingEntry(createEmptyWritingEntry());
+      setCurrent(pickNextCaseByMode(allCases, undefined, mode));
+      return;
+    }
     if (!isWritingEntryEmpty(writingEntry)) {
       const ok = window.confirm('現在の入力内容を破棄してモード切替しますか?');
       if (!ok) return;
@@ -174,7 +258,15 @@ export default function App() {
       try {
         const session = createExamSession(allCaseIds);
         setExamSession(session);
+        setExamIndex(0);
         saveExamSession(session);
+        // 初問を questionIds[0] で上書きする。
+        const firstId = session.questionIds[0];
+        const first = allCases.find((c) => c.id === firstId) ?? null;
+        setCurrent(first);
+        setSelected(null);
+        setJudgement(null);
+        setWritingFeedback(null);
       } catch {
         // 候補不足など。Exam 起動を諦め Deep に戻す（A-23 安全側フォールバック）。
         window.alert('Examモードの開始に必要な問題数が不足しています。Deepモードを継続します。');
@@ -186,11 +278,13 @@ export default function App() {
     } else {
       // Exam 以外への切替時は念のため sessionStorage の Exam 残骸を掃除する。
       setExamSession(null);
+      setExamIndex(0);
       clearExamSession();
     }
     setLearningStyle(next);
     saveLearningStyle(next);
     setWritingEntry(createEmptyWritingEntry());
+    setWritingFeedback(null);
   };
 
   /** 「今回は書かない」スキップ（PBI-036 / TASK-010）: WritingEntry をクリアするのみ。 */
@@ -229,7 +323,6 @@ export default function App() {
             <LearningStyleToggle
               style={learningStyle}
               onChange={handleLearningStyleChange}
-              disabled={isExam && examSession !== null}
             />
             <ThemeToggle />
           </div>
@@ -242,6 +335,9 @@ export default function App() {
           learningStyleScores={learningStyleScores}
           currentStyle={learningStyle}
         />
+        {isExam && examSession !== null && (
+          <ExamTimer session={examSession} onTimeUp={handleExamTimeUp} />
+        )}
       </header>
 
       <ModeSelector mode={mode} onChange={handleModeChange} />
@@ -276,6 +372,18 @@ export default function App() {
               onSkip={isWritingEntryEmpty(writingEntry) ? undefined : handleSkipWriting}
             />
           )}
+          {isDeep && !isWritingEntryEmpty(writingEntry) && (
+            <div className="writing-input__ai-row">
+              <button
+                type="button"
+                className="writing-input__ai"
+                onClick={handleEvaluateWriting}
+                aria-label="AIに評価を依頼する"
+              >
+                AIに見てもらう
+              </button>
+            </div>
+          )}
           <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
           {judgement && selected && (
             <>
@@ -290,6 +398,7 @@ export default function App() {
                     visible={!!judgement}
                     correctPriority={current.correctPriority}
                   />
+                  <FeedbackView feedback={writingFeedback} visible={writingFeedback !== null} />
                 </>
               )}
               <ExplanationView
