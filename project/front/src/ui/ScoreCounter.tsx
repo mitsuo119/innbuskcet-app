@@ -1,6 +1,6 @@
 import type { FilterMode } from '../domain/random';
 import type { LearningStyle } from '../domain/learningStyle';
-import { LEARNING_STYLES } from '../domain/learningStyle';
+import { LEARNING_STYLE_LABELS } from '../domain/learningStyleLabel';
 import type { LearningStyleScores, ModeScores, Score } from '../domain/score';
 import { ratePercent } from '../domain/score';
 
@@ -55,7 +55,7 @@ export function ScoreCounter({
   // 学習スタイル別表示（PBI-037 / TASK-015）
   const showStyle = learningStyleScores !== undefined && currentStyle !== undefined;
   const styleTarget: Score | null = showStyle ? learningStyleScores![currentStyle!] : null;
-  const styleLabel = showStyle ? LEARNING_STYLES[currentStyle!].label : null;
+  const styleLabel = showStyle ? LEARNING_STYLE_LABELS[currentStyle!].label : null;
 
   const ariaLabelBase = showMode
     ? `${modeLabel} 正答 ${target.correct} / 出題 ${target.total}（正答率 ${formatRate(target)}）`

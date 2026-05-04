@@ -130,8 +130,46 @@ project/front/
 - 案件データ: 40件（A:13 / B:14 / C:13、各 32.5%/35.0%/32.5% で 30%以上）。`ref/chapter08` の 20 業務パターンを完全網羅（[case_pattern_mapping.md](../docs/case_pattern_mapping.md) 参照）。
 - データはローカル静的 JSON のみ。サーバ・DB・外部 API は使用しない。
 
+## デプロイ（Sprint011 / PBI-049）
+
+main ブランチへの push をトリガに、GitHub Actions ([deploy.yml](../../.github/workflows/deploy.yml)) が
+`lint → tsc → vitest → build → pnpm audit (High/Critical ゲート)` を経て GitHub Pages に自動公開する。
+
+- 公開先: `https://<owner>.github.io/<repo>/`（サブパス配信）
+- PR では検証ジョブ（lint/tsc/vitest）のみ実行。デプロイは行わない。
+- `GITHUB_TOKEN` は既定 `contents: read` に最小化し、`deploy` ジョブにのみ `pages: write` / `id-token: write` を限定付与。長期 Secrets は発行しない（OIDC）。
+- 採用理由は [ADR-001](../docs/adr/ADR-001-deploy-target.md) を参照。
+
+### サブパス対応
+
+`vite.config.ts` の `base` は `VITE_BASE_URL` 環境変数で切替（dev/test は `/`、本番ビルドのみサブパス）。
+SPA フォールバックは `dist/index.html` を `dist/404.html` にコピーする方式（`scripts/copy-404.mjs`、`pnpm build` 末尾で実行）。
+
+### 環境変数
+
+雛形は [.env.example](./.env.example) を参照。実値はコミットしない。
+
+| 変数名                   | 用途                           | 設定箇所                                |
+| ------------------------ | ------------------------------ | --------------------------------------- |
+| `VITE_BASE_URL`          | Vite の `base`（公開サブパス） | GitHub Actions が `/<repo>/` を自動注入 |
+| `VITE_ADSENSE_CLIENT_ID` | Google AdSense パブリッシャ ID | GitHub Secrets（任意・PBI-050）         |
+| `VITE_ADSENSE_SLOT_ID`   | Google AdSense 広告スロット ID | GitHub Secrets（任意・PBI-050）         |
+
+`VITE_ADSENSE_*` のいずれかが未設定の場合、AdSlot コンポーネントは何も描画しない安全フォールバック動作となる（PBI-050 / DoD §10-1）。
+
+### ローカル動作確認
+
+```bash
+# 本番相当のサブパスでビルド
+VITE_BASE_URL=/ai-scrum-inbuscket/ pnpm build
+
+# プレビュー（http://localhost:4173/ai-scrum-inbuscket/）
+pnpm preview --base /ai-scrum-inbuscket/
+```
+
 ## 関連スクラム成果物
 
-- スプリントバックログ（最新）: [../../scrum/sprint003/sprint_backlog.md](../../scrum/sprint003/sprint_backlog.md)
+- スプリントバックログ（最新）: [../../scrum/sprint011/sprint_backlog.md](../../scrum/sprint011/sprint_backlog.md)
 - プロダクトゴール: [../../scrum/product_goal.md](../../scrum/product_goal.md)
 - 完成の定義: [../../scrum/definition_of_done.md](../../scrum/definition_of_done.md)
+- ADR: [ADR-001 公開デプロイ先](../docs/adr/ADR-001-deploy-target.md)

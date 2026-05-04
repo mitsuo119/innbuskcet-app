@@ -507,6 +507,8 @@ body {
   cursor: pointer;
   font: inherit;
   font-size: 0.9rem;
+  /* PBI-045 TASK-102: モバイルタップ領域 44px 以上 */
+  min-height: 44px;
 }
 
 .mode-selector__btn:hover {
@@ -621,6 +623,8 @@ body {
   cursor: pointer;
   line-height: 1.2;
   position: relative;
+  /* PBI-045 TASK-102: モバイルタップ領域 44px 以上 */
+  min-height: 44px;
 }
 
 .learning-style-toggle__btn + .learning-style-toggle__btn {
@@ -963,7 +967,6 @@ body {
   word-break: break-word;
 }
 
-
 /* ------------------------------------------------------------------
    ExamResult（PBI-030 / Sprint008 DAY1 着手分）
    - 正答率 / 所要時間 / A/B/C 別正答数の 3 ブロック構成
@@ -1061,6 +1064,8 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   cursor: pointer;
+  /* PBI-045 TASK-102: モバイルタップ領域 44px 以上 */
+  min-height: 44px;
 }
 
 .exam-result__btn--primary {
@@ -1072,6 +1077,154 @@ body {
 .exam-result__btn:focus-visible {
   outline: 2px solid var(--color-accent, #2563eb);
   outline-offset: 2px;
+}
+
+/* ===== ExamResultView 詳細パネル（PBI-043 / Sprint010 TASK-401・402） ===== */
+.exam-result__answer-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.exam-result__detail-toggle {
+  margin-left: auto;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  /* PBI-045 TASK-102: モバイルタップ領域 44px 以上 */
+  min-height: 44px;
+}
+
+.exam-result__detail-toggle:focus-visible {
+  outline: 2px solid var(--color-accent, #2563eb);
+  outline-offset: 2px;
+}
+
+.exam-result__detail-panel {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface-muted, rgba(0, 0, 0, 0.03));
+  /* 375px 幅でも横スクロール無し */
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.exam-result__detail-heading {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.exam-result__detail-body {
+  margin: 0 0 0.6rem;
+  white-space: pre-wrap;
+}
+
+.exam-result__detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 0 0.6rem;
+}
+
+.exam-result__detail-meta dt {
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.exam-result__detail-meta dd {
+  margin: 0;
+}
+
+.exam-result__detail-explanation,
+.exam-result__detail-model {
+  margin-top: 0.5rem;
+}
+
+.exam-result__detail-explanation h5,
+.exam-result__detail-model h5 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.exam-result__detail-explanation p,
+.exam-result__detail-model p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.exam-result__detail-model dl {
+  margin: 0;
+}
+
+.exam-result__detail-model dt {
+  font-weight: bold;
+  margin-top: 0.3rem;
+}
+
+.exam-result__detail-model dd {
+  margin: 0 0 0.2rem;
+  white-space: pre-wrap;
+}
+
+.exam-result__detail-fallback {
+  margin: 0;
+  color: var(--color-text-muted, #666);
+  font-style: italic;
+}
+
+/* PBI-048 / Sprint011: 詳細パネル末尾「結果一覧に戻る」ボタン（戻り導線） */
+.exam-result__detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.exam-result__detail-back {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  /* タップ領域 44px 以上（DoD §7-1 / A-55） */
+  min-height: 44px;
+}
+
+.exam-result__detail-back:focus-visible {
+  outline: 2px solid var(--color-accent, #2563eb);
+  outline-offset: 2px;
+}
+
+/* PBI-045 TASK-103: ExamResultView 詳細パネルのモバイル幅 font-size 調整 */
+@media (max-width: 480px) {
+  .exam-result__detail-toggle {
+    font-size: 0.9rem;
+  }
+  .exam-result__detail-heading {
+    font-size: 0.95rem;
+  }
+  .exam-result__detail-body,
+  .exam-result__detail-explanation p,
+  .exam-result__detail-model dd {
+    font-size: 0.9rem;
+  }
+  .exam-result__detail-explanation h5,
+  .exam-result__detail-model h5 {
+    font-size: 0.9rem;
+  }
+  .exam-result__detail-meta dt,
+  .exam-result__detail-model dt {
+    font-size: 0.85rem;
+  }
 }
 
 /* ===== FeedbackView ���P��čs�iPBI-040 / TASK-008�j ===== */
@@ -1109,6 +1262,131 @@ body {
   }
 }
 
+/* ===== ConfirmDialog（PBI-038） =====
+ * - backdrop: 固定オーバレイ
+ * - panel: 最大幅 440px・中央寄せ・WCAG AA コントラスト確保
+ * - danger バリアントは --color-danger 色系で赤表示
+ */
+
+.confirm-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: contents;
+}
+
+.confirm-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.confirm-dialog__viewport {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.confirm-dialog__panel {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+  color: var(--color-text);
+}
+
+.confirm-dialog__header {
+  margin-bottom: 0.75rem;
+}
+
+.confirm-dialog__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.confirm-dialog__description {
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.confirm-dialog__button {
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  min-width: 5rem;
+  /* PBI-045 TASK-102 / PBI-047 TASK-301: モバイルタップ領域 44×44px 以上を担保 */
+  min-height: 44px;
+}
+
+.confirm-dialog__button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.confirm-dialog__button--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: transparent;
+}
+
+.confirm-dialog__button--primary:hover {
+  opacity: 0.9;
+}
+
+.confirm-dialog__button--danger {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+  border-color: transparent;
+}
+
+.confirm-dialog__button--danger:hover {
+  opacity: 0.9;
+}
+
+.confirm-dialog__button--secondary {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.confirm-dialog__button--secondary:hover {
+  border-color: var(--color-primary);
+}
+
+@media (max-width: 480px) {
+  .confirm-dialog__actions {
+    flex-direction: column;
+  }
+
+  .confirm-dialog__button {
+    width: 100%;
+  }
+}
 /* ===== LearningStyleToggle �c�[���`�b�v�p sr-only�iPBI-036b / TASK-010�j ===== */
 .learning-style-toggle__sr-only {
   position: absolute;
@@ -1122,3 +1400,43 @@ body {
   border: 0;
 }
 
+/* ===== AdSlot�iPBI-050 / TASK-204�j=====
+ * - role="complementary"�i���C���R���e���c�O�̕⏕�̈�j�Ƃ��Ĕz�u�B
+ * - ���͂� 8px �ȏ�̃}�[�W����݂��A�אڃ{�^���̌�^�b�v��h�~�iPBI-045 �����j�B
+ * - �r���ōL���g�����o�I�ɕ����i�L���R���e���c�ƃA�v��UI�̋��E�����j�B
+ * - 375px ���ł����X�N���[�����������Ȃ��悤 max-width: 100%�Ebox-sizing: border-box�B
+ * - ���ϐ����ݒ莞�� AdSlot ���̂� null ��Ԃ����߁A��̘g�͕`�悳��Ȃ��B
+ */
+.ad-slot--header,
+.ad-slot--footer {
+  display: block;
+  margin: 1rem 0; /* �㉺ 16px �� ��^�b�v�h�~�Œ� 8px */
+  padding: 0.5rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 1px dashed var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  /* AdSense <ins> �v�f�͓����œ��I�ɍ��������܂�B�ŏ������� CLS ��}���B */
+  min-height: 50px;
+}
+
+.ad-slot--header {
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ad-slot--footer {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 480px) {
+  .ad-slot--header,
+  .ad-slot--footer {
+    /* ���o�C���ł̓R���e�i�]���ɍ��킹��i375px �ŉ��X�N���[���𔭐������Ȃ��j�B */
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0.5rem 0.25rem;
+  }
+}

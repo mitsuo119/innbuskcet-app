@@ -1,4 +1,5 @@
-import { LEARNING_STYLES, type LearningStyle } from '../domain/learningStyle';
+import { type LearningStyle } from '../domain/learningStyle';
+import { LEARNING_STYLE_LABELS } from '../domain/learningStyleLabel';
 
 export interface LearningStyleToggleProps {
   /** 現在選択中の学習スタイル。 */
@@ -10,18 +11,6 @@ export interface LearningStyleToggleProps {
 }
 
 const ORDER: readonly LearningStyle[] = ['quick', 'deep', 'exam'] as const;
-
-/**
- * 各ボタンに表示するツールチップ説明（PBI-036b / TASK-010）。
- * - `title` 属性: ホバー / 長押しで表示（デスクトップ・一部モバイル）。
- * - `aria-describedby` 経由で hidden span を参照しスクリーンリーダにも明示。
- * - `aria-label` の末尾にも同内容を含めることで touch デバイス（title 非表示環境）にもフォールバック対応。
- */
-const TOOLTIPS: Readonly<Record<LearningStyle, string>> = {
-  quick: '速習モード: 解答のみ・優先度判断の練習（約5分/問）',
-  deep: 'じっくりモード: 記述あり・模範解答と比較（約10分/問）',
-  exam: '模試モード: 20問90分・本番形式で実力測定',
-} as const;
 
 /** ツールチップ用 hidden span の id（aria-describedby 参照先）。 */
 function tooltipId(key: LearningStyle): string {
@@ -46,16 +35,16 @@ export function LearningStyleToggle({
   return (
     <div role="group" aria-label="学習スタイル" className="learning-style-toggle">
       {ORDER.map((key) => {
-        const meta = LEARNING_STYLES[key];
+        const meta = LEARNING_STYLE_LABELS[key];
         const selected = style === key;
-        const tip = TOOLTIPS[key];
+        const tip = meta.tooltip;
         const tid = tooltipId(key);
         return (
           <button
             key={key}
             type="button"
             aria-pressed={selected}
-            aria-label={`${meta.label}：${meta.description} — ${tip}`}
+            aria-label={meta.ariaLabel}
             aria-describedby={tid}
             title={tip}
             disabled={disabled}

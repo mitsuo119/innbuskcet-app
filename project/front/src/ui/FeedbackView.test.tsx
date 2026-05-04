@@ -131,7 +131,9 @@ describe('FeedbackView（PBI-029 / TASK-010）', () => {
       expect(suggestion).not.toBeNull();
       expect(suggestion!.textContent).toContain('💡');
       expect(suggestion!.textContent).toContain('改善提案:');
-      expect(suggestion!.textContent).toContain('優先度（A / B / C）の判断根拠を明記してください。');
+      expect(suggestion!.textContent).toContain(
+        '優先度（A / B / C）の判断根拠を明記してください。',
+      );
     });
 
     it('◎評価で suggestion が undefined のとき、改善提案行は表示されない', () => {
@@ -148,7 +150,11 @@ describe('FeedbackView（PBI-029 / TASK-010）', () => {
 
     it('○評価で suggestion が undefined のとき、改善提案行は表示されない', () => {
       const fb = makeFeedback({
-        judgment: { category: '判断', score: '○', comment: '判断は概ね妥当ですが、優先度を再考してください。' },
+        judgment: {
+          category: '判断',
+          score: '○',
+          comment: '判断は概ね妥当ですが、優先度を再考してください。',
+        },
         reason: [
           { category: '5W1H', score: '○', comment: '5W1H 部分含む。' },
           { category: '優先度', score: '○', comment: '優先度 部分含む。' },

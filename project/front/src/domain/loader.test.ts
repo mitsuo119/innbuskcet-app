@@ -103,10 +103,9 @@ describe('parseModelAnswer (PBI-024 / TASK-008・DoD §10-3)', () => {
     }
   });
 
-  it('loadCases 経由でも modelAnswer 未整備案件は undefined となる', () => {
+  it('loadCases 経由で全 40 件が modelAnswer を整備済みである（PBI-033c 完了）', () => {
     const cases = loadCases();
     const withoutModel = cases.filter((c) => c.modelAnswer === undefined);
-    // 段階移行中のため、未整備案件が存在することを確認
-    expect(withoutModel.length).toBeGreaterThan(0);
+    expect(withoutModel.length).toBe(0);
   });
 });

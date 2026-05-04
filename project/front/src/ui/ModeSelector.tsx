@@ -1,13 +1,10 @@
 import { FILTER_MODES, type FilterMode } from '../domain/random';
+import { FILTER_MODE_LABELS } from '../domain/filterModeLabel';
 
 interface Props {
   mode: FilterMode;
   onChange: (mode: FilterMode) => void;
 }
-
-const labelOf = (m: FilterMode): string => (m === 'all' ? '全件' : `${m}のみ`);
-
-const ariaOf = (m: FilterMode): string => (m === 'all' ? '全件から出題' : `優先度${m}のみ出題`);
 
 /**
  * 出題モード切替UI（PBI-018）。
@@ -31,7 +28,7 @@ export function ModeSelector({ mode, onChange }: Props) {
             type="button"
             role="radio"
             aria-checked={selected}
-            aria-label={ariaOf(m)}
+            aria-label={FILTER_MODE_LABELS[m].aria}
             className={'mode-selector__btn ' + (selected ? 'mode-selector__btn--selected' : '')}
             tabIndex={selected ? 0 : -1}
             onClick={() => {
@@ -49,7 +46,7 @@ export function ModeSelector({ mode, onChange }: Props) {
               onChange(next);
             }}
           >
-            {labelOf(m)}
+            {FILTER_MODE_LABELS[m].label}
           </button>
         );
       })}

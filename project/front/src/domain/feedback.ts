@@ -7,7 +7,12 @@
  * - 評価ロジックはランダム性なし（同入力→同出力）。
  */
 
-import { ACTION_KEYWORDS, REASON_KEYWORDS, SUGGESTION_TEMPLATES, countKeywordMatches } from './feedbackKeywords';
+import {
+  ACTION_KEYWORDS,
+  REASON_KEYWORDS,
+  SUGGESTION_TEMPLATES,
+  countKeywordMatches,
+} from './feedbackKeywords';
 import type { WritingEntry } from './writing';
 
 /** 評価スコア記号（3 段階）。 */

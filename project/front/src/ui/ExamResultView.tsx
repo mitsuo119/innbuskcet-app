@@ -1,17 +1,28 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { HistoryItem } from '../domain/history';
 import { buildExamResultSummary, type ExamResultSummary } from '../domain/examResult';
 import { getElapsedSeconds, type ExamSession } from '../domain/examTimer';
 import { PRIORITY_LABELS } from '../domain/priorityLabel';
-import type { Priority } from '../domain/case';
+import type { Case, Priority } from '../domain/case';
 
 export interface ExamResultViewProps {
   /** 終了した Exam セッション（startedAt から所要時間を算出）。 */
   session: ExamSession;
   /** Exam セッション中の全問回答履歴（出題順）。 */
   history: readonly HistoryItem[];
+  /**
+   * 各設問の所要時間（ms 配列・出題順・PBI-044）。
+   * - history と同一インデックスで対応する。
+   * - 未指定または該当要素が undefined の場合は「-」フォールバック表示。
+   */
+  elapsedMsList?: readonly number[];
   /** 「Deep で学習に戻る」押下時のコールバック。 */
   onBackToStudy: () => void;
+  /**
+   * 詳細パネル参照用の全案件配列（PBI-043 / Sprint010 TASK-401・402）。
+   * 未指定の場合は詳細パネルは「案件詳細未取得」のフォールバックを表示する。
+   */
+  cases?: readonly Case[];
 }
 
 /**
@@ -23,7 +34,13 @@ export interface ExamResultViewProps {
  * - 色だけに依存せず、○／× 記号と「正解／不正解」テキストを併記（DoD §9-2）。
  * - 集計は domain/examResult.ts の純粋関数 `buildExamResultSummary` に委譲する。
  */
-export function ExamResultView({ session, history, onBackToStudy }: ExamResultViewProps) {
+export function ExamResultView({
+  session,
+  history,
+  elapsedMsList,
+  onBackToStudy,
+  cases,
+}: ExamResultViewProps) {
   const summary: ExamResultSummary = useMemo(() => {
     const correct = history.map((h) => h.correctPriority);
     const user = history.map<Priority>((h) => h.answeredPriority ?? h.correctPriority);
@@ -42,6 +59,32 @@ export function ExamResultView({ session, history, onBackToStudy }: ExamResultVi
   }, [session, history]);
 
   const { totalQuestions, correctCount, percentage, elapsedDisplay, byPriority } = summary;
+
+  /** 各問の caseId から Case を引くためのマップ（PBI-043）。 */
+  const casesById = useMemo<ReadonlyMap<string, Case>>(() => {
+    const m = new Map<string, Case>();
+    for (const c of cases ?? []) m.set(c.id, c);
+    return m;
+  }, [cases]);
+
+  /** 詳細パネルを開いている行のインデックス（同時に1行のみ展開）。 */
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const toggleExpand = (index: number) => {
+    setExpandedIndex((prev) => (prev === index ? null : index));
+  };
+  /**
+   * PBI-048: 詳細パネルを閉じてフォーカスをトグルボタンへ戻す。
+   * - 「結果一覧に戻る」ボタン押下／Escape キー押下時に呼び出す。
+   * - DoD §9-1（キーボード完結）／§9-2（フォーカス可視）整合。
+   */
+  const closeDetail = (index: number) => {
+    setExpandedIndex((prev) => (prev === index ? null : prev));
+    // setState 後の DOM 更新を待ってフォーカスを戻す。
+    queueMicrotask(() => {
+      const btn = document.getElementById(`exam-result-detail-toggle-${index}`);
+      if (btn instanceof HTMLButtonElement) btn.focus();
+    });
+  };
 
   return (
     <section
@@ -112,6 +155,18 @@ export function ExamResultView({ session, history, onBackToStudy }: ExamResultVi
               const answeredLabel = answered ? PRIORITY_LABELS[answered] : null;
               const judgementMark = item.judgement === 'correct' ? '○' : '×';
               const judgementText = item.judgement === 'correct' ? '正解' : '不正解';
+              const isExpanded = expandedIndex === index;
+              const panelId = `exam-result-detail-${index}`;
+              const buttonId = `exam-result-detail-toggle-${index}`;
+              const caseItem = casesById.get(item.caseId);
+              // PBI-044: 設問別所要時間（ms → 秒表示）。未保有時は「-」フォールバック。
+              const rawElapsedMs = elapsedMsList?.[index];
+              const hasElapsed =
+                typeof rawElapsedMs === 'number' &&
+                Number.isFinite(rawElapsedMs) &&
+                rawElapsedMs >= 0;
+              const elapsedSeconds = hasElapsed ? Math.floor(rawElapsedMs / 1000) : null;
+              const elapsedDisplayText = elapsedSeconds !== null ? `${elapsedSeconds}秒` : '-';
               return (
                 <li
                   key={`${item.caseId}-${index}`}
@@ -125,17 +180,116 @@ export function ExamResultView({ session, history, onBackToStudy }: ExamResultVi
                     answered ? answered : '未回答'
                   } 正解${item.correctPriority}（${correctLabel.name}）`}
                 >
-                  <span className="exam-result__answer-no">第{index + 1}問</span>
-                  <span className="exam-result__answer-mark" aria-hidden="true">
-                    {judgementMark}
-                  </span>
-                  <span className="exam-result__answer-text">{judgementText}</span>
-                  <span className="exam-result__answer-priority">
-                    回答: {answered ? `${answered}（${answeredLabel?.name ?? ''}）` : '未回答'}
-                  </span>
-                  <span className="exam-result__answer-priority">
-                    正解: {item.correctPriority}（{correctLabel.name}）
-                  </span>
+                  <div className="exam-result__answer-summary">
+                    <span className="exam-result__answer-no">第{index + 1}問</span>
+                    <span className="exam-result__answer-mark" aria-hidden="true">
+                      {judgementMark}
+                    </span>
+                    <span className="exam-result__answer-text">{judgementText}</span>
+                    <span className="exam-result__answer-priority">
+                      回答: {answered ? `${answered}（${answeredLabel?.name ?? ''}）` : '未回答'}
+                    </span>
+                    <span className="exam-result__answer-priority">
+                      正解: {item.correctPriority}（{correctLabel.name}）
+                    </span>
+                    <span
+                      className="exam-result__answer-elapsed"
+                      aria-label={
+                        elapsedSeconds !== null
+                          ? `所要時間 ${elapsedSeconds} 秒`
+                          : '所要時間 未取得'
+                      }
+                    >
+                      所要: {elapsedDisplayText}
+                    </span>
+                    <button
+                      type="button"
+                      id={buttonId}
+                      className="exam-result__detail-toggle"
+                      aria-expanded={isExpanded}
+                      aria-controls={panelId}
+                      onClick={() => toggleExpand(index)}
+                    >
+                      {isExpanded ? '閉じる' : '詳細を見る'}
+                    </button>
+                  </div>
+                  {isExpanded && (
+                    <section
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={buttonId}
+                      className="exam-result__detail-panel"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          e.stopPropagation();
+                          closeDetail(index);
+                        }
+                      }}
+                    >
+                      {caseItem ? (
+                        <>
+                          <h4 className="exam-result__detail-heading">{caseItem.title}</h4>
+                          <p className="exam-result__detail-body">{caseItem.body}</p>
+                          <dl className="exam-result__detail-meta">
+                            <div>
+                              <dt>あなたの回答</dt>
+                              <dd>
+                                {answered
+                                  ? `${answered}（${answeredLabel?.name ?? ''}）`
+                                  : '未回答'}
+                              </dd>
+                            </div>
+                            <div>
+                              <dt>正解</dt>
+                              <dd>
+                                {item.correctPriority}（{correctLabel.name}）
+                              </dd>
+                            </div>
+                          </dl>
+                          <section className="exam-result__detail-explanation" aria-label="解説">
+                            <h5>解説</h5>
+                            <p>{caseItem.explanation}</p>
+                          </section>
+                          <section className="exam-result__detail-model" aria-label="模範解答">
+                            <h5>模範解答（骨格）</h5>
+                            {caseItem.modelAnswer ? (
+                              <dl>
+                                <div>
+                                  <dt>判断</dt>
+                                  <dd>{caseItem.modelAnswer.judgment}</dd>
+                                </div>
+                                <div>
+                                  <dt>理由</dt>
+                                  <dd>{caseItem.modelAnswer.reason}</dd>
+                                </div>
+                                <div>
+                                  <dt>アクション</dt>
+                                  <dd>{caseItem.modelAnswer.action}</dd>
+                                </div>
+                              </dl>
+                            ) : (
+                              <p className="exam-result__detail-fallback">
+                                模範解答準備中（この案件はまだ模範回答骨格が整備されていません）
+                              </p>
+                            )}
+                          </section>
+                        </>
+                      ) : (
+                        <p className="exam-result__detail-fallback">
+                          案件詳細を取得できませんでした（caseId: {item.caseId}）
+                        </p>
+                      )}
+                      <div className="exam-result__detail-actions">
+                        <button
+                          type="button"
+                          className="exam-result__detail-back"
+                          onClick={() => closeDetail(index)}
+                        >
+                          結果一覧に戻る
+                        </button>
+                      </div>
+                    </section>
+                  )}
                 </li>
               );
             })}

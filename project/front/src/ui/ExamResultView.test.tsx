@@ -24,7 +24,10 @@ function makeSession(elapsedSeconds: number, totalQuestions = 20): ExamSession {
     totalQuestions,
     timeLimit: 90 * 60,
     startedAt: Date.now() - elapsedSeconds * 1000,
-    questionIds: Array.from({ length: totalQuestions }, (_, i) => `case-${String(i + 1).padStart(3, '0')}`),
+    questionIds: Array.from(
+      { length: totalQuestions },
+      (_, i) => `case-${String(i + 1).padStart(3, '0')}`,
+    ),
   };
 }
 
@@ -168,11 +171,7 @@ describe('ExamResultView（PBI-030 / Sprint008 TASK-005 a11y・統合テスト�
     ];
     act(() => {
       root.render(
-        <ExamResultView
-          session={makeSession(60)}
-          history={dangerous}
-          onBackToStudy={() => {}}
-        />,
+        <ExamResultView session={makeSession(60)} history={dangerous} onBackToStudy={() => {}} />,
       );
     });
     // dangerouslySetInnerHTML を使用していれば script タグが DOM に現れる
@@ -198,11 +197,7 @@ describe('ExamResultView（PBI-030 / Sprint008 TASK-005 a11y・統合テスト�
     ];
     act(() => {
       root.render(
-        <ExamResultView
-          session={makeSession(60, 2)}
-          history={history}
-          onBackToStudy={() => {}}
-        />,
+        <ExamResultView session={makeSession(60, 2)} history={history} onBackToStudy={() => {}} />,
       );
     });
     // React はテキストノードとしてエスケープするので script / img は生成されない
@@ -218,11 +213,7 @@ describe('ExamResultView（PBI-030 / Sprint008 TASK-005 a11y・統合テスト�
     expect(() => {
       act(() => {
         root.render(
-          <ExamResultView
-            session={makeSession(0, 0)}
-            history={[]}
-            onBackToStudy={() => {}}
-          />,
+          <ExamResultView session={makeSession(0, 0)} history={[]} onBackToStudy={() => {}} />,
         );
       });
     }).not.toThrow();
@@ -252,11 +243,7 @@ describe('ExamResultView（PBI-030 / Sprint008 TASK-005 a11y・統合テスト�
     ];
     act(() => {
       root.render(
-        <ExamResultView
-          session={makeSession(60, 2)}
-          history={history}
-          onBackToStudy={() => {}}
-        />,
+        <ExamResultView session={makeSession(60, 2)} history={history} onBackToStudy={() => {}} />,
       );
     });
     const items = container.querySelectorAll('.exam-result__answer-row');
