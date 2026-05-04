@@ -163,4 +163,86 @@ describe('ExamResultView 詳細パネル戻り導線（PBI-048）', () => {
     });
     expect(container.querySelector('.exam-result__detail-panel')).not.toBeNull();
   });
+
+  it('先頭行展開時は「前の問へ」がdisabledで「次の問へ」は有効（PBI-054 端境界）', () => {
+    renderView();
+    const toggle = container.querySelector<HTMLButtonElement>('.exam-result__detail-toggle')!;
+    act(() => {
+      toggle.click();
+    });
+
+    const prevBtn = container.querySelector<HTMLButtonElement>('.exam-result__detail-prev');
+    const nextBtn = container.querySelector<HTMLButtonElement>('.exam-result__detail-next');
+    expect(prevBtn).not.toBeNull();
+    expect(nextBtn).not.toBeNull();
+    expect(prevBtn!.disabled).toBe(true);
+    expect(nextBtn!.disabled).toBe(false);
+  });
+
+  it('「次の問へ」で次問詳細へ遷移し、新パネル先頭見出しへフォーカス移動（PBI-054）', async () => {
+    renderView();
+    const toggle = container.querySelectorAll<HTMLButtonElement>('.exam-result__detail-toggle')[0];
+    act(() => {
+      toggle.click();
+    });
+
+    const nextBtn = container.querySelector<HTMLButtonElement>('.exam-result__detail-next')!;
+    act(() => {
+      nextBtn.click();
+    });
+    await flushMicrotasks();
+
+    const panel = container.querySelector('.exam-result__detail-panel');
+    expect(panel).not.toBeNull();
+    expect(panel!.textContent).toContain('タイトル002');
+
+    const heading = container.querySelector<HTMLElement>('#exam-result-detail-heading-1');
+    expect(heading).not.toBeNull();
+    expect(document.activeElement).toBe(heading);
+
+    const toggles = container.querySelectorAll<HTMLButtonElement>('.exam-result__detail-toggle');
+    expect(toggles[0].getAttribute('aria-expanded')).toBe('false');
+    expect(toggles[1].getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('末尾行展開時は「次の問へ」がdisabledで「前の問へ」は有効（PBI-054 端境界）', () => {
+    renderView();
+    const toggle = container.querySelectorAll<HTMLButtonElement>('.exam-result__detail-toggle')[1];
+    act(() => {
+      toggle.click();
+    });
+
+    const prevBtn = container.querySelector<HTMLButtonElement>('.exam-result__detail-prev');
+    const nextBtn = container.querySelector<HTMLButtonElement>('.exam-result__detail-next');
+    expect(prevBtn).not.toBeNull();
+    expect(nextBtn).not.toBeNull();
+    expect(prevBtn!.disabled).toBe(false);
+    expect(nextBtn!.disabled).toBe(true);
+  });
+
+  it('「前の問へ」で前問詳細へ遷移し、新パネル先頭見出しへフォーカス移動（PBI-054）', async () => {
+    renderView();
+    const toggle = container.querySelectorAll<HTMLButtonElement>('.exam-result__detail-toggle')[1];
+    act(() => {
+      toggle.click();
+    });
+
+    const prevBtn = container.querySelector<HTMLButtonElement>('.exam-result__detail-prev')!;
+    act(() => {
+      prevBtn.click();
+    });
+    await flushMicrotasks();
+
+    const panel = container.querySelector('.exam-result__detail-panel');
+    expect(panel).not.toBeNull();
+    expect(panel!.textContent).toContain('タイトル001');
+
+    const heading = container.querySelector<HTMLElement>('#exam-result-detail-heading-0');
+    expect(heading).not.toBeNull();
+    expect(document.activeElement).toBe(heading);
+
+    const toggles = container.querySelectorAll<HTMLButtonElement>('.exam-result__detail-toggle');
+    expect(toggles[0].getAttribute('aria-expanded')).toBe('true');
+    expect(toggles[1].getAttribute('aria-expanded')).toBe('false');
+  });
 });

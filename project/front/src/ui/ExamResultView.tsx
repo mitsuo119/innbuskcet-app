@@ -4,6 +4,7 @@ import { buildExamResultSummary, type ExamResultSummary } from '../domain/examRe
 import { getElapsedSeconds, type ExamSession } from '../domain/examTimer';
 import { PRIORITY_LABELS } from '../domain/priorityLabel';
 import type { Case, Priority } from '../domain/case';
+import { renderExplanationWithPatternLinks } from '../utils/explanationPatternLinks';
 
 export interface ExamResultViewProps {
   /** 終了した Exam セッション（startedAt から所要時間を算出）。 */
@@ -71,6 +72,26 @@ export function ExamResultView({
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const toggleExpand = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
+  };
+  /**
+   * PBI-054: 前後問遷移後に新しい詳細パネル先頭（見出し）へフォーカス移動する。
+   * - キーボード利用時の現在位置喪失を防止（DoD §9-2 / §9-3）。
+   */
+  const focusDetailHeading = (index: number) => {
+    queueMicrotask(() => {
+      const heading = document.getElementById(`exam-result-detail-heading-${index}`);
+      if (heading instanceof HTMLElement) heading.focus();
+    });
+  };
+  /**
+   * PBI-054: 詳細パネルを閉じずに隣接する設問詳細へ遷移する。
+   * - 先頭/末尾は何もしない（ボタン disabled と二重防御）。
+   */
+  const moveDetail = (fromIndex: number, direction: -1 | 1) => {
+    const target = fromIndex + direction;
+    if (target < 0 || target >= history.length) return;
+    setExpandedIndex(target);
+    focusDetailHeading(target);
   };
   /**
    * PBI-048: 詳細パネルを閉じてフォーカスをトグルボタンへ戻す。
@@ -228,7 +249,13 @@ export function ExamResultView({
                     >
                       {caseItem ? (
                         <>
-                          <h4 className="exam-result__detail-heading">{caseItem.title}</h4>
+                          <h4
+                            id={`exam-result-detail-heading-${index}`}
+                            className="exam-result__detail-heading"
+                            tabIndex={-1}
+                          >
+                            {caseItem.title}
+                          </h4>
                           <p className="exam-result__detail-body">{caseItem.body}</p>
                           <dl className="exam-result__detail-meta">
                             <div>
@@ -248,7 +275,7 @@ export function ExamResultView({
                           </dl>
                           <section className="exam-result__detail-explanation" aria-label="解説">
                             <h5>解説</h5>
-                            <p>{caseItem.explanation}</p>
+                            <p>{renderExplanationWithPatternLinks(caseItem.explanation)}</p>
                           </section>
                           <section className="exam-result__detail-model" aria-label="模範解答">
                             <h5>模範解答（骨格）</h5>
@@ -280,6 +307,26 @@ export function ExamResultView({
                         </p>
                       )}
                       <div className="exam-result__detail-actions">
+                        <div className="exam-result__detail-nav">
+                          <button
+                            type="button"
+                            className="exam-result__detail-prev"
+                            onClick={() => moveDetail(index, -1)}
+                            disabled={index === 0}
+                            aria-disabled={index === 0}
+                          >
+                            前の問へ
+                          </button>
+                          <button
+                            type="button"
+                            className="exam-result__detail-next"
+                            onClick={() => moveDetail(index, 1)}
+                            disabled={index === history.length - 1}
+                            aria-disabled={index === history.length - 1}
+                          >
+                            次の問へ
+                          </button>
+                        </div>
                         <button
                           type="button"
                           className="exam-result__detail-back"

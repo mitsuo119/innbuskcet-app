@@ -1,6 +1,7 @@
 import type { Case, Priority } from '../domain/case';
 import type { Judgement } from '../domain/judge';
 import { PRIORITY_LABELS, formatPriorityLabel } from '../domain/priorityLabel';
+import { renderExplanationWithPatternLinks } from '../utils/explanationPatternLinks';
 
 interface Props {
   caseItem: Case;
@@ -39,7 +40,7 @@ export function ExplanationView({ caseItem, answer, judgement, onRetry }: Props)
           </strong>
         </span>
       </div>
-      <p className="explanation__body">{caseItem.explanation}</p>
+      <p className="explanation__body">{renderExplanationWithPatternLinks(caseItem.explanation)}</p>
       {onRetry && (
         <div className="explanation__actions">
           <button

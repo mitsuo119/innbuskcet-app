@@ -105,6 +105,10 @@ jobs:
       - name: Build (本番ベース URL 注入)
         env:
           VITE_BASE_URL: /${{ github.event.repository.name }}/
+          # PBI-052 / TASK-202: AdSense クライアントID / スロットID を GitHub Secrets から注入。
+          # 未設定時は AdSense スクリプトが index.html に挿入されず、AdSlot コンポーネントも非表示になる。
+          VITE_ADSENSE_CLIENT_ID: ${{ secrets.VITE_ADSENSE_CLIENT_ID }}
+          VITE_ADSENSE_SLOT_ID: ${{ secrets.VITE_ADSENSE_SLOT_ID }}
         run: pnpm build
 
       - name: Upload Pages artifact

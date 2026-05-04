@@ -633,6 +633,14 @@ export default function App() {
             learningStyleScores={learningStyleScores}
             currentStyle={learningStyle}
           />
+          <nav className="app-support-nav" aria-label="学習サポート導線">
+            <a href="#/reference" className="app-support-nav__link">
+              解説リファレンス
+            </a>
+            <a href="#/patterns" className="app-support-nav__link">
+              パターン別解説
+            </a>
+          </nav>
           {isExam && examSession !== null && (
             <ExamTimer session={examSession} onTimeUp={handleExamTimeUp} />
           )}
@@ -748,6 +756,34 @@ export default function App() {
                 ショートカット: <kbd>A</kbd> / <kbd>B</kbd> / <kbd>C</kbd> で回答、<kbd>Enter</kbd>{' '}
                 で次の問題
               </small>
+              <nav className="app-footer__legal" aria-label="法務・サポートページ">
+                <a href="#/privacy-policy" className="app-footer__legal-link">
+                  プライバシーポリシー
+                </a>
+                <span className="app-footer__legal-sep" aria-hidden="true">
+                  |
+                </span>
+                <a href="#/terms-of-service" className="app-footer__legal-link">
+                  利用規約
+                </a>
+                <span className="app-footer__legal-sep" aria-hidden="true">
+                  |
+                </span>
+                <a href="#/contact" className="app-footer__legal-link">
+                  お問い合わせ
+                </a>
+              </nav>
+              <nav className="app-footer__legal" aria-label="学習サポートページ">
+                <a href="#/reference" className="app-footer__legal-link">
+                  解説リファレンス
+                </a>
+                <span className="app-footer__legal-sep" aria-hidden="true">
+                  |
+                </span>
+                <a href="#/patterns" className="app-footer__legal-link">
+                  パターン別解説
+                </a>
+              </nav>
             </footer>
           </>
         )}
