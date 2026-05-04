@@ -86,25 +86,36 @@ function renderBlock(block: ReferenceBlock, chapterId: ReferenceChapterId, index
   }
 }
 
+interface ChapterNavInfo {
+  prev: ReferenceChapter | null;
+  next: ReferenceChapter | null;
+  index: number;
+  total: number;
+}
+
+function getChapterNavInfo(chapter: ReferenceChapter): ChapterNavInfo {
+  const index = REFERENCE_DATA.findIndex((c) => c.id === chapter.id);
+  return {
+    prev: index > 0 ? REFERENCE_DATA[index - 1] : null,
+    next: index >= 0 && index < REFERENCE_DATA.length - 1 ? REFERENCE_DATA[index + 1] : null,
+    index,
+    total: REFERENCE_DATA.length,
+  };
+}
+
 function renderChapter(chapter: ReferenceChapter) {
+  const nav = getChapterNavInfo(chapter);
+  const positionLabel = `第 ${nav.index + 1} 章 / 全 ${nav.total} 章`;
   return (
     <article key={chapter.id} id={`reference-${chapter.id}`} className="reference-page__chapter">
       <header className="reference-page__chapter-header">
-        <p className="reference-page__chapter-kicker">{chapter.id}</p>
+        <p className="reference-page__chapter-position" aria-hidden="true">
+          {positionLabel}
+        </p>
         <h2 className="reference-page__chapter-title" tabIndex={-1}>
           {chapter.title}
         </h2>
         <p className="reference-page__chapter-description">{chapter.description}</p>
-        <dl className="reference-page__meta">
-          <div>
-            <dt>参照元</dt>
-            <dd>{chapter.sourcePath}</dd>
-          </div>
-          <div>
-            <dt>学習ゴール</dt>
-            <dd>{chapter.learningGoals.length}件</dd>
-          </div>
-        </dl>
       </header>
 
       <section className="reference-page__goal-card" aria-label={`${chapter.title} の学習ゴール`}>
@@ -135,13 +146,70 @@ function renderChapter(chapter: ReferenceChapter) {
           </section>
         ))}
       </div>
+
+      <nav
+        className="reference-page__chapter-pager"
+        aria-label={`${chapter.title} の章間ナビゲーション`}
+      >
+        {nav.prev ? (
+          <a
+            className="reference-page__pager-link reference-page__pager-link--prev"
+            href={`#/reference/${nav.prev.id}`}
+          >
+            <span className="reference-page__pager-direction" aria-hidden="true">
+              ← 前の章
+            </span>
+            <span className="reference-page__pager-title">{nav.prev.title}</span>
+          </a>
+        ) : (
+          <span
+            className="reference-page__pager-link reference-page__pager-link--prev reference-page__pager-link--disabled"
+            aria-disabled="true"
+            role="link"
+          >
+            <span className="reference-page__pager-direction" aria-hidden="true">
+              ← 前の章
+            </span>
+            <span className="reference-page__pager-title">（最初の章です）</span>
+          </span>
+        )}
+        <a
+          className="reference-page__pager-link reference-page__pager-link--top"
+          href="#reference-chapter-nav"
+        >
+          <span className="reference-page__pager-direction" aria-hidden="true">
+            ↑
+          </span>
+          <span className="reference-page__pager-title">章一覧へ戻る</span>
+        </a>
+        {nav.next ? (
+          <a
+            className="reference-page__pager-link reference-page__pager-link--next"
+            href={`#/reference/${nav.next.id}`}
+          >
+            <span className="reference-page__pager-direction" aria-hidden="true">
+              次の章 →
+            </span>
+            <span className="reference-page__pager-title">{nav.next.title}</span>
+          </a>
+        ) : (
+          <span
+            className="reference-page__pager-link reference-page__pager-link--next reference-page__pager-link--disabled"
+            aria-disabled="true"
+            role="link"
+          >
+            <span className="reference-page__pager-direction" aria-hidden="true">
+              次の章 →
+            </span>
+            <span className="reference-page__pager-title">（最後の章です）</span>
+          </span>
+        )}
+      </nav>
     </article>
   );
 }
 
 export function ReferencePage({ onBack, focusChapterId = null }: Props) {
-  const chapterLabel = REFERENCE_DATA.map((chapter) => chapter.id).join(' / ');
-
   useEffect(() => {
     if (!focusChapterId) return;
     const section = document.getElementById(`reference-${focusChapterId}`);
@@ -162,16 +230,19 @@ export function ReferencePage({ onBack, focusChapterId = null }: Props) {
           ← ホームに戻る
         </button>
         <p className="reference-page__eyebrow">解説リファレンス</p>
-        <h1 className="reference-page__title">{chapterLabel} 解説リファレンス</h1>
+        <h1 className="reference-page__title">インバスケット解説リファレンス</h1>
         <p className="reference-page__lead">
-          基礎（chapter01 /
-          chapter02）に加え、優先順位づけ（chapter05）とパターン分類（chapter08）を
-          1画面で往復できるようにした。
+          インバスケットの基礎・採点基準・優先順位づけ・案件パターン分類までを
+          1画面で往復できるようにまとめた解説エリアです。
         </p>
       </header>
 
-      <nav className="reference-page__chapter-nav" aria-label="章スキップ">
-        {REFERENCE_DATA.map((chapter) => {
+      <nav
+        id="reference-chapter-nav"
+        className="reference-page__chapter-nav"
+        aria-label="章スキップ"
+      >
+        {REFERENCE_DATA.map((chapter, index) => {
           const isCurrent = focusChapterId === chapter.id;
           return (
             <a
@@ -180,7 +251,10 @@ export function ReferencePage({ onBack, focusChapterId = null }: Props) {
               className="reference-page__chapter-link"
               aria-current={isCurrent ? 'page' : undefined}
             >
-              {chapter.id}：{chapter.title}
+              <span className="reference-page__chapter-link-index" aria-hidden="true">
+                第{index + 1}章
+              </span>
+              <span className="reference-page__chapter-link-title">{chapter.title}</span>
             </a>
           );
         })}

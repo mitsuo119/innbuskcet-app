@@ -312,21 +312,30 @@ body {
   font-size: 0.875rem;
 }
 
+/* ===== PBI-063 / Day3 前半: 問題回答画面の視認性向上 =====
+ * - case-view / answer-buttons / actions のカード境界・状態強調・タップ領域を共通方針で整える
+ * - 既存変数（--color-* / --color-focus-ring）のみ使用し両テーマ AA を維持
+ * - 共通 UI コンポーネントのため styles.css で集中管理（PBI-060 の画面単位分離は対象外）
+ */
 .case-view {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1.25rem 1rem;
-  margin-bottom: 1rem;
+  border-radius: 10px;
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .case-view__title {
-  margin: 0 0 0.75rem;
-  font-size: 1.15rem;
+  margin: 0 0 0.85rem;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  letter-spacing: 0.005em;
 }
 
 .case-view__body {
   margin: 0;
+  line-height: 1.75;
   white-space: pre-wrap;
 }
 
@@ -337,13 +346,26 @@ body {
 }
 
 .actions button {
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.1rem;
+  min-height: 44px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
   background: var(--color-surface-muted);
   color: var(--color-text);
   cursor: pointer;
   font: inherit;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    transform 0.05s;
+}
+
+.actions button:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.actions button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .actions button:disabled {
@@ -368,8 +390,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
-  padding: 0.75rem 0.5rem;
+  padding: 0.85rem 0.5rem;
+  min-height: 64px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-surface);
@@ -378,16 +402,27 @@ body {
   font: inherit;
   transition:
     border-color 0.15s,
-    background 0.15s;
+    background 0.15s,
+    box-shadow 0.15s,
+    transform 0.05s;
 }
 
 .answer-buttons__btn:hover:not(:disabled) {
   border-color: var(--color-primary);
+  background: var(--color-surface-muted);
+}
+
+.answer-buttons__btn:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .answer-buttons__btn--selected {
   border-color: var(--color-primary);
+  border-width: 2px;
+  /* 2px ボーダー化に伴うレイアウトずれを padding で吸収 */
+  padding: calc(0.85rem - 1px) calc(0.5rem - 1px);
   background: var(--color-primary-bg);
+  box-shadow: 0 0 0 1px var(--color-primary) inset;
 }
 
 .answer-buttons__btn:disabled {
@@ -429,14 +464,19 @@ body {
   text-align: center;
 }
 
+/* ===== PBI-063 / Day4 後半: ExplanationView の視認性整理 =====
+ * - case-view と同様の余白・角丸・box-shadow に揃え、左端 4px の正誤色帯で状態強調を維持
+ * - 既存 var(--color-*) のみ使用し両テーマ AA を維持（PBI-060 / pr_checklist §9.6 整合）
+ */
 .explanation {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-left-width: 4px;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  border-radius: 10px;
+  padding: 1.25rem 1.25rem 1.25rem 1.1rem;
+  margin-bottom: 1.25rem;
   color: var(--color-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .explanation--correct {
@@ -451,18 +491,20 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
   flex-wrap: wrap;
 }
 
 .explanation__summary {
   color: var(--color-text-muted);
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .explanation__body {
   margin: 0;
   white-space: pre-wrap;
+  line-height: 1.75;
 }
 
 .explanation__pattern-link {
@@ -502,17 +544,25 @@ body {
 }
 
 .explanation__retry {
-  padding: 0.4rem 0.9rem;
+  padding: 0.55rem 1.1rem;
+  min-height: 44px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
   background: var(--color-surface-muted);
   color: var(--color-text);
   cursor: pointer;
   font: inherit;
+  transition:
+    border-color 0.15s,
+    transform 0.05s;
 }
 
 .explanation__retry:hover {
   border-color: var(--color-primary);
+}
+
+.explanation__retry:active {
+  transform: translateY(1px);
 }
 
 .explanation__retry:focus-visible {
@@ -711,8 +761,30 @@ body {
     grid-template-columns: 1fr;
   }
 
+  /* PBI-063 Day3: モバイルでは記号・名称・ヒントを横並びにしてフィットさせる */
+  .answer-buttons__btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.6rem;
+    padding: 0.85rem 0.85rem;
+    text-align: left;
+  }
+
+  .answer-buttons__btn--selected {
+    padding: calc(0.85rem - 1px) calc(0.85rem - 1px);
+  }
+
+  .answer-buttons__hint {
+    text-align: left;
+    margin-left: auto;
+  }
+
   .container {
     padding: 1rem 0.75rem;
+  }
+
+  .case-view {
+    padding: 1.25rem 1rem;
   }
 
   .actions {
@@ -722,6 +794,7 @@ body {
   .actions button {
     flex: 1;
     padding: 0.75rem 1rem;
+    min-height: 44px;
   }
 
   .history-view__item {
@@ -1280,16 +1353,16 @@ body {
 }
 
 .exam-result__detail-toggle:focus-visible {
-  outline: 2px solid var(--color-accent, #2563eb);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
 .exam-result__detail-panel {
   margin-top: 0.5rem;
-  padding: 0.75rem;
+  padding: 1rem;
   border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-surface-muted, rgba(0, 0, 0, 0.03));
+  border-radius: 8px;
+  background: var(--color-surface-muted);
   /* 375px 幅でも横スクロール無し */
   max-width: 100%;
   word-break: break-word;
@@ -1355,7 +1428,7 @@ body {
 
 .exam-result__detail-fallback {
   margin: 0;
-  color: var(--color-text-muted, #666);
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
@@ -1397,7 +1470,7 @@ body {
 .exam-result__detail-prev:focus-visible,
 .exam-result__detail-next:focus-visible,
 .exam-result__detail-back:focus-visible {
-  outline: 2px solid var(--color-accent, #2563eb);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -1565,12 +1638,12 @@ body {
 .feedback-view__suggestion {
   margin: 0.35rem 0 0;
   padding: 0.45rem 0.7rem;
-  border-left: 3px solid var(--color-accent, #2563eb);
-  background: var(--color-surface-muted, rgba(37, 99, 235, 0.08));
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface-muted);
   color: var(--color-text);
   border-radius: 4px;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.55;
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
@@ -1590,11 +1663,8 @@ body {
   word-break: break-word;
 }
 
-@media (prefers-color-scheme: dark) {
-  .feedback-view__suggestion {
-    background: rgba(96, 165, 250, 0.12);
-  }
-}
+/* ダーク時の改善提案背景は --color-surface-muted（既存トークン）で AA 維持。
+ * 旧 prefers-color-scheme: dark 上書きは data-theme 切替と二重制御になるため撤去。 */
 
 /* ===== ConfirmDialog（PBI-038） =====
  * - backdrop: 固定オーバレイ

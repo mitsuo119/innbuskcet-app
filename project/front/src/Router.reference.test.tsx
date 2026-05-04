@@ -41,9 +41,7 @@ describe('PBI-056 解説導線', () => {
       root.render(<Router />);
     });
 
-    expect(container.textContent).toContain(
-      'chapter01 / chapter02 / chapter05 / chapter08 解説リファレンス',
-    );
+    expect(container.textContent).toContain('インバスケット解説リファレンス');
     expect(container.textContent).toContain('インバスケットとは何か');
     expect(container.textContent).toContain('採点基準を逆算する');
     expect(container.textContent).toContain('優先順位づけの技術');
