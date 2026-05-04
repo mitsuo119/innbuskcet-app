@@ -29,5 +29,5 @@
 
 - 持ち越しタスクなし（実装系）。運用タスク TASK-903（A-74: chapter03/06/09 PBI 案）は Sprint015 リファインメントへ PO 鈴木が継続提出。
 - 解説リファレンス拡張時は `referenceData.ts` を唯一の定義源として維持する（PBI-056〜062 共通方針）。
-- CSS 分割は `pr_checklist.md` §9.6 の横展開ルール（対象選定・完了条件・回帰観点）を必ず確認する。共通 UI コンポ（case-view / answer-buttons / actions / explanation / feedback-view / exam-result__detail-*）は `styles.css` 集中管理を維持し、画面単位 CSS 分離の対象外。
+- CSS 分割は `pr_checklist.md` §9.6 の横展開ルール（対象選定・完了条件・回帰観点）を必ず確認する。共通 UI コンポ（case-view / answer-buttons / actions / explanation / feedback-view / exam-result\_\_detail-\*）は `styles.css` 集中管理を維持し、画面単位 CSS 分離の対象外。
 - PBI-064（ストレッチ未投入）は Sprint015 で再評価。

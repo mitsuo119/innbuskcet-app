@@ -55,7 +55,11 @@ describe('PBI-056 解説導線', () => {
       root.render(<Router />);
     });
 
-    const currentLink = container.querySelector<HTMLAnchorElement>('a[aria-current="page"]');
+    // PBI-064 / Sprint015 DAY4: GlobalNav の aria-current="page"（解説リファレンス）と
+    // 章リンクの aria-current="page" が同居するため、章スキップナビ内に絞って検証する。
+    const currentLink = container.querySelector<HTMLAnchorElement>(
+      '.reference-page__chapter-link[aria-current="page"]',
+    );
     expect(currentLink).not.toBeNull();
     expect(currentLink?.getAttribute('href')).toBe('#/reference/chapter08');
     expect(currentLink?.textContent).toContain('案件パターン別攻略');

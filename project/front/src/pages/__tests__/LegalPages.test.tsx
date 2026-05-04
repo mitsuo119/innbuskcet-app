@@ -28,4 +28,28 @@ describe('PBI-051 法務ページスモークテスト', () => {
     expect(html).toContain('お問い合わせ方法');
     expect(html).toContain('GitHub Issues でお問い合わせ');
   });
+
+  // PBI-064 / Sprint015 DAY4 / TASK-201: 法務 3 ページに GlobalNav が展開されていること。
+  it('法務 3 ページに GlobalNav（aria-label="グローバルナビゲーション"）が描画される', () => {
+    const cases = [
+      { html: renderToStaticMarkup(<PrivacyPolicy onBack={vi.fn()} />), current: 'privacy-policy' },
+      {
+        html: renderToStaticMarkup(<TermsOfService onBack={vi.fn()} />),
+        current: 'terms-of-service',
+      },
+      { html: renderToStaticMarkup(<Contact onBack={vi.fn()} />), current: 'contact' },
+    ];
+    for (const { html } of cases) {
+      expect(html).toContain('aria-label="グローバルナビゲーション"');
+      expect(html).toContain('href="#/"');
+      expect(html).toContain('href="#/reference"');
+      expect(html).toContain('href="#/patterns"');
+      expect(html).toContain('href="#/privacy-policy"');
+    }
+    // PrivacyPolicy のみ aria-current="page" を持つ
+    expect(cases[0].html).toContain('aria-current="page"');
+    // terms-of-service / contact は GlobalNav 4 リンク中に対応 ID がないため aria-current 非付与
+    expect(cases[1].html).not.toContain('aria-current="page"');
+    expect(cases[2].html).not.toContain('aria-current="page"');
+  });
 });

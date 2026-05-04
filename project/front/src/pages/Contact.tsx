@@ -4,6 +4,8 @@
  * - dangerouslySetInnerHTML 不使用（XSS対策）
  */
 
+import { GlobalNav } from '../ui/GlobalNav';
+
 interface Props {
   onBack: () => void;
 }
@@ -15,6 +17,7 @@ export function Contact({ onBack }: Props) {
         <button type="button" className="legal-back-btn" onClick={onBack} aria-label="ホームに戻る">
           ← ホームに戻る
         </button>
+        <GlobalNav current="contact" />
         <h1 className="legal-title">お問い合わせ</h1>
       </header>
 

@@ -3,6 +3,7 @@ import { AdSlot } from './ui/AdSlot';
 import { AnswerButtons } from './ui/AnswerButtons';
 import { CaseView } from './ui/CaseView';
 import { ExplanationView } from './ui/ExplanationView';
+import { GlobalNav } from './ui/GlobalNav';
 import { HistoryView } from './ui/HistoryView';
 import { LearningStyleToggle } from './ui/LearningStyleToggle';
 import { ModeSelector } from './ui/ModeSelector';
@@ -619,13 +620,13 @@ export default function App() {
       <main className="container">
         <header className="app-header">
           <div className="app-header__top">
-            <h1>InBusket</h1>
+            <h1>インバスケット</h1>
             <div className="app-header__controls">
               <LearningStyleToggle style={learningStyle} onChange={handleLearningStyleChange} />
               <ThemeToggle />
             </div>
           </div>
-          <p className="app-subtitle">インバスケット学習アプリ（MVP 開発中 - Sprint 006）</p>
+          <p className="app-subtitle">インバスケット学習アプリ</p>
           <ScoreCounter
             score={score}
             modeScores={modeScores}
@@ -633,14 +634,7 @@ export default function App() {
             learningStyleScores={learningStyleScores}
             currentStyle={learningStyle}
           />
-          <nav className="app-support-nav" aria-label="学習サポート導線">
-            <a href="#/reference" className="app-support-nav__link">
-              解説リファレンス
-            </a>
-            <a href="#/patterns" className="app-support-nav__link">
-              パターン別解説
-            </a>
-          </nav>
+          <GlobalNav current="home" />
           {isExam && examSession !== null && (
             <ExamTimer session={examSession} onTimeUp={handleExamTimeUp} />
           )}

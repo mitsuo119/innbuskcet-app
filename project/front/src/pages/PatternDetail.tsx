@@ -6,6 +6,7 @@
  * - dangerouslySetInnerHTML 不使用（XSS対策）
  */
 import { findPatternById, type PatternPriority } from '../data/patternData';
+import { GlobalNav } from '../ui/GlobalNav';
 
 interface Props {
   patternId: number;
@@ -33,6 +34,7 @@ export function PatternDetail({ patternId, onBack }: Props) {
         >
           ← 一覧に戻る
         </button>
+        <GlobalNav current="patterns" />
         <p>パターン{patternId}が見つかりませんでした。</p>
       </div>
     );
@@ -49,6 +51,7 @@ export function PatternDetail({ patternId, onBack }: Props) {
         >
           ← 一覧に戻る
         </button>
+        <GlobalNav current="patterns" />
         <h1 className="legal-title">
           パターン{pattern.id}：{pattern.name}
         </h1>

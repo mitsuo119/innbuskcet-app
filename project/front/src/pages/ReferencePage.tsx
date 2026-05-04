@@ -5,6 +5,7 @@ import {
   type ReferenceChapter,
   type ReferenceChapterId,
 } from '../data/referenceData';
+import { GlobalNav } from '../ui/GlobalNav';
 import './ReferencePage.css';
 
 interface Props {
@@ -229,6 +230,7 @@ export function ReferencePage({ onBack, focusChapterId = null }: Props) {
         >
           ← ホームに戻る
         </button>
+        <GlobalNav current="reference" />
         <p className="reference-page__eyebrow">解説リファレンス</p>
         <h1 className="reference-page__title">インバスケット解説リファレンス</h1>
         <p className="reference-page__lead">

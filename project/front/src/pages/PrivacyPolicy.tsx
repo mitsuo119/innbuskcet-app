@@ -6,6 +6,8 @@
  * - 外部リンクは rel="noopener noreferrer" 付与
  */
 
+import { GlobalNav } from '../ui/GlobalNav';
+
 interface Props {
   onBack: () => void;
 }
@@ -17,6 +19,7 @@ export function PrivacyPolicy({ onBack }: Props) {
         <button type="button" className="legal-back-btn" onClick={onBack} aria-label="ホームに戻る">
           ← ホームに戻る
         </button>
+        <GlobalNav current="privacy-policy" />
         <h1 className="legal-title">プライバシーポリシー</h1>
         <p className="legal-updated">最終更新日: 2026年7月15日</p>
       </header>

@@ -6,6 +6,7 @@
  * - dangerouslySetInnerHTML 不使用（XSS対策）
  */
 import { PATTERN_DATA, type PatternPriority } from '../data/patternData';
+import { GlobalNav } from '../ui/GlobalNav';
 
 interface Props {
   onSelectPattern: (id: number) => void;
@@ -29,6 +30,7 @@ export function PatternList({ onSelectPattern, onBack }: Props) {
         <button type="button" className="legal-back-btn" onClick={onBack} aria-label="ホームに戻る">
           ← ホームに戻る
         </button>
+        <GlobalNav current="patterns" />
         <h1 className="legal-title">パターン別解説</h1>
         <p className="legal-updated">インバスケット全20パターンの優先度・対応フレームワーク</p>
       </header>

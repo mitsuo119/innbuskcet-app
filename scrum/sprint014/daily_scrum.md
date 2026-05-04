@@ -103,11 +103,11 @@
 
 ### スプリント進捗サマリ（Day2 終了時点）
 
-| PBI     | 状態       | 備考                                                                                  |
-| ------- | ---------- | ------------------------------------------------------------------------------------- |
-| PBI-061 | Done       | Day1 で 1pt 消化済。                                                                  |
+| PBI     | 状態       | 備考                                                                                                                              |
+| ------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| PBI-061 | Done       | Day1 で 1pt 消化済。                                                                                                              |
 | PBI-062 | レビュー中 | TASK-201〜205 全 Done。章ページャー / タイポ整理 / CSS 局所化 / a11y 確認 / vitest 追加完了。Day5 の DoD 最終確認で Done 化判定。 |
-| PBI-063 | ToDo       | Day3 から TASK-302 / TASK-303 / TASK-304 を計画通り並走着手予定。                     |
+| PBI-063 | ToDo       | Day3 から TASK-302 / TASK-303 / TASK-304 を計画通り並走着手予定。                                                                 |
 
 - 消化見込: 4pt（PBI-061 1pt + PBI-062 3pt） / 計画 7pt
 - 残: 3pt（PBI-063 3pt）
@@ -156,10 +156,10 @@
 
 ### スプリント進捗サマリ（Day3 終了時点）
 
-| PBI     | 状態       | 備考                                                                                  |
-| ------- | ---------- | ------------------------------------------------------------------------------------- |
-| PBI-061 | Done       | Day1 で 1pt 消化済。                                                                  |
-| PBI-062 | レビュー中 | Day5 の DoD 最終確認で Done 化判定（変更なし）。                                       |
+| PBI     | 状態       | 備考                                                                                          |
+| ------- | ---------- | --------------------------------------------------------------------------------------------- |
+| PBI-061 | Done       | Day1 で 1pt 消化済。                                                                          |
+| PBI-062 | レビュー中 | Day5 の DoD 最終確認で Done 化判定（変更なし）。                                              |
 | PBI-063 | 進行中     | TASK-301 Done / TASK-302・303・304 前半着手済（CSS 改修＋vitest +7）。Day4 で後半完了見込み。 |
 
 - 消化見込: 4pt（PBI-061 + PBI-062） / 計画 7pt（PBI-063 は Day4 着地予定）
@@ -186,7 +186,7 @@
 - **昨日**: PBI-063 の TASK-302 前半（共通 UI コンポの余白・タイポ・状態強調）を完了。
 - **今日**: TASK-302 後半（ExplanationView/FeedbackView 系の境界整理）＋ DoD 確認を担当。
   - **ExplanationView**: カード `padding 1rem → 1.25rem 1.25rem 1.25rem 1.1rem`、`border-radius 8px → 10px`、`box-shadow: 0 1px 2px rgba(0,0,0,0.04)` を追加して `case-view` と視覚階層を統一。本文 `line-height 1.75`、サマリ `line-height 1.5` で長文の可読性を改善。
-  - **explanation__retry**: `padding 0.4rem 0.9rem → 0.55rem 1.1rem` ＋ `min-height: 44px` を明示し、デスクトップでも 44px タップ領域確保（DoD §7-1）。`hover:border-color`／`active: translateY(1px)` の押下フィードバックを `.actions button` と統一。`focus-visible` は既存の共通方針（`--color-focus-ring`）を維持。
+  - **explanation\_\_retry**: `padding 0.4rem 0.9rem → 0.55rem 1.1rem` ＋ `min-height: 44px` を明示し、デスクトップでも 44px タップ領域確保（DoD §7-1）。`hover:border-color`／`active: translateY(1px)` の押下フィードバックを `.actions button` と統一。`focus-visible` は既存の共通方針（`--color-focus-ring`）を維持。
   - **FeedbackView 改善提案行**: `border-left` を未定義 `--color-accent` フォールバックから `--color-primary` に置換、背景は `--color-surface-muted` のみ参照。`prefers-color-scheme: dark` の `rgba(96,165,250,0.12)` 上書きは `data-theme` 切替と二重制御になるため撤去（テーマトークンに一本化）。両テーマで AA を維持。
   - **DoD 確認**: `dangerouslySetInnerHTML` 不使用（ExplanationView は `renderExplanationWithPatternLinks` のテキスト＋リンク返却、FeedbackView は本文テキストノードのみ）／aria 属性（`aria-live="polite"` / `aria-label="AI評価フィードバック"`）／タップ領域 44px 以上／既存変数のみ使用、を全て満たすことを確認。CSS 変更は `styles.css` 内の共通 UI コンポ集中で破壊的変更なし。
 - **障害**: なし。
@@ -198,7 +198,7 @@
 - **今日**: TASK-305（375px / 両テーマ / キーボードでの手動回帰確認）を担当。
   - 375px（iPhone SE 相当）で QuickView / DeepView / ExamView / ExplanationView / ExamResultView 詳細パネルを巡回し、横スクロール無し・タップ領域 44px 以上を実測確認。`answer-buttons__btn` 64px / `actions button` 44px / `explanation__retry` 44px / `exam-result__detail-toggle|prev|next|back` 44px をクリア。
   - `data-theme="light"` / `"dark"` を切替えて、追加・調整した `case-view` / `answer-buttons` / `actions` / `explanation` / `exam-result__detail-*` / `feedback-view__suggestion` の前景・背景・focus リングが両テーマで AA を維持していることを目視＋既存実測（伊藤 Day3 / Day4）で再確認。
-  - キーボードのみで「案件 → A/B/C 選択（answer-buttons__btn--selected の状態強調が見える）→ 回答送信 → ExplanationView の retry → ExamResultView 詳細パネル展開／前後ナビ／結果一覧に戻る」までフォーカス遷移が DOM 順で破綻無く流れ、`focus-visible` outline がコントラスト基準を満たすことを確認。誤フォーカス・フォーカストラップなし。
+  - キーボードのみで「案件 → A/B/C 選択（answer-buttons\_\_btn--selected の状態強調が見える）→ 回答送信 → ExplanationView の retry → ExamResultView 詳細パネル展開／前後ナビ／結果一覧に戻る」までフォーカス遷移が DOM 順で破綻無く流れ、`focus-visible` outline がコントラスト基準を満たすことを確認。誤フォーカス・フォーカストラップなし。
 - **障害**: なし。
 
 ### 中村（助っ人Dev）
@@ -224,12 +224,12 @@
 
 ### スプリント進捗サマリ（Day4 終了時点）
 
-| PBI     | 状態       | 備考                                                                                  |
-| ------- | ---------- | ------------------------------------------------------------------------------------- |
-| PBI-061 | Done       | Day1 で 1pt 消化済。                                                                  |
-| PBI-062 | レビュー中 | Day5 の DoD 最終確認で Done 化判定（差分なし）。                                       |
-| PBI-063 | レビュー中 | TASK-301〜305 全 Done。視認性・状態強調・両テーマ AA・aria 不変・vitest 379 件 all pass。Day5 の DoD 最終確認で Done 化判定。 |
-| PBI-064 | ストレッチ見送り | Day5 余力不足のため未投入。Sprint015 候補として残置。                            |
+| PBI     | 状態             | 備考                                                                                                                          |
+| ------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| PBI-061 | Done             | Day1 で 1pt 消化済。                                                                                                          |
+| PBI-062 | レビュー中       | Day5 の DoD 最終確認で Done 化判定（差分なし）。                                                                              |
+| PBI-063 | レビュー中       | TASK-301〜305 全 Done。視認性・状態強調・両テーマ AA・aria 不変・vitest 379 件 all pass。Day5 の DoD 最終確認で Done 化判定。 |
+| PBI-064 | ストレッチ見送り | Day5 余力不足のため未投入。Sprint015 候補として残置。                                                                         |
 
 - 消化見込: 7pt（PBI-061 1pt + PBI-062 3pt + PBI-063 3pt） / 計画 7pt
 - 残: 0pt（Day5 は PR 集約・DoD 最終確認・レビュー準備）
@@ -277,13 +277,12 @@
 
 ### スプリント進捗サマリ（Day5 終了時点）
 
-| PBI     | 状態       | 備考                                                                                  |
-| ------- | ---------- | ------------------------------------------------------------------------------------- |
-| PBI-061 | Done       | 1pt 消化（Day1 で完了）。                                                              |
-| PBI-062 | Done       | 3pt 消化。章ページャー / タイポ整理 / CSS 局所化 / a11y 確認 / vitest 5 ケース追加。  |
-| PBI-063 | Done       | 3pt 消化。共通 UI コンポ＋ Explanation/Feedback/ExamResult 詳細の視認性・状態強調・両テーマ AA・aria 不変・vitest +12 ケース。 |
-| PBI-064 | ストレッチ見送り | Sprint015 候補として残置。                                                       |
+| PBI     | 状態             | 備考                                                                                                                           |
+| ------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| PBI-061 | Done             | 1pt 消化（Day1 で完了）。                                                                                                      |
+| PBI-062 | Done             | 3pt 消化。章ページャー / タイポ整理 / CSS 局所化 / a11y 確認 / vitest 5 ケース追加。                                           |
+| PBI-063 | Done             | 3pt 消化。共通 UI コンポ＋ Explanation/Feedback/ExamResult 詳細の視認性・状態強調・両テーマ AA・aria 不変・vitest +12 ケース。 |
+| PBI-064 | ストレッチ見送り | Sprint015 候補として残置。                                                                                                     |
 
 - 消化: **7pt** / 計画 7pt（達成率 100%）
 - 最終品質ゲート: tsc 0 / lint 0 / test **39 files / 379 tests all pass** / build 成功
-
