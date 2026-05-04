@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <!--
+      PBI-068 / TASK-504
+      GitHub Pages はディレクトリ未一致時にこの 404.html を返却する。
+      SPA はハッシュベースルーティングのためアプリ本体（index.html）の
+      自動フォールバックは不要。代わりに静的な 404 ページとして
+      「トップへ戻る」導線を表示する。
+      `__SITE_URL__` は vite.config.ts の SEO プラグインで実 URL に置換される。
+      ファビコン等は 404.html からの相対参照（同階層 = サブパス直下）で解決する。
+    -->
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="16x16 32x32 48x48" />
+    <title>ページが見つかりません - インバスケット - 学習アプリ</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f7f8;
+        --surface: #ffffff;
+        --text: #1f2328;
+        --text-muted: #57606a;
+        --border: #d0d7de;
+        --primary: #0969da;
+        --primary-on: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117;
+          --surface: #161b22;
+          --text: #e6edf3;
+          --text-muted: #8d96a0;
+          --border: #30363d;
+          --primary: #4493f8;
+          --primary-on: #0d1117;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          'Hiragino Kaku Gothic ProN',
+          Meiryo,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        line-height: 1.6;
+      }
+      main {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        max-width: 480px;
+        width: 100%;
+        text-align: center;
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.5rem;
+      }
+      .code {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        letter-spacing: 0.1em;
+        margin: 0 0 1rem;
+      }
+      p {
+        margin: 0 0 1.25rem;
+        color: var(--text-muted);
+      }
+      .home-link {
+        display: inline-block;
+        background: var(--primary);
+        color: var(--primary-on);
+        text-decoration: none;
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+      .home-link:hover,
+      .home-link:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="code">404</p>
+      <h1>ページが見つかりません</h1>
+      <p>お探しのページは移動または削除された可能性があります。</p>
+      <a class="home-link" href="__SITE_URL__">トップへ戻る</a>
+    </main>
+  </body>
+</html>

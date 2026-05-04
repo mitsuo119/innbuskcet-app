@@ -432,3 +432,126 @@ Sprint014 で解説リファレンスの自然言語化（PBI-061）と各画面
 2. サブタイトル文面（例「インバスケット学習アプリ」）は PO・開発者でプランニング時に確定する。
 3. 既存テストで `InBusket` / `MVP 開発中` / `Sprint 006` 文字列を検証している箇所は同一 PR 内で更新する。
 4. 法務ページ本文の固有名「InBusket」は今回スコープ外。改名要否はレビュー時に再確認。
+
+---
+
+## 追加依頼（2026-05-04 佐藤 / Sprint016 向け）
+
+### 背景
+
+Sprint015 までで UI の自然言語化（PBI-061 / PBI-065）と各画面の UX 改善が一巡し、一般公開ユーザに見せる体裁が整ってきた。一方で、Web ページとしての**仕上げ要素（アイコン整備・SEO 対策）が未着手**であり、次の課題が顕在化している。
+
+- **アイコン未整備**: ファビコン（`favicon.ico` / `apple-touch-icon` / SVG ファビコン）や PWA インストール時のアプリアイコン（`manifest.json` 経由の各サイズ PNG）が未配置で、ブラウザタブ・ブックマーク・スマホホーム画面に既定アイコンが出てしまう。ブランド認知と信頼感の観点で改善余地が大きい。
+- **SEO 最小要件の不足**: `<meta name="description">`、OGP（`og:title` / `og:description` / `og:image` / `og:url` / `og:type`）、Twitter Card、`<link rel="canonical">`、`lang` 属性整合、構造化データ（JSON-LD: `WebSite` / `WebApplication` 等）が未実装または不足。検索結果や SNS シェア時の表示品質が低い。
+- **その他ページ品質**: `robots.txt` / `sitemap.xml`、`theme-color`、`color-scheme`、404 ページ整備、画像 `alt`・`width/height` 属性付与漏れの有無確認、Lighthouse SEO/Best Practices/PWA スコアの底上げ、初期ロード時の `<noscript>` フォールバック整理など、公開サイトとして整えるべき細部が残っている。
+
+GitHub Pages 公開（PBI-049）/ AdSense 連携（PBI-050/052）/ 法務ページ（PBI-051）が完了している現状、SEO とアイコン整備は**広告審査・流入導線・ブランド体験のすべてに直結する仕上げ作業**として優先度が高い。
+
+### 依頼内容
+
+#### 依頼1: アイコン（ファビコン・PWA アイコン）整備
+
+- ブラウザタブ向けファビコン（`favicon.ico` 16/32/48px、SVG ファビコン、`apple-touch-icon` 180px）を整備し、`index.html` から適切に参照する。
+- PWA インストール対応として `manifest.json`（`name` / `short_name` / `icons`（192/512px、`maskable` 含む）/ `theme_color` / `background_color` / `start_url` / `display` / `scope`）を整備する。
+- アイコンデザインはインバスケット学習アプリのブランドに沿った簡潔なものでよい（PO・開発者で確定。SVG 1 枚から各サイズを派生する方針推奨）。
+- ライト/ダーク両テーマでブラウザタブに視認できる配色とする。
+
+#### 依頼2: SEO 対策（meta description / OGP / canonical / 構造化データ）
+
+- `<meta name="description">` を全画面共通もしくは画面別に設定する（最低限トップページに 70〜120 字の自然な日本語）。
+- OGP（`og:title` / `og:description` / `og:image` / `og:url` / `og:type=website`）と Twitter Card（`twitter:card=summary_large_image` 等）を設定する。
+- `<link rel="canonical">` を設定し、GitHub Pages サブパス公開でも正規 URL が一意に解決されるようにする。
+- 構造化データ（JSON-LD）として `WebSite` または `WebApplication` を最低 1 件埋め込み、検索エンジンにアプリ概要が伝わるようにする。
+- `<html lang="ja">`、`theme-color`、`color-scheme` の整合を確認する。
+- `robots.txt` / `sitemap.xml` の最小構成を整備する（GitHub Pages 配下のサブパスで参照可能にする）。
+
+#### 依頼3: その他ページ品質向上
+
+- 404 ページ（GitHub Pages 用 `404.html`）を SPA ルーティングと整合させる（既存があれば文言整理）。
+- 画像 `alt`・`width/height` 属性、`<noscript>` フォールバック文言、`prefers-reduced-motion` 配慮の再点検。
+- Lighthouse の SEO / Best Practices / PWA スコアを Sprint016 内で計測し、主要な指摘を改善する（Performance スコアは対象外。優先は SEO / Best Practices / PWA）。
+- 既存の WCAG AA 準拠と `a11y_checklist.md` / `pr_checklist.md` 規律は維持。
+
+### 受入基準
+
+- [ ] `favicon.ico`・SVG ファビコン・`apple-touch-icon` が配置され、ブラウザタブ／iOS 追加時にブランドアイコンが表示される
+- [ ] `manifest.json` に PWA 必須項目（name / short_name / icons 192&512 / maskable / theme_color / background_color / start_url / display / scope）が記載されている
+- [ ] `<meta name="description">` がトップページに自然な日本語で設定されている
+- [ ] OGP（og:title/description/image/url/type）と Twitter Card が設定され、SNS デバッガー想定で title/description/image が解決される
+- [ ] `<link rel="canonical">` が公開 URL に対して正しく解決される
+- [ ] JSON-LD 構造化データ（`WebSite` または `WebApplication`）が 1 件以上埋め込まれている
+- [ ] `robots.txt` / `sitemap.xml` が公開 URL のサブパス配下で配信される
+- [ ] 404 ページが SPA フォールバックと整合し、ナビゲーション導線が表示される
+- [ ] Lighthouse の SEO / Best Practices / PWA カテゴリで主要な失敗項目（critical/serious 相当）が解消されている
+- [ ] 375px 幅・ライト/ダーク両テーマで表示崩れ・回帰がない
+- [ ] 既存テストが全てパスする（必要に応じて `<title>` / `<meta>` / `<link>` 検証テストを追加）
+
+### Sprint への組み込み方針
+
+- 本依頼は Sprint016 の主要起点として位置づける。範囲が広いため、PO 側で**機能単位の PBI 分割**を行ってリファインメントに付議する。
+- 推定分割（PO 仮説）:
+  - PBI-A（仮）: アイコン整備（ファビコン群＋`manifest.json`＋`apple-touch-icon`）/ Size: 2pt 想定
+  - PBI-B（仮）: SEO メタ整備（description / OGP / Twitter Card / canonical / lang / theme-color）/ Size: 2pt 想定
+  - PBI-C（仮）: 構造化データ＋`robots.txt` / `sitemap.xml`＋404 ページ整合 / Size: 2pt 想定
+  - PBI-D（仮・ストレッチ）: Lighthouse SEO/Best Practices/PWA 指摘改善＋画像属性・`<noscript>` 再点検 / Size: 1〜2pt 想定
+- **PO 視点コメント（優先度・分割方針）**:
+  - 価値順は **アイコン（ブランド体験・即視認）≧ SEO メタ（流入・SNS シェア品質）＞ 構造化データ／`robots`／404 ＞ Lighthouse 指摘**。短期効果が大きい順に 1 PBI = 2pt 程度の粒度で並列着手しやすく分割する。
+  - AdSense 審査・GitHub Pages 運用（PBI-049〜052 系）の後続施策として、**Sprint016 で「アイコン＋SEO メタ」を主軸（4pt）**、**「構造化データ＋公開ファイル＋404」をストレッチ（合計 6pt）** を推奨。
+  - PBI-060 で確立した CSS 分割方針・PBI-058/059 の PR 規律（`import.meta.env` 依存テスト・サブパス参照）を遵守し、ベースパス配下の参照（`canonical` / `og:url` / `manifest` / `icons` パス）が破綻しないことを必ず PR レビュー観点に含める。
+  - アイコン素材の決定（簡潔な SVG 1 枚＋派生）は Sprint016 開始前にプランニングで確定。デザイン議論で着手が遅延しないよう、PO 側で素案を 1〜2 案準備して付議する。
+  - セキュリティ監査（渡辺）には `manifest.json` / 構造化データ / 外部参照（OGP 画像 URL 等）の取り扱いについて事前共有し、外部リソース参照の最小化方針を確認する。
+
+### スコープ外（明示）
+
+- ロゴ・ブランドガイドラインの本格策定（簡潔な SVG ファビコン素案で代替）。
+- パフォーマンス最適化全般（バンドル分割・画像 WebP 化等）は Lighthouse Performance を対象外とすることで Sprint016 では着手しない。必要なら別 PBI で起票。
+- 多言語対応（`hreflang` 等）。本アプリは日本語単一前提のため対象外。
+
+---
+
+## リファインメント確定（鈴木 / 2026-05-04・Sprint016 向け）
+
+### 新規 PBI 起票結果（product_backlog.csv 反映済）
+
+| ID      | タイトル                                                             | Priority | Size | Status |
+| ------- | -------------------------------------------------------------------- | -------- | ---- | ------ |
+| PBI-066 | アイコン整備（ファビコン群と PWA manifest）                          | High     | 2    | Ready  |
+| PBI-067 | SEO メタ整備（description / OGP / Twitter Card / canonical / lang）  | High     | 2    | Ready  |
+| PBI-068 | 構造化データと robots.txt / sitemap.xml と 404 ページ整備            | Medium   | 2    | Ready  |
+| PBI-069 | Lighthouse SEO/Best Practices/PWA 指摘改善と画像属性/noscript 再点検 | Low      | 1    | Ready  |
+
+**分割方針:**
+
+- 依頼1（アイコン整備）→ **PBI-066** に一本化。`favicon.ico` / SVG ファビコン / `apple-touch-icon` / `manifest.json` を 1 PBI で完結し、即視認のブランド価値を 1 スプリント内に確定させる。
+- 依頼2（SEO 対策）→ **PBI-067**（メタ系：description / OGP / Twitter Card / canonical / lang / theme-color）と **PBI-068**（構造化データ / `robots.txt` / `sitemap.xml` / 404 ページ）に 2 分割。価値順（流入導線 ≧ クロール基盤）と影響範囲（`index.html` メタ vs 公開ファイル群）を分離して並列着手しやすくする。
+- 依頼3（その他品質向上）→ **PBI-069** に集約しストレッチ位置づけ。Lighthouse 計測・画像属性・`<noscript>` 再点検は主軸完了後に余力で消化する想定。
+- アイコン素材は簡潔な SVG 1 枚から各サイズを派生する PO 仮説に従う。デザイン議論で着手遅延しないよう Sprint016 プランニング前に PO 側で 1〜2 案準備して付議する。
+
+### Ready 判定メモ
+
+- **PBI-066**: 変更対象が `project/front/public/` 配下のアセット追加と `index.html` 参照、`manifest.json` 新設に局所化。GitHub Pages サブパス参照規律（PBI-059）順守を受入基準に明記し 2pt と判断。
+- **PBI-067**: 変更対象が `index.html` の `<meta>` / `<link>` と OGP 画像の配置に局所化。`import.meta.env` 依存テスト規律（PBI-058）と canonical のサブパス解決（PBI-059）順守を受入基準に明記し 2pt と判断。
+- **PBI-068**: JSON-LD 埋め込み・`robots.txt` / `sitemap.xml` 新設・GitHub Pages 用 `404.html` 整備の 3 軸。`dangerouslySetInnerHTML` 不使用（DoD10-2）と SPA 整合を受入基準に明記し 2pt と判断。
+- **PBI-069**: Lighthouse 計測結果記録と既存実装の再点検が中心。スコープを「critical/serious 相当の主要指摘」と明示し過大化を防止。Performance カテゴリは対象外として 1pt と判断。
+
+### Sprint016 候補 優先順位（直近スプリントベロシティ目安 8〜9pt）
+
+| 優先 | PBI     | Size | 投入判断                                                                  |
+| ---- | ------- | ---- | ------------------------------------------------------------------------- |
+| 1    | PBI-066 | 2    | 主軸・必須。即視認のブランド価値が高く先行投入。                          |
+| 2    | PBI-067 | 2    | 主軸・必須。流入導線・SNS シェア品質を担保。`order007` 主目的の中核。     |
+| 3    | PBI-068 | 2    | 主軸候補。クロール基盤と 404 整合。合計 6pt で成立し計画粒度として妥当。  |
+| 4    | PBI-069 | 1    | ストレッチ候補。合計 7pt。Lighthouse 計測の余力時のみプランニングで判断。 |
+
+- **PO 推奨スコープ: PBI-066（2）+ PBI-067（2）+ PBI-068（2）= 6pt**
+- **ストレッチ**: PBI-069（1）を加えて 7pt。プランニングで開発者と確認。
+- ベロシティ目安に対し 6〜7pt はやや控えめだが、`index.html` / `public/` / `manifest.json` の同時編集が PR レビュー観点（PBI-058 / PBI-059 規律）で慎重さを要するため、初手は主軸 3 件に集中する方針を推奨。
+
+### Sprint016 プランニングへの引き継ぎ
+
+1. PBI-066 のアイコン素材は PO 側で SVG 1〜2 案を事前準備。プランニング冒頭で確定し実装着手の遅延を防ぐ。
+2. PBI-066 / PBI-067 / PBI-068 のサブパス参照（`manifest` / `canonical` / `og:url` / `robots` / `sitemap` / 404 内リンク）はベースパス配下で破綻しないことを PR レビュー観点に明記（PBI-059 規律準拠）。
+3. PBI-067 で `import.meta.env`（公開 URL 等）に依存する箇所は props/定数注入で扱いテストはモック注入で検証する（PBI-058 規律準拠）。
+4. セキュリティ監査（渡辺）に `manifest.json` / 構造化データ / OGP 外部画像参照について事前共有し、外部リソース参照の最小化方針を確認。
+5. PBI-069 が Sprint016 で投入見送りになった場合は Sprint017 候補として継続。Lighthouse Performance カテゴリは引き続きスコープ外。
+6. プロダクトゴール更新は不要。既存ゴール条件（公開サイトとしての仕上げ）に整合するため文面変更なし。

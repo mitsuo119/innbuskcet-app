@@ -3,9 +3,109 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- PBI-066: ファビコン群 / PWA manifest。
+         以下の絶対パス（先頭 /）は Vite ビルド時に `import.meta.env.BASE_URL` 経由で
+         GitHub Pages サブパスへ書き換わる（PBI-059 規律 / vite.config.ts base）。 -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- PBI-067: SEO / OGP / Twitter Card / canonical。
+         `__SITE_URL__` は vite.config.ts の SEO プラグインで GitHub Pages 公開 URL（末尾 / 付き）に
+         置換される（src 側 `import.meta.env` を使わずビルド時注入で扱う・PBI-058 規律）。
+         GitHub Actions では `VITE_SITE_URL=https://<owner>.github.io/<repo>/` を注入。 -->
+    <meta
+      name="description"
+      content="管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。"
+    />
+    <link rel="canonical" href="__SITE_URL__" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="インバスケット - 学習アプリ" />
+    <meta property="og:title" content="インバスケット - 学習アプリ" />
+    <meta
+      property="og:description"
+      content="管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。"
+    />
+    <meta property="og:url" content="__SITE_URL__" />
+    <meta property="og:image" content="__SITE_URL__icon-512.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="インバスケット学習アプリのアイコン" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="インバスケット - 学習アプリ" />
+    <meta
+      name="twitter:description"
+      content="管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。"
+    />
+    <meta name="twitter:image" content="__SITE_URL__icon-512.png" />
+    <meta name="twitter:image:alt" content="インバスケット学習アプリのアイコン" />
     <title>インバスケット - 学習アプリ</title>
+    <!-- PBI-068 / TASK-501: JSON-LD 構造化データ（WebApplication）。
+         `dangerouslySetInnerHTML` 不使用・index.html 直書き（DoD §10-2）。
+         `__SITE_URL__` は vite.config.ts の SEO プラグインで実 URL に置換される。 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "インバスケット - 学習アプリ",
+        "alternateName": "インバスケット学習アプリ",
+        "url": "__SITE_URL__",
+        "description": "管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。",
+        "inLanguage": "ja",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "JPY"
+        },
+        "image": "__SITE_URL__icon-512.png"
+      }
+    </script>
   </head>
   <body>
+    <!-- PBI-069 / TASK-603: noscript フォールバック。
+         本アプリは React SPA のため JavaScript 無効環境では UI を描画できない。
+         検索エンジンのクローラや JS 無効ユーザーに対して、プロダクト概要と
+         有効化手順を日本語で案内する。外部参照ゼロ・インラインスタイルのみ。 -->
+    <noscript>
+      <div
+        role="alert"
+        style="
+          max-width: 640px;
+          margin: 2rem auto;
+          padding: 1.5rem;
+          border: 1px solid #d0d7de;
+          border-radius: 8px;
+          font-family:
+            system-ui,
+            -apple-system,
+            'Segoe UI',
+            sans-serif;
+          line-height: 1.7;
+          color: #1f2328;
+          background: #ffffff;
+        "
+      >
+        <h1 style="font-size: 1.25rem; margin: 0 0 0.75rem">JavaScript を有効にしてください</h1>
+        <p style="margin: 0 0 0.5rem">
+          本サイトは「インバスケット -
+          学習アプリ」です。管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学習できる無料の日本語学習Webアプリです。
+        </p>
+        <p style="margin: 0">
+          画面を表示するには JavaScript を有効化したうえでページを再読み込みしてください。
+        </p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PBI-066 ブランドアイコン素材（マスター SVG）
+  - ブランドカラー（ライトテーマ primary: #0969da）に合わせた青背景。
+  - インバスケット（書類受け）を象徴する 3 段の用紙モチーフ。
+  - 角丸は OS/ブラウザのアイコンクリップとも親和。生成 PNG と同じ幾何学。
+  - 安全領域（中央 80%）内に主要要素を収め maskable にも整合。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="インバスケット学習アプリ">
+  <title>インバスケット学習アプリ</title>
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="#0969da"/>
+  <g fill="#ffffff">
+    <!-- 上段の用紙（短め） -->
+    <rect x="144" y="136" width="224" height="48" rx="14" ry="14" opacity="0.92"/>
+    <!-- 中段の用紙 -->
+    <rect x="120" y="216" width="272" height="56" rx="16" ry="16"/>
+    <!-- 下段の用紙（受けトレイ） -->
+    <rect x="104" y="304" width="304" height="80" rx="20" ry="20"/>
+  </g>
+</svg>

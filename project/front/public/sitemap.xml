@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PBI-068 / TASK-503
+  `__SITE_URL__` は vite.config.ts の SEO プラグインによりビルド時に
+  GitHub Pages 公開 URL（末尾 / 付き）へ置換される（PBI-058 / PBI-059 規律）。
+  SPA はハッシュベースルーティング（src/Router.tsx）のため、各画面 URL は
+  `__SITE_URL__#/<route>` 形式で記述する。
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>__SITE_URL__</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/patterns</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/reference</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/privacy-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/terms-of-service</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/contact</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

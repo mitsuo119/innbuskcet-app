@@ -1,0 +1,9 @@
+# PBI-068 / TASK-502
+# GitHub Pages サブパス公開配下で配信される robots.txt。
+# `__SITE_URL__` は vite.config.ts の SEO プラグインによりビルド時に
+# 公開 URL（末尾 / 付き）へ置換される（PBI-058 規律 / VITE_SITE_URL 注入）。
+
+User-agent: *
+Allow: /
+
+Sitemap: __SITE_URL__sitemap.xml

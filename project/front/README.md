@@ -143,7 +143,7 @@ main ブランチへの push をトリガに、GitHub Actions ([deploy.yml](../.
 ### サブパス対応
 
 `vite.config.ts` の `base` は `VITE_BASE_URL` 環境変数で切替（dev/test は `/`、本番ビルドのみサブパス）。
-SPA フォールバックは `dist/index.html` を `dist/404.html` にコピーする方式（`scripts/copy-404.mjs`、`pnpm build` 末尾で実行）。
+404 ページは `public/404.html` を静的に配置する方式（PBI-068 / TASK-504）。SPA はハッシュベースルーティングのため自動フォールバックは不要で、未一致パス時に「トップへ戻る」導線を表示する。`__SITE_URL__` は vite.config.ts の SEO プラグインで GitHub Pages 公開 URL に置換される。
 
 ### 環境変数
 
