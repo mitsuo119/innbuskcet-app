@@ -16,6 +16,8 @@ import { ExamTimer } from './ui/ExamTimer';
 import { FeedbackView } from './ui/FeedbackView';
 import { ExamResultView } from './ui/ExamResultView';
 import { ConfirmDialog, type ConfirmDialogAction } from './ui/ConfirmDialog';
+import { SelfScoreInput } from './ui/SelfScoreInput';
+import { RadarChart } from './ui/RadarChart';
 import type { Case, Priority } from './domain/case';
 import { evaluateWriting, type WritingFeedback } from './domain/feedback';
 import {
@@ -46,6 +48,10 @@ import {
 } from './domain/score';
 import { resolveShortcut, isEditableTarget } from './domain/shortcut';
 import { createEmptyWritingEntry, isWritingEntryEmpty, type WritingEntry } from './domain/writing';
+import {
+  type SelfScoreEntry,
+  type SelfScoreHistory,
+} from './domain/selfScore';
 import {
   clearExamProgress,
   clearExamSession,
@@ -119,6 +125,16 @@ export default function App() {
   const [writingFeedback, setWritingFeedback] = useState<WritingFeedback | null>(null);
   /** ConfirmDialog の表示 state（PBI-038）。 */
   const [dialogState, setDialogState] = useState<DialogState>(DIALOG_CLOSED);
+  /**
+   * PBI-025: 6軸自己採点履歴（セッション内のみ保持・リロードで初期化）。
+   * - 採点済みエントリを順番に蓄積し RadarChart の平均計算に使用する。
+   */
+  const [selfScoreHistory, setSelfScoreHistory] = useState<SelfScoreHistory>([]);
+  /**
+   * PBI-025: 現在の問題に対して自己採点が完了（または スキップ）したかどうか。
+   * - true の場合は SelfScoreInput を非表示にする。
+   */
+  const [selfScoreInputDone, setSelfScoreInputDone] = useState(false);
 
   const locked = judgement !== null;
   const isDeep = isDeepMode(learningStyle);
@@ -205,6 +221,7 @@ export default function App() {
       setJudgement(null);
       setWritingEntry(createEmptyWritingEntry());
       setWritingFeedback(null);
+      setSelfScoreInputDone(false);
       // PBI-044: 次設問の表示開始時刻にリセットし、設問別所要時間を計測する。
       questionStartedAtRef.current = Date.now();
       return;
@@ -214,6 +231,24 @@ export default function App() {
     setJudgement(null);
     setWritingEntry(createEmptyWritingEntry());
     setWritingFeedback(null);
+    setSelfScoreInputDone(false);
+  };
+
+  /**
+   * PBI-025: 自己採点記録ハンドラ。
+   * - 入力スコアを selfScoreHistory に追加し、入力フォームを閉じる。
+   */
+  const handleSelfScoreSubmit = (entry: SelfScoreEntry) => {
+    setSelfScoreHistory((prev) => [...prev, entry]);
+    setSelfScoreInputDone(true);
+  };
+
+  /**
+   * PBI-025: 自己採点スキップハンドラ。
+   * - 採点しないまま入力フォームを閉じる（履歴には追加しない）。
+   */
+  const handleSelfScoreSkip = () => {
+    setSelfScoreInputDone(true);
   };
 
   /**
@@ -722,11 +757,23 @@ export default function App() {
                       judgement={judgement}
                       onRetry={handleRetry}
                     />
+                    {/* PBI-025: 自己採点入力UI（回答後・スキップまたは採点完了まで表示） */}
+                    {!selfScoreInputDone && (
+                      <SelfScoreInput
+                        onSubmit={handleSelfScoreSubmit}
+                        onSkip={handleSelfScoreSkip}
+                      />
+                    )}
                   </>
                 )}
               </>
             ) : (
               <p>該当する優先度の案件がありません。モードを切替えてください。</p>
+            )}
+
+            {/* PBI-025: 6軸レーダーチャート（1問以上採点済みのときに表示） */}
+            {selfScoreHistory.length > 0 && (
+              <RadarChart history={selfScoreHistory} />
             )}
 
             <div className="actions">
