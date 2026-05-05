@@ -2466,3 +2466,214 @@ body {
   font-weight: 600;
   color: var(--color-primary);
 }
+
+/* =====================================================
+ * PBI-026: パターン別弱点分析 Top3（WeaknessPatternTop3）
+ * ===================================================== */
+.weakness-pattern {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.weakness-pattern__title {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.weakness-pattern__subtitle {
+  margin-left: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.weakness-pattern__desc {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.weakness-pattern__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.weakness-pattern__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border-left: 4px solid transparent;
+  background: var(--color-surface-muted);
+}
+
+.weakness-pattern__item--high {
+  border-left-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.weakness-pattern__item--medium {
+  border-left-color: #f0a500;
+  background: #fffbea;
+}
+
+.weakness-pattern__item--low {
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+:root[data-theme='dark'] .weakness-pattern__item--medium {
+  background: #2b2200;
+}
+
+.weakness-pattern__rank {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-border);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.weakness-pattern__item--high .weakness-pattern__rank {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+}
+
+.weakness-pattern__item--medium .weakness-pattern__rank {
+  background: #f0a500;
+  color: #ffffff;
+}
+
+.weakness-pattern__item--low .weakness-pattern__rank {
+  background: var(--color-success);
+  color: var(--color-on-success);
+}
+
+.weakness-pattern__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.weakness-pattern__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.weakness-pattern__low-reliability {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #a0522d;
+  background: #fff3cd;
+  border: 1px solid #f0a500;
+  border-radius: 3px;
+  padding: 0.1rem 0.3rem;
+}
+
+:root[data-theme='dark'] .weakness-pattern__low-reliability {
+  color: #ffc966;
+  background: #3a2800;
+  border-color: #8a6000;
+}
+
+.weakness-pattern__stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.weakness-pattern__count {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.weakness-pattern__bar-wrap {
+  flex: 1;
+  min-width: 4rem;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.weakness-pattern__bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.weakness-pattern__bar--high {
+  background: var(--color-danger);
+}
+
+.weakness-pattern__bar--medium {
+  background: #f0a500;
+}
+
+.weakness-pattern__bar--low {
+  background: var(--color-success);
+}
+
+.weakness-pattern__badge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  white-space: nowrap;
+}
+
+.weakness-pattern__badge--high {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+}
+
+.weakness-pattern__badge--medium {
+  background: #f0a500;
+  color: #ffffff;
+}
+
+.weakness-pattern__badge--low {
+  background: var(--color-success);
+  color: var(--color-on-success);
+}
+
+@media (max-width: 480px) {
+  .weakness-pattern {
+    padding: 1rem;
+  }
+
+  .weakness-pattern__stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .weakness-pattern__bar-wrap {
+    width: 100%;
+  }
+}

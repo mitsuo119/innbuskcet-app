@@ -313,3 +313,109 @@
 - [x] a11y: 数値テキストの代替表現を提供（DoD9-3）
 - [x] vitest単体テスト追加（集計ロジック・境界値）15件
 - [x] DoD全項目（21項目）を満たす
+
+---
+
+## DAY3（2026-08-21）
+
+| 項目 | 内容 |
+| --- | --- |
+| 日時 | 2026-08-21（金）09:30 |
+| 参加者 | 伊藤・田中・山本・中村 |
+
+### 昨日やったこと
+- 伊藤: PBI-025 TASK-251（自己採点入力UI）・TASK-256（vitest 15件）完了
+- 田中: PBI-025 TASK-252（6軸集計ロジック）・TASK-254（最低軸強調・改善提案）完了
+- 中村: PBI-025 TASK-253（SVGレーダーチャート）完了
+- 山本: PBI-025 TASK-255（a11y対応）確認完了
+- PBI-025 全タスク Done（476件テスト通過）
+
+### 今日やること
+- 田中: PBI-026 TASK-261（パターン別集計ロジック実装）
+- 中村: PBI-026 TASK-262（弱点Top3表示UIコンポーネント）
+- 山本: PBI-026 TASK-263（信頼度警告表示・PBI-025との導線整理）
+- 伊藤: PBI-026 TASK-264（vitest単体テスト追加）・TASK-265（DoD確認・PR）
+
+### 障害物
+- なし
+
+### 開発実施内容（DAY3）
+
+#### PBI-026: パターン別弱点分析 Top3表示
+
+**TASK-261: case_pattern_mapping参照・パターン別集計ロジック実装**
+
+新規ファイル: project/front/src/domain/patternWeakness.ts
+
+- CASE_PATTERN_MAP: case-001〜case-040の40件をchapter08の20パターンへマッピング（case_pattern_mapping.md 逆引き表より）
+- PATTERN_NAME_MAP: パターン番号→パターン名称のマッピング（全20パターン）
+- ggregateByPattern(): 回答履歴を20パターン別に集計（total/incorrect/errorRate/lowReliability）
+  - CASE_PATTERN_MAPに存在しないcase_idは無視
+  - 純粋関数（入力配列を変更しない）
+- selectWeaknessTop3(): 誤答率降順TOP3を選定（同率は出題件数多優先）
+- RELIABILITY_THRESHOLD = 1: total ≤ 1件のパターンに警告フラグ
+
+**TASK-262: 弱点Top3表示UIコンポーネント実装**
+
+新規ファイル: project/front/src/ui/WeaknessPatternTop3.tsx
+
+- 3問以上回答済みのときにApp.tsxから表示（RadarChartの下）
+- 順位バッジ（1〜3位）・パターン名・回答数/誤答数・誤答率バー・弱点バッジを表示
+- 弱点度合い3段階: high（≥70%・赤）/ medium（≥40%・橙）/ low（<40%・緑）
+- aria-live="polite"、各リストアイテムにaria-labelを付与（DoD §9-3）
+
+**TASK-263: 信頼度警告表示・PBI-025との導線整理**
+
+- lowReliability=true（total ≤ 1件）のパターンに「⚠ 参考値」バッジを表示
+  - title属性と aria-label で「出題数が少ないため信頼度が低い」を読み上げ
+- 役割分担をdescに明記:「6軸自己採点がスキル軸の振り返りなのに対し、こちらは問題パターン別の客観集計」
+- styles.css: .weakness-pattern 系スタイル（210行）追加
+  - ダーク/ライト両テーマ対応（CSS変数使用）
+  - モバイル480px以下でstats縦積みレスポンシブ対応
+
+**TASK-264: vitest単体テスト追加**
+
+新規ファイル: project/front/src/domain/patternWeakness.test.ts（19件）
+
+- CASE_PATTERN_MAP: 40件確認・全パターン値1〜20範囲・20パターン全てが1件以上
+- PATTERN_NAME_MAP: 20パターン全て名称定義確認
+- ggregateByPattern: 空配列/1件正解/1件誤答/同一パターン複数/複数パターン/不明case_id無視/patternName確認
+- lowReliability境界値: threshold値での true/false テスト
+- selectWeaknessTop3: 空配列/3件未満/誤答率降順/同率時出題数優先/最大3件切捨/全正解
+
+**TASK-265: DoD確認・PR作成**
+
+| DoD項目 | 判定 |
+| --- | --- |
+| 1-1 TypeScript型エラーゼロ | はい（pnpm tsc --noEmit 出力なし） |
+| 1-2 ESLint/Prettierエラーゼロ | はい（pnpm lint 警告なし） |
+| 1-3 チーム内ペア確認完了 | はい（田中・山本レビュー） |
+| 2-1 単体テスト全件成功 | はい（495件 pass・新規19件含む） |
+| 2-2 受入基準の手動動作確認完了 | はい |
+| 3-1 README起動手順記載 | はい（既存README変更なし） |
+| 4-1 ローカルChrome動作確認 | はい（pnpm dev 起動・3問回答後にTop3表示を確認） |
+| 4-2 出題→回答→解説→次問サイクル | はい（変更なし） |
+| 5-1 pnpm audit | 外部ライブラリ追加なし。追加脆弱性なし |
+| 5-2 シークレット未ハードコード | はい |
+| 6-1 応答1秒以内 | はい（集計はO(n)のインメモリ処理） |
+| 7-1 スマホ〜PC表示崩れなし | はい（480px以下でモバイルレスポンシブ） |
+| 8-1 JSONデータ管理 | はい（CASE_PATTERN_MAPはsrc/domain/patternWeakness.tsで管理） |
+| 9-1 キーボードのみで主要操作完結 | はい（WeaknessPatternTop3はdisplay-onlyで操作不要） |
+| 9-2 フォーカス可視 | はい |
+| 9-3 aria属性付与 | はい（aria-live/aria-label/role="img"） |
+| 10-1 入力検証実装 | はい（CASE_PATTERN_MAPに存在しないIDを無視） |
+| 10-2 dangerouslySetInnerHTML不使用 | はい |
+| 10-3 セッションデータ整合性 | はい（セッション内のみ/useState） |
+| その他 | はい（全21項目確認） |
+
+**受入基準確認:**
+
+- [x] セッション内の正誤履歴をchapter08の20パターンで集計する
+- [x] 誤答率上位3パターンを「弱点パターンTop3」として件数とともに表示する
+- [x] 出題が少ないパターン（1件のみ等）は信頼度低として警告表示する（「⚠ 参考値」バッジ）
+- [x] セッション内のみ保持・リロードで初期化（useState のみ使用）
+- [x] PBI-025（6軸）との導線整理・役割分担を明示（6軸vs20パターン）
+- [x] vitest単体テスト追加（集計・信頼度・Top3選定ロジック）19件
+- [x] DoD全項目（21項目）を満たす
+
+**PBI-026 ステータス: Done（DoD充足）**

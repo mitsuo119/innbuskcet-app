@@ -18,6 +18,7 @@ import { ExamResultView } from './ui/ExamResultView';
 import { ConfirmDialog, type ConfirmDialogAction } from './ui/ConfirmDialog';
 import { SelfScoreInput } from './ui/SelfScoreInput';
 import { RadarChart } from './ui/RadarChart';
+import { WeaknessPatternTop3 } from './ui/WeaknessPatternTop3';
 import type { Case, Priority } from './domain/case';
 import { evaluateWriting, type WritingFeedback } from './domain/feedback';
 import {
@@ -774,6 +775,11 @@ export default function App() {
             {/* PBI-025: 6軸レーダーチャート（1問以上採点済みのときに表示） */}
             {selfScoreHistory.length > 0 && (
               <RadarChart history={selfScoreHistory} />
+            )}
+
+            {/* PBI-026: パターン別弱点Top3（3問以上回答済みのときに表示） */}
+            {history.length >= 3 && (
+              <WeaknessPatternTop3 history={history} />
             )}
 
             <div className="actions">
