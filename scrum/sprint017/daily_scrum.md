@@ -419,3 +419,121 @@
 - [x] DoD全項目（21項目）を満たす
 
 **PBI-026 ステータス: Done（DoD充足）**
+
+---
+
+## DAY4（2026-08-22）
+
+| 項目 | 内容 |
+| --- | --- |
+| 日時 | 2026-08-22（土）09:30 |
+| 参加者 | 伊藤・田中 |
+
+### 昨日やったこと
+- 田中: PBI-026 TASK-261（パターン別集計ロジック）完了
+- 中村: PBI-026 TASK-262（弱点Top3表示UI）完了
+- 山本: PBI-026 TASK-263（信頼度警告・導線整理）完了
+- 伊藤: PBI-026 TASK-264（vitest 19件）・TASK-265（DoD確認）完了
+- Sprint017の主軸PBI（PBI-070 / PBI-025 / PBI-026）を全てDone化
+
+### 今日やること
+- 全PBI完了確認（sprint_backlog上のDone状態確認）
+- 統合確認・品質チェック（`project/front`）
+  - `pnpm run typecheck`（未定義なら `tsc --noEmit`）
+  - `pnpm test`
+  - `pnpm build`
+- 余力確認としてPBI-031（Low・1pt）のReady状態を確認し、投入可否コメントをバックログに記録
+
+### 障害物
+- なし（`typecheck`スクリプト未定義は代替コマンドで解消）
+
+### 開発実施内容（DAY4）
+
+#### 1) 全PBI完了確認
+
+- `scrum/sprint017/sprint_backlog.md` を確認し、以下3PBIの全タスクがDoneであることを再確認。
+  - PBI-070（TASK-701〜704）
+  - PBI-025（TASK-251〜257）
+  - PBI-026（TASK-261〜265）
+
+#### 2) 統合確認・品質チェック
+
+作業ディレクトリ: `d:\work\github\ai-scrum-inbuscket\project\front`
+
+- `pnpm run typecheck` 実行
+  - 結果: `ERR_PNPM_NO_SCRIPT Missing script: typecheck`
+- 代替として `pnpm exec tsc --noEmit` 実行
+  - 結果: 出力なし（型エラーなし）
+- `pnpm test` 実行
+  - 結果: **46 files / 495 tests passed**
+- `pnpm build` 実行
+  - 結果: **build成功**（`vite build`完了、`transform-seo-tokens` 正常実行）
+
+#### 3) バッファ作業（PBI-031）判断メモ
+
+- `scrum/product_backlog.csv` で PBI-031 の状態が **Ready** であることを確認。
+- 本日は統合確認を優先し、新規着手は見送り。
+- スプリントバックログにPO鈴木判断コメントとして「条件付きで追加実施可能（Day5開始時の4h余力再確認後に最終判断）」を記録。
+
+### DAY4時点の結論
+
+- Sprint017の主軸3PBIはすべてDoneを維持。
+- DoD観点の主要ゲート（型チェック/単体テスト/ビルド）は全てクリア。
+- Day5は、キャパシティ次第でPBI-031を投入可能な状態。
+
+---
+
+## DAY5（2026-08-25）
+
+| 項目 | 内容 |
+| --- | --- |
+| 日時 | 2026-08-25（火）09:30 |
+| 参加者 | 伊藤・田中 |
+
+### 昨日やったこと
+- Sprint017主軸PBI（PBI-070 / PBI-025 / PBI-026）のDone維持を確認
+- 統合確認（`pnpm exec tsc --noEmit` / `pnpm test` / `pnpm build`）を完了
+
+### 今日やること
+- 最終品質確認（`pnpm test` / `pnpm build` の再実行）
+- DoD最終確認（PBI-070 / PBI-025 / PBI-026）
+- 記録更新（`daily_scrum.md` / `sprint_backlog.md`）
+- Gitコミット＆push
+
+### 障害物
+- なし
+
+### 開発実施内容（DAY5）
+
+#### 1) 最終品質確認
+
+作業ディレクトリ: `d:\work\github\ai-scrum-inbuscket\project\front`
+
+- `pnpm test`
+  - 結果: **46 files / 495 tests passed**
+- `pnpm build`
+  - 結果: **build成功**（`tsc -b` / `vite build` / `transform-seo-tokens` まで正常完了）
+
+#### 2) DoD最終確認（全PBI）
+
+- 対象: **PBI-070 / PBI-025 / PBI-026**
+- 判定: **全PBI DoD充足（Done維持）**
+
+| DoD観点 | 最終判定 |
+| --- | --- |
+| コード品質（1-1〜1-3） | はい |
+| テスト（2-1〜2-2） | はい |
+| ドキュメント（3-1〜3-2） | はい |
+| 動作確認（4-1〜4-2） | はい |
+| セキュリティ（5-1〜5-2） | はい |
+| パフォーマンス（6-1） | はい |
+| UI/UX（7-1〜7-2） | はい |
+| データ管理（8-1） | はい |
+| アクセシビリティ（9-1〜9-3） | はい |
+| 入力検証・データ保護（10-1〜10-3） | はい |
+
+#### 3) DAY5結論
+
+- Sprint017の計画対象PBI（PBI-070 / PBI-025 / PBI-026）は全てDone。
+- 最終日再確認でも、全テスト通過・ビルド成功を確認。
+- スプリントレビューへ提出可能なインクリメント状態を確認。
