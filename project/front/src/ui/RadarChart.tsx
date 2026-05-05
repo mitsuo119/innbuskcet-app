@@ -95,9 +95,7 @@ export function RadarChart({ history }: Props) {
         ))}
       </p>
 
-      <h3 className="radar-chart__title">
-        スキル分析（{history.length}問分の平均）
-      </h3>
+      <h3 className="radar-chart__title">スキル分析（{history.length}問分の平均）</h3>
 
       <div className="radar-chart__container">
         <svg
@@ -140,10 +138,7 @@ export function RadarChart({ history }: Props) {
           })}
 
           {/* === スコアポリゴン === */}
-          <polygon
-            className="radar-chart__score"
-            points={scorePolygonPoints(averages)}
-          />
+          <polygon className="radar-chart__score" points={scorePolygonPoints(averages)} />
 
           {/* === スコアの頂点ドット === */}
           {SELF_SCORE_AXES.map((axis, i) => {

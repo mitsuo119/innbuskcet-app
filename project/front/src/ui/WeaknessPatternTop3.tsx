@@ -28,11 +28,7 @@ export function WeaknessPatternTop3({ history }: Props) {
   }
 
   return (
-    <section
-      className="weakness-pattern"
-      aria-label="パターン別弱点分析 Top3"
-      aria-live="polite"
-    >
+    <section className="weakness-pattern" aria-label="パターン別弱点分析 Top3" aria-live="polite">
       <h3 className="weakness-pattern__title">
         パターン別弱点 Top3
         <span className="weakness-pattern__subtitle">（問題種別ごとの誤答率）</span>
@@ -57,15 +53,10 @@ interface PatternStatItemProps {
 function PatternStatItem({ rank, stat }: PatternStatItemProps) {
   const errorPercent = Math.round(stat.errorRate * 100);
   // 弱点度合いを3段階で分類
-  const weaknessLevel =
-    stat.errorRate >= 0.7 ? 'high' : stat.errorRate >= 0.4 ? 'medium' : 'low';
+  const weaknessLevel = stat.errorRate >= 0.7 ? 'high' : stat.errorRate >= 0.4 ? 'medium' : 'low';
 
   const weaknessLabel =
-    weaknessLevel === 'high'
-      ? '要注意'
-      : weaknessLevel === 'medium'
-        ? '注意'
-        : '良好';
+    weaknessLevel === 'high' ? '要注意' : weaknessLevel === 'medium' ? '注意' : '良好';
 
   return (
     <li

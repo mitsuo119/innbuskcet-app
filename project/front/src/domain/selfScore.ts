@@ -56,8 +56,7 @@ export const AXIS_META: Record<SelfScoreAxis, AxisMeta> = {
     label: '洞察',
     description: '背景や意図を深く読み取れたか',
     chapterRef: 'chapter03',
-    suggestion:
-      'マネジャーとしてのマインドセット強化が有効です。chapter03を参照してください。',
+    suggestion: 'マネジャーとしてのマインドセット強化が有効です。chapter03を参照してください。',
   },
   orgUtilization: {
     label: '組織活用',
@@ -70,8 +69,7 @@ export const AXIS_META: Record<SelfScoreAxis, AxisMeta> = {
     label: 'ヒューマンスキル',
     description: '関係者への配慮・コミュニケーションを意識できたか',
     chapterRef: 'chapter09',
-    suggestion:
-      '説得力のある文章・指示の書き方を練習しましょう。chapter09を参照してください。',
+    suggestion: '説得力のある文章・指示の書き方を練習しましょう。chapter09を参照してください。',
   },
 };
 

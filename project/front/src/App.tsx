@@ -49,10 +49,7 @@ import {
 } from './domain/score';
 import { resolveShortcut, isEditableTarget } from './domain/shortcut';
 import { createEmptyWritingEntry, isWritingEntryEmpty, type WritingEntry } from './domain/writing';
-import {
-  type SelfScoreEntry,
-  type SelfScoreHistory,
-} from './domain/selfScore';
+import { type SelfScoreEntry, type SelfScoreHistory } from './domain/selfScore';
 import {
   clearExamProgress,
   clearExamSession,
@@ -773,14 +770,10 @@ export default function App() {
             )}
 
             {/* PBI-025: 6軸レーダーチャート（1問以上採点済みのときに表示） */}
-            {selfScoreHistory.length > 0 && (
-              <RadarChart history={selfScoreHistory} />
-            )}
+            {selfScoreHistory.length > 0 && <RadarChart history={selfScoreHistory} />}
 
             {/* PBI-026: パターン別弱点Top3（3問以上回答済みのときに表示） */}
-            {history.length >= 3 && (
-              <WeaknessPatternTop3 history={history} />
-            )}
+            {history.length >= 3 && <WeaknessPatternTop3 history={history} />}
 
             <div className="actions">
               {!locked ? (

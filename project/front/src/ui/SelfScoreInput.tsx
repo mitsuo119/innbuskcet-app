@@ -35,11 +35,7 @@ export function SelfScoreInput({ onSubmit, onSkip }: Props) {
   };
 
   return (
-    <section
-      className="self-score-input"
-      aria-label="6軸自己採点"
-      aria-live="polite"
-    >
+    <section className="self-score-input" aria-label="6軸自己採点" aria-live="polite">
       <h3 className="self-score-input__title">自己採点（任意）</h3>
       <p className="self-score-input__desc">
         今回の回答を6軸で自己評価してください。1（低い）〜5（高い）で選択。

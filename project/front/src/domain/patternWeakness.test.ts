@@ -15,10 +15,7 @@ import {
 } from './patternWeakness';
 
 // テスト用ヘルパー: HistoryItemを簡潔に生成する
-function makeItem(
-  caseId: string,
-  judgement: 'correct' | 'incorrect',
-): HistoryItem {
+function makeItem(caseId: string, judgement: 'correct' | 'incorrect'): HistoryItem {
   return {
     caseId,
     judgement,
@@ -90,7 +87,7 @@ describe('aggregateByPattern', () => {
   it('同一パターンの複数回答を正しく集計する', () => {
     const history = [
       makeItem('case-002', 'incorrect'), // pattern 12
-      makeItem('case-006', 'correct'),   // pattern 12
+      makeItem('case-006', 'correct'), // pattern 12
       makeItem('case-009', 'incorrect'), // pattern 12
     ];
     const stats = aggregateByPattern(history);
@@ -104,7 +101,7 @@ describe('aggregateByPattern', () => {
 
   it('複数パターンを個別に集計する', () => {
     const history = [
-      makeItem('case-001', 'correct'),   // pattern 1
+      makeItem('case-001', 'correct'), // pattern 1
       makeItem('case-004', 'incorrect'), // pattern 8
     ];
     const stats = aggregateByPattern(history);
@@ -115,7 +112,7 @@ describe('aggregateByPattern', () => {
   it('CASE_PATTERN_MAPに存在しないcase_idは無視する', () => {
     const history = [
       makeItem('case-999', 'incorrect'), // 存在しない
-      makeItem('case-001', 'correct'),   // pattern 1
+      makeItem('case-001', 'correct'), // pattern 1
     ];
     const stats = aggregateByPattern(history);
     expect(stats).toHaveLength(1);
@@ -168,12 +165,12 @@ describe('selectWeaknessTop3', () => {
   it('誤答率の降順で並ぶ', () => {
     // pattern 1: 1/1 = 100%, pattern 12: 1/3 ≈ 33%, pattern 9: 0/2 = 0%
     const history = [
-      makeItem('case-001', 'incorrect'),  // p1
-      makeItem('case-002', 'incorrect'),  // p12
-      makeItem('case-006', 'correct'),    // p12
-      makeItem('case-009', 'correct'),    // p12
-      makeItem('case-007', 'correct'),    // p9
-      makeItem('case-029', 'correct'),    // p9
+      makeItem('case-001', 'incorrect'), // p1
+      makeItem('case-002', 'incorrect'), // p12
+      makeItem('case-006', 'correct'), // p12
+      makeItem('case-009', 'correct'), // p12
+      makeItem('case-007', 'correct'), // p9
+      makeItem('case-029', 'correct'), // p9
     ];
     const stats = aggregateByPattern(history);
     const top3 = selectWeaknessTop3(stats);
@@ -186,9 +183,9 @@ describe('selectWeaknessTop3', () => {
   it('同率誤答率の場合は出題件数が多い方が上位になる', () => {
     // どちらも errorRate=1.0 だが、一方は total=2、もう一方は total=1
     const history = [
-      makeItem('case-001', 'incorrect'),  // p1: total=1, errorRate=1.0
-      makeItem('case-007', 'incorrect'),  // p9: total=2, errorRate=1.0
-      makeItem('case-029', 'incorrect'),  // p9: (追加)
+      makeItem('case-001', 'incorrect'), // p1: total=1, errorRate=1.0
+      makeItem('case-007', 'incorrect'), // p9: total=2, errorRate=1.0
+      makeItem('case-029', 'incorrect'), // p9: (追加)
     ];
     const stats = aggregateByPattern(history);
     const top3 = selectWeaknessTop3(stats);
