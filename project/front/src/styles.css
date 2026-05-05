@@ -115,7 +115,16 @@ body {
 
 .app-subtitle {
   color: var(--color-text-muted);
-  margin-top: -0.5rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* PBI-070: モバイル（〜430px）でサブタイトルとモードボタン間の余白を確保 */
+@media (max-width: 430px) {
+  .app-subtitle {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+  }
 }
 
 /* ===== ScoreCounter（PBI-021 拡張対応） ===== */
