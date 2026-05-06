@@ -71,6 +71,51 @@
         "image": "__SITE_URL__icon-512.png"
       }
     </script>
+    <!-- PBI-072 / TASK-722: JSON-LD 追加（WebSite + BreadcrumbList）。
+         主要導線（ホーム / 解説 / パターン / 法務）を検索エンジンへ明示する。 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "インバスケット - 学習アプリ",
+            "url": "__SITE_URL__",
+            "inLanguage": "ja",
+            "description": "管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。"
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "ホーム",
+                "item": "__SITE_URL__"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "解説リファレンス",
+                "item": "__SITE_URL__#/reference"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "パターン別解説",
+                "item": "__SITE_URL__#/patterns"
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "name": "プライバシーポリシー",
+                "item": "__SITE_URL__#/privacy-policy"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <!-- PBI-069 / TASK-603: noscript フォールバック。

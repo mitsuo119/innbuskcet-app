@@ -23,6 +23,41 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>__SITE_URL__#/reference/chapter01</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/reference/chapter02</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/reference/chapter05</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/reference/chapter08</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/patterns/1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/patterns/8</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>__SITE_URL__#/patterns/20</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>__SITE_URL__#/privacy-policy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

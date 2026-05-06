@@ -1,4 +1,6 @@
 # PBI-068 / TASK-502
+# PBI-072 / TASK-725: sitemap の主要公開ルート拡張に合わせ、
+# robots からの参照点（Sitemap 行）を継続利用する。
 # GitHub Pages サブパス公開配下で配信される robots.txt。
 # `__SITE_URL__` は vite.config.ts の SEO プラグインによりビルド時に
 # 公開 URL（末尾 / 付き）へ置換される（PBI-058 規律 / VITE_SITE_URL 注入）。

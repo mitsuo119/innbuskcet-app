@@ -28,9 +28,9 @@ function makeItem(caseId: string, judgement: 'correct' | 'incorrect'): HistoryIt
 // CASE_PATTERN_MAP のサニティチェック
 // =====================================================
 describe('CASE_PATTERN_MAP', () => {
-  it('全40件のcase_idが含まれている', () => {
+  it('全70件のcase_idが含まれている', () => {
     const ids = Object.keys(CASE_PATTERN_MAP);
-    expect(ids.length).toBe(40);
+    expect(ids.length).toBe(70);
   });
 
   it('全パターン値が1〜20の範囲内である', () => {

@@ -1,7 +1,7 @@
 /**
  * PBI-026: パターン別弱点分析ドメインロジック
  *
- * case_pattern_mapping.md の 40 件対応表に基づき、
+ * case_pattern_mapping.md の対応表に基づき、
  * セッション内の回答履歴をchapter08の20パターンで集計し、
  * 誤答率上位3パターンを「弱点パターンTop3」として返す。
  *
@@ -80,6 +80,36 @@ export const CASE_PATTERN_MAP: Record<string, number> = {
   'case-038': 11,
   'case-039': 15,
   'case-040': 20,
+  'case-041': 1,
+  'case-042': 6,
+  'case-043': 10,
+  'case-044': 14,
+  'case-045': 18,
+  'case-046': 7,
+  'case-047': 14,
+  'case-048': 16,
+  'case-049': 10,
+  'case-050': 9,
+  'case-051': 11,
+  'case-052': 18,
+  'case-053': 2,
+  'case-054': 14,
+  'case-055': 3,
+  'case-056': 12,
+  'case-057': 1,
+  'case-058': 6,
+  'case-059': 10,
+  'case-060': 14,
+  'case-061': 18,
+  'case-062': 7,
+  'case-063': 16,
+  'case-064': 9,
+  'case-065': 11,
+  'case-066': 12,
+  'case-067': 2,
+  'case-068': 3,
+  'case-069': 15,
+  'case-070': 20,
 };
 
 /** パターンID → パターン名称のマッピング（chapter08-case-patterns.md より） */

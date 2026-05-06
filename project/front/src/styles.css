@@ -531,6 +531,31 @@ body {
   border-radius: 2px;
 }
 
+.explanation__related {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.explanation__related-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.explanation__related-link:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.explanation__related-sep {
+  color: var(--color-text-muted);
+}
+
 .badge {
   display: inline-block;
   padding: 0.15rem 0.6rem;

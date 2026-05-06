@@ -41,6 +41,17 @@ export function ExplanationView({ caseItem, answer, judgement, onRetry }: Props)
         </span>
       </div>
       <p className="explanation__body">{renderExplanationWithPatternLinks(caseItem.explanation)}</p>
+      <nav className="explanation__related" aria-label="関連学習ページ">
+        <a href="#/patterns" className="explanation__related-link">
+          関連パターンを見る
+        </a>
+        <span className="explanation__related-sep" aria-hidden="true">
+          |
+        </span>
+        <a href="#/reference" className="explanation__related-link">
+          解説リファレンスへ
+        </a>
+      </nav>
       {onRetry && (
         <div className="explanation__actions">
           <button

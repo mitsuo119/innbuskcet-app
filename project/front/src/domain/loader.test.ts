@@ -103,7 +103,7 @@ describe('parseModelAnswer (PBI-024 / TASK-008・DoD §10-3)', () => {
     }
   });
 
-  it('loadCases 経由で全 40 件が modelAnswer を整備済みである（PBI-033c 完了）', () => {
+  it('loadCases 経由で全件が modelAnswer を整備済みである（PBI-033c 完了）', () => {
     const cases = loadCases();
     const withoutModel = cases.filter((c) => c.modelAnswer === undefined);
     expect(withoutModel.length).toBe(0);

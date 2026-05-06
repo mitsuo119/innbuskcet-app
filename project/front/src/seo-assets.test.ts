@@ -60,6 +60,13 @@ describe('PBI-068 JSON-LD 構造化データ', () => {
     // （コメント等で語句に言及することは許容）。
     expect(INDEX_HTML).not.toMatch(/dangerouslySetInnerHTML\s*=/);
   });
+
+  it('WebSite と BreadcrumbList の JSON-LD を追加している（PBI-072）', () => {
+    expect(INDEX_HTML).toContain('"@type": "WebSite"');
+    expect(INDEX_HTML).toContain('"@type": "BreadcrumbList"');
+    expect(INDEX_HTML).toContain('"name": "解説リファレンス"');
+    expect(INDEX_HTML).toContain('"name": "パターン別解説"');
+  });
 });
 
 describe('PBI-068 robots.txt', () => {
