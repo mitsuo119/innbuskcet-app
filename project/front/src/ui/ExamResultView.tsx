@@ -204,7 +204,10 @@ export function ExamResultView({
         </dl>
       </section>
 
-      <section className="exam-result__timeline" aria-labelledby="exam-result-view-timeline-heading">
+      <section
+        className="exam-result__timeline"
+        aria-labelledby="exam-result-view-timeline-heading"
+      >
         <h3 id="exam-result-view-timeline-heading" className="exam-result__breakdown-heading">
           Exam 90分ミニタイムライン
         </h3>
@@ -230,7 +233,10 @@ export function ExamResultView({
                   </span>
                 )}
                 {item.isOverTotal && (
-                  <span className="exam-result__timeline-badge exam-result__timeline-badge--over" title="90分超過">
+                  <span
+                    className="exam-result__timeline-badge exam-result__timeline-badge--over"
+                    title="90分超過"
+                  >
                     ⏱ 90分超過
                   </span>
                 )}

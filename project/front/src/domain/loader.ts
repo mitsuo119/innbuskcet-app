@@ -94,7 +94,8 @@ export function loadCases(): Case[] {
     }
     const c = raw as Partial<Record<keyof Case, unknown>>;
 
-    const { id, title, body, correctPriority, explanation, modelAnswer, characters, departments } = c;
+    const { id, title, body, correctPriority, explanation, modelAnswer, characters, departments } =
+      c;
 
     if (typeof id !== 'string' || id.length === 0) {
       throw new Error(`cases.json[${index}] の id が不正です`);

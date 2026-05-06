@@ -1140,7 +1140,8 @@ body {
 
 /* ===== ScoreCounter learning style badge (PBI-037 / TASK-015) ===== */
 
-.score-counter__style {  display: inline-flex;
+.score-counter__style {
+  display: inline-flex;
   align-items: baseline;
   gap: 0.25rem;
   margin-left: 0.6rem;

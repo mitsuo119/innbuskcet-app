@@ -52,7 +52,9 @@ function findByField(
       value: currentMap.get(key) ?? key,
       matchedCaseIds: Array.from(ids),
     }))
-    .sort((a, b) => b.matchedCaseIds.length - a.matchedCaseIds.length || a.value.localeCompare(b.value));
+    .sort(
+      (a, b) => b.matchedCaseIds.length - a.matchedCaseIds.length || a.value.localeCompare(b.value),
+    );
 }
 
 /**

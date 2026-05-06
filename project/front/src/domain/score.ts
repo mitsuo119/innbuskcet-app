@@ -106,9 +106,7 @@ export function calcRollingScore(
   n: number,
   style?: LearningStyle,
 ): Score | null {
-  const filtered = style
-    ? history.filter((item) => item.learningStyle === style)
-    : [...history];
+  const filtered = style ? history.filter((item) => item.learningStyle === style) : [...history];
   if (filtered.length < n) return null;
   const recent = filtered.slice(-n);
   return {

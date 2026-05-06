@@ -38,13 +38,17 @@ describe('buildRelatedCaseHighlights (PBI-028)', () => {
       characters: ['山田課長'],
       departments: ['企画部'],
     });
-    const previous = [createCase('case-001', { characters: ['田中課長'], departments: ['営業部'] })];
+    const previous = [
+      createCase('case-001', { characters: ['田中課長'], departments: ['営業部'] }),
+    ];
     expect(buildRelatedCaseHighlights(current, previous)).toEqual([]);
   });
 
   it('currentCase にメタデータ未設定でも空配列を返す', () => {
     const current = createCase('case-current', {});
-    const previous = [createCase('case-001', { characters: ['田中課長'], departments: ['営業部'] })];
+    const previous = [
+      createCase('case-001', { characters: ['田中課長'], departments: ['営業部'] }),
+    ];
     expect(buildRelatedCaseHighlights(current, previous)).toEqual([]);
   });
 

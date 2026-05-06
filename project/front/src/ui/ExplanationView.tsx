@@ -18,7 +18,13 @@ interface Props {
  * - SR 読み上げは `aria-label` に `formatPriorityLabel`（例: 「A（最優先）即時着手すべき」）を格納
  * - onRetry が渡された場合、同一案件をもう一度解き直す導線を表示する。
  */
-export function ExplanationView({ caseItem, answer, judgement, relatedHighlights = [], onRetry }: Props) {
+export function ExplanationView({
+  caseItem,
+  answer,
+  judgement,
+  relatedHighlights = [],
+  onRetry,
+}: Props) {
   const isCorrect = judgement === 'correct';
   const answerLabel = PRIORITY_LABELS[answer];
   const correctLabel = PRIORITY_LABELS[caseItem.correctPriority];
@@ -61,7 +67,9 @@ export function ExplanationView({ caseItem, answer, judgement, relatedHighlights
                   </span>
                   <span className="explanation__insight-label">{label}</span>
                   <strong className="explanation__insight-value">{item.value}</strong>
-                  <span className="explanation__insight-meta">（既出{item.matchedCaseIds.length}件）</span>
+                  <span className="explanation__insight-meta">
+                    （既出{item.matchedCaseIds.length}件）
+                  </span>
                 </li>
               );
             })}

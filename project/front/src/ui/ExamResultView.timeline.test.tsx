@@ -15,7 +15,10 @@ function makeSession(totalQuestions = 3): ExamSession {
     totalQuestions,
     timeLimit: 90 * 60,
     startedAt: Date.now() - 1_000,
-    questionIds: Array.from({ length: totalQuestions }, (_, i) => `case-${String(i + 1).padStart(3, '0')}`),
+    questionIds: Array.from(
+      { length: totalQuestions },
+      (_, i) => `case-${String(i + 1).padStart(3, '0')}`,
+    ),
   };
 }
 

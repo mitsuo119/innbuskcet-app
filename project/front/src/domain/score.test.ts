@@ -156,10 +156,7 @@ describe('addLearningStyleScore() (PBI-037 / TASK-015)', () => {
 });
 
 describe('calcRollingScore() (PBI-031)', () => {
-  const makeItem = (
-    judgement: 'correct' | 'incorrect',
-    style?: 'quick' | 'deep' | 'exam',
-  ) => ({
+  const makeItem = (judgement: 'correct' | 'incorrect', style?: 'quick' | 'deep' | 'exam') => ({
     caseId: 'case-001',
     judgement,
     correctPriority: 'A' as const,

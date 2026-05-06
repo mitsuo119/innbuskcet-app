@@ -85,7 +85,11 @@ export function ScoreCounter({
         : `直近${rollingN}問 正答${rollingScore.correct}/${rollingScore.total}（${formatRate(rollingScore)}）`;
 
   return (
-    <div className="score-counter" aria-live="polite" aria-label={`${ariaLabel}${rollingAriaText ? '。' + rollingAriaText : ''}`}>
+    <div
+      className="score-counter"
+      aria-live="polite"
+      aria-label={`${ariaLabel}${rollingAriaText ? '。' + rollingAriaText : ''}`}
+    >
       {showMode && (
         <span className="score-counter__mode" aria-hidden="true">
           {modeLabel}

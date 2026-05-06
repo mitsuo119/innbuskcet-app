@@ -134,6 +134,7 @@ PR 単位で以下を記入する。
 | ローリングラベル `.score-counter__rolling-label` | `#9da7b3` | `#21262d` | 5.7:1  | ≥ 4.5:1 | OK   |
 
 **対応内容:**
+
 - `.case-view` に `color: var(--color-text)` を明示追加（防御的 CSS・継承依存を排除）
 - `styles.css` ダークテーマコメントを `--color-surface: #161b22` 基準の実測値に更新
 - 全組合せ WCAG AA 以上を確認。現行値の変更なし
