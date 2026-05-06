@@ -4,6 +4,37 @@ import type { Case, ModelAnswer, Priority } from './case';
 const VALID_PRIORITIES: ReadonlySet<Priority> = new Set<Priority>(['A', 'B', 'C']);
 
 /**
+ * 任意の文字列配列フィールドを検証する（PBI-028 / DoD §10-3）。
+ * - 未指定は undefined を返す
+ * - 配列以外、空文字、非文字列を含む場合は undefined にフォールバック
+ */
+function parseOptionalStringArray(
+  raw: unknown,
+  fieldName: 'characters' | 'departments',
+  index: number,
+  id: string,
+): string[] | undefined {
+  if (raw === undefined || raw === null) return undefined;
+  if (!Array.isArray(raw)) {
+    console.warn(
+      `cases.json[${index}] (id=${id}): ${fieldName} は文字列配列である必要があります（undefined にフォールバック）`,
+    );
+    return undefined;
+  }
+  const values: string[] = [];
+  for (const item of raw) {
+    if (typeof item !== 'string' || item.trim().length === 0) {
+      console.warn(
+        `cases.json[${index}] (id=${id}): ${fieldName} の要素は非空文字列である必要があります（undefined にフォールバック）`,
+      );
+      return undefined;
+    }
+    values.push(item.trim());
+  }
+  return values.length > 0 ? Array.from(new Set(values)) : undefined;
+}
+
+/**
  * raw な modelAnswer を検証して返す（DoD §10-3：受領データの整合性検証）。
  *
  * 設計方針（TASK-008 / Sprint005）:
@@ -63,7 +94,7 @@ export function loadCases(): Case[] {
     }
     const c = raw as Partial<Record<keyof Case, unknown>>;
 
-    const { id, title, body, correctPriority, explanation, modelAnswer } = c;
+    const { id, title, body, correctPriority, explanation, modelAnswer, characters, departments } = c;
 
     if (typeof id !== 'string' || id.length === 0) {
       throw new Error(`cases.json[${index}] の id が不正です`);
@@ -84,6 +115,8 @@ export function loadCases(): Case[] {
     }
 
     const parsedModel = parseModelAnswer(modelAnswer, index, id);
+    const parsedCharacters = parseOptionalStringArray(characters, 'characters', index, id);
+    const parsedDepartments = parseOptionalStringArray(departments, 'departments', index, id);
 
     const result: Case = {
       id,
@@ -92,6 +125,8 @@ export function loadCases(): Case[] {
       correctPriority: correctPriority as Priority,
       explanation,
     };
+    if (parsedCharacters) result.characters = parsedCharacters;
+    if (parsedDepartments) result.departments = parsedDepartments;
     if (parsedModel) result.modelAnswer = parsedModel;
     return result;
   });

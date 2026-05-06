@@ -1,5 +1,6 @@
 import type { Case, Priority } from '../domain/case';
 import type { Judgement } from '../domain/judge';
+import type { RelatedCaseHighlight } from '../domain/relatedCaseHighlight';
 import { PRIORITY_LABELS, formatPriorityLabel } from '../domain/priorityLabel';
 import { renderExplanationWithPatternLinks } from '../utils/explanationPatternLinks';
 
@@ -7,6 +8,7 @@ interface Props {
   caseItem: Case;
   answer: Priority;
   judgement: Judgement;
+  relatedHighlights?: readonly RelatedCaseHighlight[];
   onRetry?: () => void;
 }
 
@@ -16,7 +18,7 @@ interface Props {
  * - SR 読み上げは `aria-label` に `formatPriorityLabel`（例: 「A（最優先）即時着手すべき」）を格納
  * - onRetry が渡された場合、同一案件をもう一度解き直す導線を表示する。
  */
-export function ExplanationView({ caseItem, answer, judgement, onRetry }: Props) {
+export function ExplanationView({ caseItem, answer, judgement, relatedHighlights = [], onRetry }: Props) {
   const isCorrect = judgement === 'correct';
   const answerLabel = PRIORITY_LABELS[answer];
   const correctLabel = PRIORITY_LABELS[caseItem.correctPriority];
@@ -41,6 +43,31 @@ export function ExplanationView({ caseItem, answer, judgement, onRetry }: Props)
         </span>
       </div>
       <p className="explanation__body">{renderExplanationWithPatternLinks(caseItem.explanation)}</p>
+      {relatedHighlights.length > 0 && (
+        <section className="explanation__insights" aria-label="案件間の関連ハイライト">
+          <p className="explanation__insights-title">関連の気づき</p>
+          <ul className="explanation__insights-list">
+            {relatedHighlights.map((item) => {
+              const isCharacter = item.kind === 'character';
+              const label = isCharacter ? '同一人物' : '同一部署';
+              const symbol = isCharacter ? '👤' : '🏢';
+              return (
+                <li
+                  key={`${item.kind}-${item.value}`}
+                  className={`explanation__insight explanation__insight--${item.kind}`}
+                >
+                  <span className="explanation__insight-symbol" aria-hidden="true">
+                    {symbol}
+                  </span>
+                  <span className="explanation__insight-label">{label}</span>
+                  <strong className="explanation__insight-value">{item.value}</strong>
+                  <span className="explanation__insight-meta">（既出{item.matchedCaseIds.length}件）</span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
       <nav className="explanation__related" aria-label="関連学習ページ">
         <a href="#/patterns" className="explanation__related-link">
           関連パターンを見る

@@ -20,6 +20,15 @@ interface Props {
   learningStyleScores?: LearningStyleScores;
   /** 現在の学習スタイル（PBI-037）。learningStyleScores と併用 */
   currentStyle?: LearningStyle;
+  /**
+   * 直近N件ローリング正答率（PBI-031）。
+   * - Score: 直近 rollingN 件の集計結果
+   * - null: 件数不足（安全表示: `-/- (--%)`）
+   * - undefined: 表示しない（Exam モード等）
+   */
+  rollingScore?: Score | null;
+  /** ローリング集計件数 N（デフォルト 10） */
+  rollingN?: number;
 }
 
 const MODE_LABEL: Record<FilterMode, string> = {
@@ -46,6 +55,8 @@ export function ScoreCounter({
   currentMode,
   learningStyleScores,
   currentStyle,
+  rollingScore,
+  rollingN = 10,
 }: Props) {
   // 拡張プロパティ（modeScores + currentMode）が両方揃った場合のみモード別表示
   const showMode = modeScores !== undefined && currentMode !== undefined;
@@ -65,8 +76,16 @@ export function ScoreCounter({
       ? `${ariaLabelBase}。${styleLabel}モード 正答 ${styleTarget.correct} / 出題 ${styleTarget.total}（正答率 ${formatRate(styleTarget)}）`
       : ariaLabelBase;
 
+  // ローリング正答率テキスト（PBI-031）
+  const rollingAriaText =
+    rollingScore === undefined
+      ? ''
+      : rollingScore === null
+        ? `直近${rollingN}問の正答率 集計中`
+        : `直近${rollingN}問 正答${rollingScore.correct}/${rollingScore.total}（${formatRate(rollingScore)}）`;
+
   return (
-    <div className="score-counter" aria-live="polite" aria-label={ariaLabel}>
+    <div className="score-counter" aria-live="polite" aria-label={`${ariaLabel}${rollingAriaText ? '。' + rollingAriaText : ''}`}>
       {showMode && (
         <span className="score-counter__mode" aria-hidden="true">
           {modeLabel}
@@ -94,6 +113,21 @@ export function ScoreCounter({
           <span className="score-counter__sep">/</span>
           <strong>{styleTarget.total}</strong>
           <span className="score-counter__rate">({formatRate(styleTarget)})</span>
+        </span>
+      )}
+      {rollingScore !== undefined && (
+        <span className="score-counter__rolling" aria-hidden="true">
+          <span className="score-counter__rolling-label">直近{rollingN}問</span>
+          {rollingScore === null ? (
+            <span>-/-&nbsp;(--%)</span>
+          ) : (
+            <>
+              <strong>{rollingScore.correct}</strong>
+              <span className="score-counter__sep">/</span>
+              <strong>{rollingScore.total}</strong>
+              <span className="score-counter__rate">({formatRate(rollingScore)}%)</span>
+            </>
+          )}
         </span>
       )}
     </div>

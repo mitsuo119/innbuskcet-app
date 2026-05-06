@@ -36,6 +36,16 @@ export interface Case {
   /** 解説文（なぜその優先度なのか） */
   explanation: string;
   /**
+   * 案件に登場する人物名（PBI-028 / 任意）。
+   * 段階移行のため未設定案件は undefined。
+   */
+  characters?: string[];
+  /**
+   * 案件に登場する部署名（PBI-028 / 任意）。
+   * 段階移行のため未設定案件は undefined。
+   */
+  departments?: string[];
+  /**
    * 模範回答骨格（PBI-024 / 任意）。
    * cases.json で段階的に整備中。未整備の案件では undefined。
    */

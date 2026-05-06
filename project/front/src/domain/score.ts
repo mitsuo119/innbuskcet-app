@@ -2,6 +2,7 @@ import type { Judgement } from './judge';
 import { FILTER_MODES, type FilterMode } from './random';
 import type { Priority } from './case';
 import type { LearningStyle } from './learningStyle';
+import type { HistoryItem } from './history';
 
 /** セッション内スコア（リロードでリセット） */
 export interface Score {
@@ -91,5 +92,27 @@ export function addLearningStyleScore(
   return {
     ...scores,
     [style]: addScore(scores[style], judgement),
+  };
+}
+
+/**
+ * 直近N件のローリング正答率を計算する純粋関数（PBI-031）。
+ * - style 指定時は該当学習スタイルでフィルタした上で直近 n 件を集計（Quick/Deep 独立集計）
+ * - フィルタ後の件数が n 未満の場合は null を返す（安全表示: UI 側で `-/- (--%)`等を表示）
+ * - イミュータブル（入力配列を変更しない）
+ */
+export function calcRollingScore(
+  history: readonly HistoryItem[],
+  n: number,
+  style?: LearningStyle,
+): Score | null {
+  const filtered = style
+    ? history.filter((item) => item.learningStyle === style)
+    : [...history];
+  if (filtered.length < n) return null;
+  const recent = filtered.slice(-n);
+  return {
+    total: n,
+    correct: recent.filter((item) => item.judgement === 'correct').length,
   };
 }

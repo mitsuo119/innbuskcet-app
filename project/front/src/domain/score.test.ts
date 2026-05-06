@@ -3,6 +3,7 @@ import {
   addLearningStyleScore,
   addModeScore,
   addScore,
+  calcRollingScore,
   initialLearningStyleScores,
   initialModeScores,
   initialScore,
@@ -151,5 +152,71 @@ describe('addLearningStyleScore() (PBI-037 / TASK-015)', () => {
     const next = addLearningStyleScore(base, 'quick', 'correct');
     expect(base).toEqual(initialLearningStyleScores);
     expect(next).not.toBe(base);
+  });
+});
+
+describe('calcRollingScore() (PBI-031)', () => {
+  const makeItem = (
+    judgement: 'correct' | 'incorrect',
+    style?: 'quick' | 'deep' | 'exam',
+  ) => ({
+    caseId: 'case-001',
+    judgement,
+    correctPriority: 'A' as const,
+    learningStyle: style,
+  });
+
+  it('件数が n 未満のとき null を返す（安全表示）', () => {
+    const history = Array.from({ length: 9 }, () => makeItem('correct', 'quick'));
+    expect(calcRollingScore(history, 10, 'quick')).toBeNull();
+  });
+
+  it('件数が n のとき正しく集計する', () => {
+    const history = [
+      ...Array.from({ length: 7 }, () => makeItem('correct', 'quick')),
+      ...Array.from({ length: 3 }, () => makeItem('incorrect', 'quick')),
+    ];
+    const result = calcRollingScore(history, 10, 'quick');
+    expect(result).toEqual({ total: 10, correct: 7 });
+  });
+
+  it('件数が n を超えるとき直近 n 件のみ集計する', () => {
+    // 古い 5 件は正解、直近 10 件は不正解 5/正解 5
+    const history = [
+      ...Array.from({ length: 5 }, () => makeItem('correct', 'quick')),
+      ...Array.from({ length: 5 }, () => makeItem('incorrect', 'quick')),
+      ...Array.from({ length: 5 }, () => makeItem('correct', 'quick')),
+    ];
+    const result = calcRollingScore(history, 10, 'quick');
+    expect(result).toEqual({ total: 10, correct: 5 });
+  });
+
+  it('Quick/Deep を独立集計: quick フィルタ時は deep 分を除外する', () => {
+    const history = [
+      ...Array.from({ length: 5 }, () => makeItem('correct', 'deep')),
+      ...Array.from({ length: 10 }, () => makeItem('incorrect', 'quick')),
+    ];
+    const result = calcRollingScore(history, 10, 'quick');
+    expect(result).toEqual({ total: 10, correct: 0 });
+  });
+
+  it('style 未指定のとき全件集計する', () => {
+    const history = [
+      ...Array.from({ length: 5 }, () => makeItem('correct', 'quick')),
+      ...Array.from({ length: 5 }, () => makeItem('correct', 'deep')),
+    ];
+    const result = calcRollingScore(history, 10);
+    expect(result).toEqual({ total: 10, correct: 10 });
+  });
+
+  it('履歴が空のとき null を返す', () => {
+    expect(calcRollingScore([], 10, 'quick')).toBeNull();
+  });
+
+  it('入力配列を変更しない（イミュータブル）', () => {
+    const history = Array.from({ length: 10 }, () => makeItem('correct', 'quick'));
+    const original = [...history];
+    calcRollingScore(history, 10, 'quick');
+    expect(history).toEqual(original);
   });
 });

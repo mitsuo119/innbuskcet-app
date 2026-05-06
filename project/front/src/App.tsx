@@ -43,6 +43,7 @@ import {
   addLearningStyleScore,
   addModeScore,
   addScore,
+  calcRollingScore,
   initialLearningStyleScores,
   initialModeScores,
   initialScore,
@@ -60,6 +61,7 @@ import {
   saveExamSession,
   type ExamSession,
 } from './domain/examTimer';
+import { buildRelatedCaseHighlights } from './domain/relatedCaseHighlight';
 
 /** ConfirmDialog の表示状態（PBI-038）。 */
 interface DialogState {
@@ -137,6 +139,33 @@ export default function App() {
   const locked = judgement !== null;
   const isDeep = isDeepMode(learningStyle);
   const isExam = learningStyle === 'exam';
+
+  /** 直近10問ローリング正答率（PBI-031）。Exam モードは表示しない（undefined）。 */
+  const rollingScore = useMemo(
+    () => (isExam ? undefined : calcRollingScore(history, 10, learningStyle)),
+    [history, isExam, learningStyle],
+  );
+
+  /** caseId 逆引きマップ（PBI-028: 既出案件参照のため）。 */
+  const caseMap = useMemo(() => {
+    const map = new Map<string, Case>();
+    for (const item of allCases) map.set(item.id, item);
+    return map;
+  }, [allCases]);
+
+  /**
+   * PBI-028: セッション内の既出案件との関連（同一人物/同一部署）を算出する。
+   * - handleSubmit で history 末尾に「現在回答」が追加されるため、slice(0, -1) で除外。
+   * - ハイライト対象がない場合は空配列（解説表示は通常動作）。
+   */
+  const relatedHighlights = useMemo(() => {
+    if (!current || judgement === null) return [];
+    const previousCases = history
+      .slice(0, -1)
+      .map((h) => caseMap.get(h.caseId))
+      .filter((c): c is Case => c !== undefined);
+    return buildRelatedCaseHighlights(current, previousCases);
+  }, [caseMap, current, history, judgement]);
 
   const handleSelect = (priority: Priority) => {
     if (locked || !current) return;
@@ -666,6 +695,8 @@ export default function App() {
             currentMode={mode}
             learningStyleScores={learningStyleScores}
             currentStyle={learningStyle}
+            rollingScore={rollingScore}
+            rollingN={10}
           />
           <GlobalNav current="home" />
           {isExam && examSession !== null && (
@@ -753,6 +784,7 @@ export default function App() {
                       caseItem={current}
                       answer={selected}
                       judgement={judgement}
+                      relatedHighlights={relatedHighlights}
                       onRetry={handleRetry}
                     />
                     {/* PBI-025: 自己採点入力UI（回答後・スキップまたは採点完了まで表示） */}

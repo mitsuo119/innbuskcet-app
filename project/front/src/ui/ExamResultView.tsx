@@ -1,10 +1,21 @@
 import { useMemo, useState } from 'react';
 import type { HistoryItem } from '../domain/history';
 import { buildExamResultSummary, type ExamResultSummary } from '../domain/examResult';
-import { getElapsedSeconds, type ExamSession } from '../domain/examTimer';
+import { EXAM_TIME_LIMIT_SECONDS, getElapsedSeconds, type ExamSession } from '../domain/examTimer';
 import { PRIORITY_LABELS } from '../domain/priorityLabel';
 import type { Case, Priority } from '../domain/case';
 import { renderExplanationWithPatternLinks } from '../utils/explanationPatternLinks';
+
+const TIMELINE_TOTAL_MS = EXAM_TIME_LIMIT_SECONDS * 1000;
+const TIMELINE_SLOW_MS = 5 * 60 * 1000;
+
+function formatTimelineElapsed(ms: number | null): string {
+  if (ms === null) return '-';
+  const totalSeconds = Math.floor(ms / 1000);
+  const mm = Math.floor(totalSeconds / 60);
+  const ss = totalSeconds % 60;
+  return `${mm}:${String(ss).padStart(2, '0')}`;
+}
 
 export interface ExamResultViewProps {
   /** 終了した Exam セッション（startedAt から所要時間を算出）。 */
@@ -60,6 +71,37 @@ export function ExamResultView({
   }, [session, history]);
 
   const { totalQuestions, correctCount, percentage, elapsedDisplay, byPriority } = summary;
+
+  /** PBI-053: Exam90分ミニタイムライン（設問別 elapsedMs 可視化）。 */
+  const timelineItems = useMemo(
+    () =>
+      history.map((item, index) => {
+        const rawElapsed = elapsedMsList?.[index];
+        const elapsedMs =
+          typeof rawElapsed === 'number' && Number.isFinite(rawElapsed) && rawElapsed >= 0
+            ? rawElapsed
+            : null;
+        const clampedMs = elapsedMs === null ? 0 : Math.min(elapsedMs, TIMELINE_TOTAL_MS);
+        const widthPercent = Math.max(0, Math.min(100, (clampedMs / TIMELINE_TOTAL_MS) * 100));
+        const isSlow = elapsedMs !== null && elapsedMs > TIMELINE_SLOW_MS;
+        const isOverTotal = elapsedMs !== null && elapsedMs > TIMELINE_TOTAL_MS;
+        const elapsedText = formatTimelineElapsed(elapsedMs);
+        const statusText =
+          elapsedMs === null
+            ? '所要時間未取得'
+            : `${elapsedText}${isSlow ? '・5分超' : ''}${isOverTotal ? '・90分超過' : ''}`;
+        return {
+          key: `${item.caseId}-${index}`,
+          questionNo: index + 1,
+          widthPercent,
+          isSlow,
+          isOverTotal,
+          elapsedText,
+          ariaLabel: `第${index + 1}問 ${statusText}`,
+        };
+      }),
+    [history, elapsedMsList],
+  );
 
   /** 各問の caseId から Case を引くためのマップ（PBI-043）。 */
   const casesById = useMemo<ReadonlyMap<string, Case>>(() => {
@@ -160,6 +202,42 @@ export function ExamResultView({
             );
           })}
         </dl>
+      </section>
+
+      <section className="exam-result__timeline" aria-labelledby="exam-result-view-timeline-heading">
+        <h3 id="exam-result-view-timeline-heading" className="exam-result__breakdown-heading">
+          Exam 90分ミニタイムライン
+        </h3>
+        <ol className="exam-result__timeline-list" aria-label="設問ごとの所要時間タイムライン">
+          {timelineItems.map((item) => (
+            <li key={item.key} className="exam-result__timeline-row" aria-label={item.ariaLabel}>
+              <span className="exam-result__timeline-no">Q{item.questionNo}</span>
+              <div className="exam-result__timeline-track" aria-hidden="true">
+                <div
+                  className={
+                    'exam-result__timeline-fill' +
+                    (item.isSlow ? ' exam-result__timeline-fill--slow' : '') +
+                    (item.isOverTotal ? ' exam-result__timeline-fill--over' : '')
+                  }
+                  style={{ width: `${item.widthPercent}%` }}
+                />
+              </div>
+              <div className="exam-result__timeline-meta">
+                <span className="exam-result__timeline-time">{item.elapsedText}</span>
+                {item.isSlow && (
+                  <span className="exam-result__timeline-badge" title="5分超">
+                    ⚠ 5分超
+                  </span>
+                )}
+                {item.isOverTotal && (
+                  <span className="exam-result__timeline-badge exam-result__timeline-badge--over" title="90分超過">
+                    ⏱ 90分超過
+                  </span>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="exam-result__answers" aria-labelledby="exam-result-view-answers-heading">

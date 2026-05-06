@@ -108,4 +108,29 @@ describe('parseModelAnswer (PBI-024 / TASK-008・DoD §10-3)', () => {
     const withoutModel = cases.filter((c) => c.modelAnswer === undefined);
     expect(withoutModel.length).toBe(0);
   });
+
+  it('characters / departments は任意で、存在する場合は非空文字列配列である（PBI-028）', () => {
+    const cases = loadCases();
+    const withMeta = cases.filter((c) => c.characters || c.departments);
+    expect(withMeta.length).toBeGreaterThan(0);
+
+    for (const c of withMeta) {
+      if (c.characters) {
+        expect(Array.isArray(c.characters)).toBe(true);
+        expect(c.characters.length).toBeGreaterThan(0);
+        for (const item of c.characters) {
+          expect(typeof item).toBe('string');
+          expect(item.length).toBeGreaterThan(0);
+        }
+      }
+      if (c.departments) {
+        expect(Array.isArray(c.departments)).toBe(true);
+        expect(c.departments.length).toBeGreaterThan(0);
+        for (const item of c.departments) {
+          expect(typeof item).toBe('string');
+          expect(item.length).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
 });

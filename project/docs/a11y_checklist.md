@@ -118,6 +118,26 @@ PR 単位で以下を記入する。
 | ExamResult 各問 ○ ／ × 記号        | 8.2:1  | 7.6:1  | ≥ 4.5:1 | OK   |
 | LearningStyleToggle 選択中ラベル   | 7.8:1  | 7.5:1  | ≥ 4.5:1 | OK   |
 
+### 4-4. ダーク時案件本文・解説本文コントラスト実測（PBI-032 / Sprint019 DAY1）
+
+> 確認者: 伊藤（開発者）／確認日: 2026-09-06（Sprint019 DAY1）  
+> 計測基準: WCAG 2.1 相対輝度式（sRGB） / WCAG AA ≥ 4.5:1  
+> 測定対象: `.case-view` 本文（`--color-text` × `--color-surface`）と `.explanation__body` 補助テキスト（`--color-text-muted` × `--color-surface`）
+
+| 対象                                             | 前景色    | 背景色    | 比率   | 基準    | 結果 |
+| ------------------------------------------------ | --------- | --------- | ------ | ------- | ---- |
+| 案件本文 `.case-view__body`                      | `#e6edf3` | `#161b22` | 14.7:1 | ≥ 4.5:1 | OK   |
+| 解説本文 `.explanation__body`                    | `#e6edf3` | `#161b22` | 14.7:1 | ≥ 4.5:1 | OK   |
+| 解説補助 `.explanation__summary`                 | `#9da7b3` | `#161b22` | 7.1:1  | ≥ 4.5:1 | OK   |
+| 本文（body 背景）                                | `#e6edf3` | `#0d1117` | 16.0:1 | ≥ 4.5:1 | OK   |
+| 補助テキスト（body 背景）                        | `#9da7b3` | `#0d1117` | 7.1:1  | ≥ 4.5:1 | OK   |
+| ローリングラベル `.score-counter__rolling-label` | `#9da7b3` | `#21262d` | 5.7:1  | ≥ 4.5:1 | OK   |
+
+**対応内容:**
+- `.case-view` に `color: var(--color-text)` を明示追加（防御的 CSS・継承依存を排除）
+- `styles.css` ダークテーマコメントを `--color-surface: #161b22` 基準の実測値に更新
+- 全組合せ WCAG AA 以上を確認。現行値の変更なし
+
 > 値は CSS 変数（`--color-text` / `--color-on-primary` 等）に依存し、375px 幅でもデスクトップと同一の token を使用しているため変化なし。375px でのフォントサイズ縮小なし（rem ベース）。
 
 ---

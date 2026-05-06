@@ -60,4 +60,34 @@ describe('ExplanationView（PBI-063 / Day4 視認性向上）', () => {
     // テキストノードとして本文が描画されている
     expect(html).toContain('解説本文ダミー');
   });
+
+  it('relatedHighlights 指定時に記号+ラベル付きで関連ハイライトを表示する', () => {
+    const html = renderToStaticMarkup(
+      <ExplanationView
+        caseItem={SAMPLE}
+        answer="A"
+        judgement="correct"
+        relatedHighlights={[
+          { kind: 'character', value: '田中課長', matchedCaseIds: ['case-001', 'case-002'] },
+          { kind: 'department', value: '営業部', matchedCaseIds: ['case-003'] },
+        ]}
+      />,
+    );
+    expect(html).toContain('案件間の関連ハイライト');
+    expect(html).toContain('同一人物');
+    expect(html).toContain('田中課長');
+    expect(html).toContain('既出2件');
+    expect(html).toContain('同一部署');
+    expect(html).toContain('営業部');
+    expect(html).toContain('👤');
+    expect(html).toContain('🏢');
+  });
+
+  it('relatedHighlights が空の場合は関連ハイライトセクションを描画しない', () => {
+    const html = renderToStaticMarkup(
+      <ExplanationView caseItem={SAMPLE} answer="A" judgement="correct" relatedHighlights={[]} />,
+    );
+    expect(html).not.toContain('案件間の関連ハイライト');
+    expect(html).not.toContain('関連の気づき');
+  });
 });
