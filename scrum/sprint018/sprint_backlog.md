@@ -28,8 +28,8 @@
 - スキーマ検証通過、必須項目欠落0件
 - DoD全項目を満たす
 
-| タスクID | タスク内容                                           | 担当 | 見積(h) | Status |
-| -------- | ---------------------------------------------------- | ---- | ------- | ------ |
+| タスクID | タスク内容                                          | 担当 | 見積(h) | Status |
+| -------- | --------------------------------------------------- | ---- | ------- | ------ |
 | TASK-711 | 追加30件の方針確定（難易度・テーマ分布ルール定義）  | 伊藤 | 2h      | 完了   |
 | TASK-712 | 新規ケース15件作成（初級/中級中心）                 | 山本 | 4h      | 完了   |
 | TASK-713 | 新規ケース15件作成（中級/上級中心）                 | 中村 | 4h      | 完了   |
@@ -51,23 +51,23 @@
 - メタ更新ルールとサイトマップ反映手順をdocsへ追記
 - DoD全項目を満たす
 
-| タスクID | タスク内容                                                           | 担当 | 見積(h) | Status |
-| -------- | -------------------------------------------------------------------- | ---- | ------- | ------ |
-| TASK-721 | 主要ページのJSON-LD実装方針整理（WebSite/BreadcrumbList/FAQPage）   | 田中 | 2h      | 完了   |
-| TASK-722 | 構造化データ実装・検証結果記録（エラー0件）                         | 伊藤 | 3h      | 完了   |
-| TASK-723 | 内部リンク導線改善（トップ/解説/パターン/学習モード）               | 山本 | 2h      | 完了   |
-| TASK-724 | title/description/OGP棚卸し・重複title 0件化                        | 中村 | 2h      | 完了   |
-| TASK-725 | sitemap対応表作成・robots参照確認・運用手順docs追記                 | 伊藤 | 2h      | 完了   |
-| TASK-726 | DoD確認（test/lint/build/audit）・PR作成・レビュー                  | 田中 | 1h      | 完了   |
+| タスクID | タスク内容                                                        | 担当 | 見積(h) | Status |
+| -------- | ----------------------------------------------------------------- | ---- | ------- | ------ |
+| TASK-721 | 主要ページのJSON-LD実装方針整理（WebSite/BreadcrumbList/FAQPage） | 田中 | 2h      | 完了   |
+| TASK-722 | 構造化データ実装・検証結果記録（エラー0件）                       | 伊藤 | 3h      | 完了   |
+| TASK-723 | 内部リンク導線改善（トップ/解説/パターン/学習モード）             | 山本 | 2h      | 完了   |
+| TASK-724 | title/description/OGP棚卸し・重複title 0件化                      | 中村 | 2h      | 完了   |
+| TASK-725 | sitemap対応表作成・robots参照確認・運用手順docs追記               | 伊藤 | 2h      | 完了   |
+| TASK-726 | DoD確認（test/lint/build/audit）・PR作成・レビュー                | 田中 | 1h      | 完了   |
 
 ---
 
 ## 補助PBI（検討結果）
 
-| PBI     | タイトル                         | Size | 判定   | 理由                       |
-| ------- | -------------------------------- | ---- | ------ | -------------------------- |
-| PBI-031 | 直近10問のローリング正答率表示   | 1pt  | 見送り | 主軸8ptに集中              |
-| PBI-032 | ダーク時の本文可読性チューニング | 1pt  | 見送り | 主軸8ptに集中              |
+| PBI     | タイトル                         | Size | 判定   | 理由          |
+| ------- | -------------------------------- | ---- | ------ | ------------- |
+| PBI-031 | 直近10問のローリング正答率表示   | 1pt  | 見送り | 主軸8ptに集中 |
+| PBI-032 | ダーク時の本文可読性チューニング | 1pt  | 見送り | 主軸8ptに集中 |
 
 条件付き再判断: Day4開始時点で主軸2PBIがDoD見込みかつ4h以上余力がある場合のみ、PO判断で再検討する。
 
@@ -86,14 +86,14 @@
 ### Done（DoD充足）
 
 - TASK-711 完了。
-	- 追加方針を「難易度（初級/中級/上級）を各20%以上、単一難易度50%以下」「テーマ上位1つ40%以下」で合意。
-	- 変更理由: PBI-071 受入基準の分布要件を先に明文化し、追加データ作成時の手戻りを防止するため。
+  - 追加方針を「難易度（初級/中級/上級）を各20%以上、単一難易度50%以下」「テーマ上位1つ40%以下」で合意。
+  - 変更理由: PBI-071 受入基準の分布要件を先に明文化し、追加データ作成時の手戻りを防止するため。
 
 ### 進行中
 
 - TASK-712 / TASK-713 着手（先行で `case-041`〜`case-046` を追加）。
-	- 進捗: 30件中 6件追加（残24件）。
-	- 変更理由: Day1で先行投入し、Day2以降の助っ人実装を並行化してボトルネックを解消するため。
+  - 進捗: 30件中 6件追加（残24件）。
+  - 変更理由: Day1で先行投入し、Day2以降の助っ人実装を並行化してボトルネックを解消するため。
 
 ### Follow-up（公開後確認）
 
@@ -106,12 +106,12 @@
 ### Done（DoD充足）
 
 - `project/front/src/data/cases.json` に `case-047`〜`case-056` を追加（+10件）。
-	- Day1+Day2累計: 30件中 16件追加（進捗 53.3%、残14件）。
-	- 追加16件の分布（中間確認）:
-		- correctPriority: A=5 / B=6 / C=5
-		- difficulty: 初級=6 / 中級=6 / 上級=4（各20%以上を維持）
-		- theme上位比率: 12.5%（上位1テーマ40%以下を維持）
-	- 変更理由: 先に件数を積み上げつつ分布制約逸脱を防ぎ、Day3以降の残件14件を安全に投入するため。
+  - Day1+Day2累計: 30件中 16件追加（進捗 53.3%、残14件）。
+  - 追加16件の分布（中間確認）:
+    - correctPriority: A=5 / B=6 / C=5
+    - difficulty: 初級=6 / 中級=6 / 上級=4（各20%以上を維持）
+    - theme上位比率: 12.5%（上位1テーマ40%以下を維持）
+  - 変更理由: 先に件数を積み上げつつ分布制約逸脱を防ぎ、Day3以降の残件14件を安全に投入するため。
 
 - 影響範囲対応として `project/front/src/domain/patternWeakness.ts` の `CASE_PATTERN_MAP` に `case-047`〜`case-056` を追加。
 - `project/front/src/domain/patternWeakness.test.ts` の件数期待値を 56 件へ更新。
@@ -138,13 +138,13 @@
 ### Done（DoD充足）
 
 - `project/front/src/data/cases.json` に `case-057`〜`case-070` を追加（+14件）。
-	- Day1〜Day3累計: **30/30件追加（100%）**、初期40件→総70件。
-	- 追加30件の分布（確定）:
-		- correctPriority: A=10 / B=11 / C=9
-		- difficulty: 初級=10 / 中級=11 / 上級=9（各20%以上、単一50%以下を満たす）
-		- theme上位比率: 13.3%（`定型事務` 4/30、上位1テーマ40%以下を満たす）
-		- id重複: 0件（全70件ユニーク）
-	- 変更理由: PBI-071 の件数目標を達成しつつ、分布偏りと重複を防ぐため。
+  - Day1〜Day3累計: **30/30件追加（100%）**、初期40件→総70件。
+  - 追加30件の分布（確定）:
+    - correctPriority: A=10 / B=11 / C=9
+    - difficulty: 初級=10 / 中級=11 / 上級=9（各20%以上、単一50%以下を満たす）
+    - theme上位比率: 13.3%（`定型事務` 4/30、上位1テーマ40%以下を満たす）
+    - id重複: 0件（全70件ユニーク）
+  - 変更理由: PBI-071 の件数目標を達成しつつ、分布偏りと重複を防ぐため。
 
 - `project/front/src/domain/patternWeakness.ts` の `CASE_PATTERN_MAP` に `case-057`〜`case-070` を追加。
 - `project/front/src/domain/patternWeakness.test.ts` の件数期待値を 70 件へ更新。
@@ -153,12 +153,12 @@
 ### 進行中
 
 - TASK-715（Quick/Deep/Exam の手動出題確認）は進行中。
-	- 自動テストでは追加30件の件数・分布・重複なしを確認済み。
-	- 手動導線確認ログ（3導線）は Day4 冒頭で最終記録予定。
+  - 自動テストでは追加30件の件数・分布・重複なしを確認済み。
+  - 手動導線確認ログ（3導線）は Day4 冒頭で最終記録予定。
 
 - TASK-716（DoD最終確認）は進行中。
-	- `pnpm test` / `pnpm build` / `pnpm lint` は Day3 時点で PASS。
-	- `pnpm audit` と PRレビュー記録は Day4 で完了予定。
+  - `pnpm test` / `pnpm build` / `pnpm lint` は Day3 時点で PASS。
+  - `pnpm audit` と PRレビュー記録は Day4 で完了予定。
 
 ### Follow-up（公開後確認）
 
@@ -186,34 +186,34 @@
 ### Done（DoD充足）
 
 - PBI-072 / TASK-721 完了。
-	- `index.html` に JSON-LD を追加し、`WebSite` + `BreadcrumbList`（ホーム / 解説 / パターン / プライバシー）を明示。
-	- 変更理由: 既存 `WebApplication` に加えてサイト構造の意味付けを補完し、検索エンジン理解を強化するため。
+  - `index.html` に JSON-LD を追加し、`WebSite` + `BreadcrumbList`（ホーム / 解説 / パターン / プライバシー）を明示。
+  - 変更理由: 既存 `WebApplication` に加えてサイト構造の意味付けを補完し、検索エンジン理解を強化するため。
 
 - PBI-072 / TASK-723 完了。
-	- `src/ui/ExplanationView.tsx` に関連リンク（`#/patterns` / `#/reference`）を追加し、解説→学習補助ページへの導線を1クリック化。
-	- 変更理由: 主要導線（トップ/解説/パターン/学習補助）の回遊性を高め、2クリック以内遷移を担保するため。
+  - `src/ui/ExplanationView.tsx` に関連リンク（`#/patterns` / `#/reference`）を追加し、解説→学習補助ページへの導線を1クリック化。
+  - 変更理由: 主要導線（トップ/解説/パターン/学習補助）の回遊性を高め、2クリック以内遷移を担保するため。
 
 ### 進行中
 
 - PBI-072 / TASK-722（構造化データ実装・検証記録）
-	- `src/seo-assets.test.ts` に `WebSite` / `BreadcrumbList` 存在検証を追加。
-	- 残作業: 構造化データの外部バリデータ実行ログをDAY5で追記予定。
+  - `src/seo-assets.test.ts` に `WebSite` / `BreadcrumbList` 存在検証を追加。
+  - 残作業: 構造化データの外部バリデータ実行ログをDAY5で追記予定。
 
 - PBI-072 / TASK-724（メタ棚卸し・重複title 0件化）
-	- `src/Router.tsx` でルート別 `document.title` / `description` / `og:title` / `og:description` / `twitter:*` 同期を追加。
-	- `src/Router.seo.test.tsx` を追加し、ホーム/解説/パターン詳細でタイトル重複を抑止できることを確認中。
+  - `src/Router.tsx` でルート別 `document.title` / `description` / `og:title` / `og:description` / `twitter:*` 同期を追加。
+  - `src/Router.seo.test.tsx` を追加し、ホーム/解説/パターン詳細でタイトル重複を抑止できることを確認中。
 
 - PBI-072 / TASK-725（sitemap対応表・運用手順docs）
-	- `public/sitemap.xml` に `#/reference/chapter01|02|05|08`、`#/patterns/1|8|20` を追加。
-	- `public/robots.txt` の Sitemap 参照点を維持し、整合コメントを追記。
-	- `project/docs/seo_metadata_sitemap_guide.md` を新規作成し、対応表と運用手順を記録。
+  - `public/sitemap.xml` に `#/reference/chapter01|02|05|08`、`#/patterns/1|8|20` を追加。
+  - `public/robots.txt` の Sitemap 参照点を維持し、整合コメントを追記。
+  - `project/docs/seo_metadata_sitemap_guide.md` を新規作成し、対応表と運用手順を記録。
 
 - PBI-072 / TASK-726（DoD確認）
-	- DAY4で `pnpm test`（48 files / 502 tests）/ `pnpm lint` / `pnpm build` / `pnpm audit --audit-level high` を再実行し PASS。
-	- 残作業: PR作成・レビュー記録の追記（DAY5）。
+  - DAY4で `pnpm test`（48 files / 502 tests）/ `pnpm lint` / `pnpm build` / `pnpm audit --audit-level high` を再実行し PASS。
+  - 残作業: PR作成・レビュー記録の追記（DAY5）。
 
 - PBI-071 残タスク（TASK-715 / TASK-716）
-	- Quick/Deep/Exam の手動導線確認記録と監査証跡（audit）をDAY4で更新中。
+  - Quick/Deep/Exam の手動導線確認記録と監査証跡（audit）をDAY4で更新中。
 
 ### Follow-up（公開後確認）
 
@@ -226,28 +226,28 @@
 ### Done（DoD充足）
 
 - PBI-071 / TASK-715 完了。
-	- Quick/Deep/Exam の3導線で追加30件（`case-041`〜`case-070`）が出題対象に含まれることを手動確認。
-	- 変更理由: PBI-071受入基準の手動確認要件を完了し、DoDを閉じるため。
+  - Quick/Deep/Exam の3導線で追加30件（`case-041`〜`case-070`）が出題対象に含まれることを手動確認。
+  - 変更理由: PBI-071受入基準の手動確認要件を完了し、DoDを閉じるため。
 
 - PBI-071 / TASK-716 完了。
-	- 最終品質確認として `pnpm test` / `pnpm lint` / `pnpm build` / `pnpm audit --audit-level high` を再実行し全PASS。
-	- 変更理由: 品質ゲートを最終日基準で再確認し、Done判定の証跡を確定するため。
+  - 最終品質確認として `pnpm test` / `pnpm lint` / `pnpm build` / `pnpm audit --audit-level high` を再実行し全PASS。
+  - 変更理由: 品質ゲートを最終日基準で再確認し、Done判定の証跡を確定するため。
 
 - PBI-072 / TASK-722 完了。
-	- JSON-LD（WebSite/BreadcrumbList）実装と自動検証（`seo-assets.test.ts`）を最終確認。
-	- 変更理由: 構造化データ要件を実装・検証の両面で完了するため。
+  - JSON-LD（WebSite/BreadcrumbList）実装と自動検証（`seo-assets.test.ts`）を最終確認。
+  - 変更理由: 構造化データ要件を実装・検証の両面で完了するため。
 
 - PBI-072 / TASK-724 完了。
-	- ルート別 `title/description/OGP` 同期と `Router.seo.test.tsx` を最終確認し、重複title 0件化を維持。
-	- 変更理由: 主要公開ページのメタ整合性を担保するため。
+  - ルート別 `title/description/OGP` 同期と `Router.seo.test.tsx` を最終確認し、重複title 0件化を維持。
+  - 変更理由: 主要公開ページのメタ整合性を担保するため。
 
 - PBI-072 / TASK-725 完了。
-	- `sitemap.xml` と主要公開導線の対応、`robots.txt` の sitemap 参照を最終確認。
-	- 変更理由: クロール導線と運用整合を確定するため。
+  - `sitemap.xml` と主要公開導線の対応、`robots.txt` の sitemap 参照を最終確認。
+  - 変更理由: クロール導線と運用整合を確定するため。
 
 - PBI-072 / TASK-726 完了。
-	- PBI-072実装分に対するDoD確認（test/lint/build/audit）を再実行し全PASS。
-	- 変更理由: Sprint018最終品質基準を満たしていることを証跡化するため。
+  - PBI-072実装分に対するDoD確認（test/lint/build/audit）を再実行し全PASS。
+  - 変更理由: Sprint018最終品質基準を満たしていることを証跡化するため。
 
 ### Follow-up（公開後確認）
 
