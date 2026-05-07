@@ -5,7 +5,7 @@ import { renderExplanationWithPatternLinks } from '../explanationPatternLinks';
 describe('renderExplanationWithPatternLinks', () => {
   it('パターン1が含まれる場合、パターン1リンクが生成されること', () => {
     const nodes = renderExplanationWithPatternLinks('判断はパターン1を参照。');
-    const anchor = nodes.find((node) => isValidElement(node) && node.props.href === '#/patterns/1');
+    const anchor = nodes.find((node) => isValidElement(node) && node.props.href === '/patterns/1');
 
     expect(anchor).toBeDefined();
     expect(isValidElement(anchor) ? anchor.props.children : '').toBe('パターン1');
@@ -22,7 +22,7 @@ describe('renderExplanationWithPatternLinks', () => {
     const links = nodes.filter((node) => isValidElement(node));
 
     expect(links).toHaveLength(2);
-    expect(isValidElement(links[0]) ? links[0].props.href : '').toBe('#/patterns/2');
-    expect(isValidElement(links[1]) ? links[1].props.href : '').toBe('#/patterns/10');
+    expect(isValidElement(links[0]) ? links[0].props.href : '').toBe('/patterns/2');
+    expect(isValidElement(links[1]) ? links[1].props.href : '').toBe('/patterns/10');
   });
 });

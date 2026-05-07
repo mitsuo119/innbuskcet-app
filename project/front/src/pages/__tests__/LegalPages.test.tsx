@@ -41,10 +41,10 @@ describe('PBI-051 法務ページスモークテスト', () => {
     ];
     for (const { html } of cases) {
       expect(html).toContain('aria-label="グローバルナビゲーション"');
-      expect(html).toContain('href="#/"');
-      expect(html).toContain('href="#/reference"');
-      expect(html).toContain('href="#/patterns"');
-      expect(html).toContain('href="#/privacy-policy"');
+      expect(html).toContain('href="/"');
+      expect(html).toContain('href="/reference"');
+      expect(html).toContain('href="/patterns"');
+      expect(html).toContain('href="/privacy-policy"');
     }
     // PrivacyPolicy のみ aria-current="page" を持つ
     expect(cases[0].html).toContain('aria-current="page"');

@@ -155,7 +155,7 @@ function renderChapter(chapter: ReferenceChapter) {
         {nav.prev ? (
           <a
             className="reference-page__pager-link reference-page__pager-link--prev"
-            href={`#/reference/${nav.prev.id}`}
+            href={`/reference/${nav.prev.id}`}
           >
             <span className="reference-page__pager-direction" aria-hidden="true">
               ← 前の章
@@ -186,7 +186,7 @@ function renderChapter(chapter: ReferenceChapter) {
         {nav.next ? (
           <a
             className="reference-page__pager-link reference-page__pager-link--next"
-            href={`#/reference/${nav.next.id}`}
+            href={`/reference/${nav.next.id}`}
           >
             <span className="reference-page__pager-direction" aria-hidden="true">
               次の章 →
@@ -249,7 +249,7 @@ export function ReferencePage({ onBack, focusChapterId = null }: Props) {
           return (
             <a
               key={chapter.id}
-              href={`#/reference/${chapter.id}`}
+              href={`/reference/${chapter.id}`}
               className="reference-page__chapter-link"
               aria-current={isCurrent ? 'page' : undefined}
             >

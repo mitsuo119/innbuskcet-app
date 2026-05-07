@@ -4,7 +4,7 @@
  * - アクティブ状態: current で指定したリンクのみ aria-current="page"
  * - aria 属性: <nav> に aria-label="グローバルナビゲーション"
  * - 順序: 仕様順固定
- * - href: ハッシュベースのルーターと整合
+ * - href: pathname ベースのルーターと整合（PBI-076 / TASK-076-4）
  *
  * 既存テストの慣習に倣い `renderToStaticMarkup` で HTML 文字列検証する
  * （`@testing-library/react` は未導入）。
@@ -30,12 +30,12 @@ describe('GlobalNav（PBI-064 / TASK-201）', () => {
     }
   });
 
-  it('各リンクがハッシュベースの正しい href を持つ', () => {
+  it('各リンクが pathname ベースの正しい href を持つ（PBI-076 / TASK-076-4）', () => {
     const html = renderToStaticMarkup(<GlobalNav current="home" />);
-    expect(html).toContain('href="#/"');
-    expect(html).toContain('href="#/reference"');
-    expect(html).toContain('href="#/patterns"');
-    expect(html).toContain('href="#/privacy-policy"');
+    expect(html).toContain('href="/"');
+    expect(html).toContain('href="/reference"');
+    expect(html).toContain('href="/patterns"');
+    expect(html).toContain('href="/privacy-policy"');
   });
 
   it('current で指定したページのリンクのみ aria-current="page" を持つ', () => {
@@ -45,7 +45,7 @@ describe('GlobalNav（PBI-064 / TASK-201）', () => {
     expect(matches).toHaveLength(1);
     // その属性は "解説リファレンス" のリンク要素に付いている
     expect(html).toMatch(
-      /<a[^>]*href="#\/reference"[^>]*aria-current="page"[^>]*>解説リファレンス<\/a>/,
+      /<a[^>]*href="\/reference"[^>]*aria-current="page"[^>]*>解説リファレンス<\/a>/,
     );
   });
 
@@ -53,12 +53,12 @@ describe('GlobalNav（PBI-064 / TASK-201）', () => {
     const html = renderToStaticMarkup(<GlobalNav current="home" />);
     // 問題回答リンクに active 修飾クラス
     expect(html).toMatch(
-      /<a[^>]*href="#\/"[^>]*class="[^"]*global-nav__link--active[^"]*"[^>]*>問題回答<\/a>/,
+      /<a[^>]*href="\/"[^>]*class="[^"]*global-nav__link--active[^"]*"[^>]*>問題回答<\/a>/,
     );
     // 他リンクには active 修飾クラスが付かない
-    expect(html).not.toMatch(/<a[^>]*href="#\/reference"[^>]*global-nav__link--active/);
-    expect(html).not.toMatch(/<a[^>]*href="#\/patterns"[^>]*global-nav__link--active/);
-    expect(html).not.toMatch(/<a[^>]*href="#\/privacy-policy"[^>]*global-nav__link--active/);
+    expect(html).not.toMatch(/<a[^>]*href="\/reference"[^>]*global-nav__link--active/);
+    expect(html).not.toMatch(/<a[^>]*href="\/patterns"[^>]*global-nav__link--active/);
+    expect(html).not.toMatch(/<a[^>]*href="\/privacy-policy"[^>]*global-nav__link--active/);
   });
 
   it('current が未対応ページ（terms-of-service / contact）でも全リンクは inactive で描画される', () => {

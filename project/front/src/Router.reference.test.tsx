@@ -31,7 +31,7 @@ describe('PBI-056 解説導線', () => {
     const html = renderToStaticMarkup(<App />);
 
     expect(html).toContain('解説リファレンス');
-    expect(html).toContain('href="#/reference"');
+    expect(html).toContain('href="/reference"');
   });
 
   it('Router は #/reference で解説リファレンス画面を表示する', () => {
@@ -61,7 +61,7 @@ describe('PBI-056 解説導線', () => {
       '.reference-page__chapter-link[aria-current="page"]',
     );
     expect(currentLink).not.toBeNull();
-    expect(currentLink?.getAttribute('href')).toBe('#/reference/chapter08');
+    expect(currentLink?.getAttribute('href')).toBe('/reference/chapter08');
     expect(currentLink?.textContent).toContain('案件パターン別攻略');
   });
 });

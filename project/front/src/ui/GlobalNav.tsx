@@ -3,7 +3,8 @@
  * - 主要ページ（問題回答 / 解説リファレンス / パターン別解説 / プライバシー）への
  *   表記・順序・アクティブ状態を統一する共通コンポーネント。
  * - アクティブページは aria-current="page" を付与し、CSS でも視覚区別する（DoD 9-3）。
- * - 全リンクはハッシュベースルーター（Router.tsx）と整合する `href="#/..."` を使用。
+ * - PBI-076 / TASK-076-4: History API 移行に伴い `href="/..."` 形式の pathname リンクを使用。
+ *   レガシー `#/...` ハッシュリンクは Router.tsx の delegated click handler が後方互換維持。
  * - dangerouslySetInnerHTML 不使用（DoD 10-2）。
  */
 
@@ -20,7 +21,7 @@ interface NavItem {
   id: GlobalNavPage;
   /** UI 表示ラベル（日本語）。 */
   label: string;
-  /** ハッシュベースの遷移先。 */
+  /** pathname ベースの遷移先（PBI-076 / TASK-076-4）。 */
   href: string;
 }
 
@@ -30,10 +31,10 @@ interface NavItem {
  *   既存リンクから辿れる構成（PBI-051 整合）。
  */
 const NAV_ITEMS: readonly NavItem[] = [
-  { id: 'home', label: '問題回答', href: '#/' },
-  { id: 'reference', label: '解説リファレンス', href: '#/reference' },
-  { id: 'patterns', label: 'パターン別解説', href: '#/patterns' },
-  { id: 'privacy-policy', label: 'プライバシー', href: '#/privacy-policy' },
+  { id: 'home', label: '問題回答', href: '/' },
+  { id: 'reference', label: '解説リファレンス', href: '/reference' },
+  { id: 'patterns', label: 'パターン別解説', href: '/patterns' },
+  { id: 'privacy-policy', label: 'プライバシー', href: '/privacy-policy' },
 ];
 
 interface Props {

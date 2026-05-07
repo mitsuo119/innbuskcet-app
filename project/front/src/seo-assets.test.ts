@@ -103,15 +103,22 @@ describe('PBI-068 sitemap.xml', () => {
     expect(SITEMAP).toContain('<urlset');
   });
 
-  it('トップページ + 主要画面 URL を含む（hash ルート 6 件以上）', () => {
+  it('トップページ + 主要画面 URL を含む（pathname ルート 6 件以上 / PBI-076 で hash 撤廃）', () => {
     const locs = [...SITEMAP.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     expect(locs.length).toBeGreaterThanOrEqual(6);
     expect(locs).toContain(SITE_URL_TOKEN); // home
-    expect(locs).toContain(`${SITE_URL_TOKEN}#/patterns`);
-    expect(locs).toContain(`${SITE_URL_TOKEN}#/reference`);
-    expect(locs).toContain(`${SITE_URL_TOKEN}#/privacy-policy`);
-    expect(locs).toContain(`${SITE_URL_TOKEN}#/terms-of-service`);
-    expect(locs).toContain(`${SITE_URL_TOKEN}#/contact`);
+    expect(locs).toContain(`${SITE_URL_TOKEN}patterns`);
+    expect(locs).toContain(`${SITE_URL_TOKEN}reference`);
+    expect(locs).toContain(`${SITE_URL_TOKEN}privacy-policy`);
+    expect(locs).toContain(`${SITE_URL_TOKEN}terms-of-service`);
+    expect(locs).toContain(`${SITE_URL_TOKEN}contact`);
+  });
+
+  it('hash ベース URL（`#/...`）を含まない（PBI-076 / TASK-076-5）', () => {
+    const locs = [...SITEMAP.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    for (const loc of locs) {
+      expect(loc, `sitemap に hash ルートが残存: ${loc}`).not.toMatch(/#\//);
+    }
   });
 
   it('source 上の <loc> は全て __SITE_URL__ トークン始まりで http(s) 直書きを含まない', () => {
@@ -132,12 +139,16 @@ describe('PBI-068 sitemap.xml', () => {
       ),
     );
     expect(prod).toContain('<loc>https://owner.github.io/ai-scrum-inbuscket/</loc>');
-    expect(prod).toContain('<loc>https://owner.github.io/ai-scrum-inbuscket/#/patterns</loc>');
+    expect(prod).toContain('<loc>https://owner.github.io/ai-scrum-inbuscket/patterns</loc>');
+    expect(prod).toContain(
+      '<loc>https://owner.github.io/ai-scrum-inbuscket/reference/chapter01</loc>',
+    );
     expect(prod).not.toContain(SITE_URL_TOKEN);
 
     // 開発時
     const dev = replaceSeoTokens(SITEMAP, resolveSiteUrl({}, '/'));
     expect(dev).toContain('<loc>http://localhost:5173/</loc>');
+    expect(dev).toContain('<loc>http://localhost:5173/patterns</loc>');
     expect(dev).not.toContain(SITE_URL_TOKEN);
   });
 });

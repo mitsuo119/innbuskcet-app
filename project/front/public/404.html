@@ -4,6 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
+    <!-- PBI-076 / TASK-076-2: GitHub Pages SPA フォールバック。
+         History API ルート（例: /privacy-policy, /reference/chapter08）は dist 上に
+         ファイルが存在しないため GitHub Pages は本 404.html を返す。
+         元 pathname を sessionStorage に保管したうえで SPA root（index.html）へ
+         即時ハードリダイレクトし、index.html 側で history.replaceState により復元する。
+         JS 無効環境では下方の静的 404 ビューと「トップへ戻る」リンクを表示する（DoD §9-4）。
+         `__SITE_URL__` は vite/transform-seo-tokens.mjs で実 URL に置換される。 -->
+    <script>
+      (function () {
+        try {
+          var l = window.location;
+          var siteUrl = '__SITE_URL__';
+          var basePath = '/';
+          try {
+            basePath = new URL(siteUrl).pathname;
+          } catch (e) {
+            basePath = '/';
+          }
+          if (basePath.charAt(basePath.length - 1) !== '/') basePath += '/';
+          var path = l.pathname;
+          // SPA ルート / 404.html 直アクセス時はリダイレクトしない
+          if (path === basePath || path === basePath + '404.html') return;
+          // base prefix 不一致は別アプリのためそのまま静的 404 を表示
+          if (path.indexOf(basePath) !== 0) return;
+          // 復元用に元 URL を保存し SPA root に遷移
+          sessionStorage.setItem('inbusket:spa-fallback', path + l.search + l.hash);
+          l.replace(l.origin + basePath);
+        } catch (e) {
+          /* sessionStorage 不可・SecurityError 等は静的 404 を表示 */
+        }
+      })();
+    </script>
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />

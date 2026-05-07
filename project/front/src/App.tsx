@@ -829,30 +829,30 @@ export default function App() {
                 で次の問題
               </small>
               <nav className="app-footer__legal" aria-label="法務・サポートページ">
-                <a href="#/privacy-policy" className="app-footer__legal-link">
+                <a href="/privacy-policy" className="app-footer__legal-link">
                   プライバシーポリシー
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="#/terms-of-service" className="app-footer__legal-link">
+                <a href="/terms-of-service" className="app-footer__legal-link">
                   利用規約
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="#/contact" className="app-footer__legal-link">
+                <a href="/contact" className="app-footer__legal-link">
                   お問い合わせ
                 </a>
               </nav>
               <nav className="app-footer__legal" aria-label="学習サポートページ">
-                <a href="#/reference" className="app-footer__legal-link">
+                <a href="/reference" className="app-footer__legal-link">
                   解説リファレンス
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="#/patterns" className="app-footer__legal-link">
+                <a href="/patterns" className="app-footer__legal-link">
                   パターン別解説
                 </a>
               </nav>

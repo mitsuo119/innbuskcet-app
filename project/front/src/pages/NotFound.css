@@ -1,0 +1,66 @@
+/*
+ * NotFound 画面スタイル（PBI-076 / TASK-076-3）
+ * - 共通 CSS カスタムプロパティ（--bg / --surface / --text / --border / --primary 系）を利用。
+ * - ライト/ダーク両テーマで WCAG 2.1 AA（4.5:1）コントラストを満たす（A-55 / DoD §9）。
+ * - モバイル幅 375px で横スクロールが発生しない。
+ */
+
+.not-found-view {
+  max-width: 640px;
+  margin: 3rem auto;
+  padding: 2rem 1.5rem;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #d0d7de);
+  border-radius: 12px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.not-found-view__code {
+  margin: 0;
+  color: var(--text-muted, #57606a);
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.not-found-view__title {
+  margin: 0.5rem 0 1rem;
+  font-size: 1.5rem;
+  color: var(--text, #1f2328);
+}
+
+.not-found-view__description {
+  margin: 0 0 1.5rem;
+  color: var(--text-muted, #57606a);
+}
+
+.not-found-view__home-button {
+  /* タップ領域 44px 以上を満たす（A-55 / DoD §7） */
+  display: inline-block;
+  min-height: 44px;
+  padding: 0.625rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--primary, #0969da);
+  background: var(--primary, #0969da);
+  color: var(--primary-on, #ffffff);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.not-found-view__home-button:hover,
+.not-found-view__home-button:focus-visible {
+  outline: 2px solid var(--primary, #0969da);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .not-found-view {
+    margin: 1.5rem 0.75rem;
+    padding: 1.5rem 1rem;
+  }
+  .not-found-view__title {
+    font-size: 1.25rem;
+  }
+}

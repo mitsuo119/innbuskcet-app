@@ -27,7 +27,7 @@ export function renderExplanationWithPatternLinks(text: string): ReactNode[] {
       nodes.push(
         <a
           key={`pattern-link-${start}-${patternId}`}
-          href={`#/patterns/${patternId}`}
+          href={`/patterns/${patternId}`}
           className="explanation__pattern-link"
           aria-label={`パターン${patternId}の詳細へ移動`}
         >

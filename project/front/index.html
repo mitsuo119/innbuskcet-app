@@ -3,6 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- PBI-076 / TASK-076-2: GitHub Pages SPA フォールバック復元。
+         404.html から `inbusket:spa-fallback` キーで保管された元 pathname を
+         React マウント前に history.replaceState で復元することで、ユーザがアクセスした
+         本来の URL（例: /reference/chapter08）を Router が認識できるようにする。 -->
+    <script>
+      (function () {
+        try {
+          var saved = sessionStorage.getItem('inbusket:spa-fallback');
+          if (saved) {
+            sessionStorage.removeItem('inbusket:spa-fallback');
+            history.replaceState(null, '', saved);
+          }
+        } catch (e) {
+          /* sessionStorage 不可時はそのまま */
+        }
+      })();
+    </script>
     <!-- PBI-066: ファビコン群 / PWA manifest。
          以下の絶対パス（先頭 /）は Vite ビルド時に `import.meta.env.BASE_URL` 経由で
          GitHub Pages サブパスへ書き換わる（PBI-059 規律 / vite.config.ts base）。 -->

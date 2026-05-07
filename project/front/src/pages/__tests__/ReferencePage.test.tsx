@@ -23,10 +23,10 @@ describe('PBI-056 解説リファレンス画面', () => {
     expect(html).not.toContain('ref/chapter');
     expect(html).not.toContain('参照元</dt>');
     // 内部ルーティングは維持
-    expect(html).toContain('href="#/reference/chapter01"');
-    expect(html).toContain('href="#/reference/chapter02"');
-    expect(html).toContain('href="#/reference/chapter05"');
-    expect(html).toContain('href="#/reference/chapter08"');
+    expect(html).toContain('href="/reference/chapter01"');
+    expect(html).toContain('href="/reference/chapter02"');
+    expect(html).toContain('href="/reference/chapter05"');
+    expect(html).toContain('href="/reference/chapter08"');
   });
 
   it('テーブル・箇条書き・補足メモ・参照導線を安全にレンダリングする', () => {
@@ -38,8 +38,8 @@ describe('PBI-056 解説リファレンス画面', () => {
     expect(html).toContain('緊急度×重要度マトリクス');
     expect(html).toContain('30秒優先度チェック');
     expect(html).toContain('代表パターン分類（要点）');
-    expect(html).toContain('href="#/patterns"');
-    expect(html).toContain('href="#/patterns/14"');
+    expect(html).toContain('href="/patterns"');
+    expect(html).toContain('href="/patterns/14"');
     expect(html).toContain('aria-current="page"');
   });
 
@@ -71,7 +71,7 @@ describe('PBI-056 解説リファレンス画面', () => {
       );
       expect(ch01Block).toContain('aria-disabled="true"');
       expect(ch01Block).toContain('（最初の章です）');
-      expect(ch01Block).toContain('href="#/reference/chapter02"');
+      expect(ch01Block).toContain('href="/reference/chapter02"');
 
       // chapter08 セクション（末尾章）
       const ch08Start = html.indexOf('id="reference-chapter08"');
@@ -81,7 +81,7 @@ describe('PBI-056 解説リファレンス画面', () => {
       );
       expect(ch08Block).toContain('（最後の章です）');
       // 直前章 chapter05 へのリンクが存在する
-      expect(ch08Block).toContain('href="#/reference/chapter05"');
+      expect(ch08Block).toContain('href="/reference/chapter05"');
     });
 
     it('章スキップナビは番号バッジ＋章タイトルを表示する', () => {

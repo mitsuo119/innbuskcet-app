@@ -104,7 +104,17 @@
 - [ ] **インライン回避**: 分割対象の TSX に `style={...}` 属性を持ち込まない（CSS ファイル側で完結させる）
 - [ ] **共通変数の維持**: 既存の CSS カスタムプロパティ（`--color-*` 等）を引き続き利用し、ページ固有の色定義を新設する場合は理由をコメントで明記する
 
-## 10. コミット / PR 体裁
+## 10. SEO / サイトマップ整合（PBI-082）
+
+> SEO に影響する変更（新規ルート追加・タイトル/メタ説明文・robots/sitemap・構造化データ・Lighthouse SEO スコアに関わる修正）を伴う PR が対象。詳細運用は [seo_operations.md](./seo_operations.md) を参照。
+
+- [ ] 新規ルート追加時、`Router.tsx` の `resolveRouteSeo` でタイトル/説明を定義し、`sitemap.xml` にも追加した（[seo_metadata_sitemap_guide.md](./seo_metadata_sitemap_guide.md) 参照）
+- [ ] `seo-assets.test.ts`（robots.txt / sitemap.xml / 404.html / JSON-LD 整合）が PASS
+- [ ] meta robots `noindex` の付与は 404 / 開発用ルートのみで、通常ルートに混入していない
+- [ ] dist ビルドで Lighthouse SEO スコアが 95 以上を維持（−5 ポイント以下の下落なし。手順は [seo_operations.md §6](./seo_operations.md#6-lighthouse-seo-定点観測手順)）
+- [ ] スプリント横断 SEO チェックは [seo_operations.md §7 雛形](./seo_operations.md#7-スプリント毎-seo-チェックリスト雛形) に従い Sprint Review 前に記入する
+
+## 11. コミット / PR 体裁
 
 - [ ] コミットメッセージは Conventional Commits 風（`feat(front): ...`, `fix(front): ...` 等）
 - [ ] PR タイトルに変更概要を簡潔に記載
@@ -124,3 +134,4 @@
 | 2026-05-03 | v0.6.0 | Sprint010 リファインメント（A-55）。§6 にモバイル幅 375px チェック観点（横スクロール / タップ領域 44px / ソフトキーボード被り / 両テーマ AA / 実機確認記録）を追加し全 PR で運用開始。PBI-045 / PBI-047 と連動。                                                   |
 | 2026-07-22 | v0.7.0 | Sprint013 DAY1（PBI-058 / PBI-059）。§2 に `import.meta.env` 依存テスト規律、§4 にサブパス公開時のベースパス確認を追加。Sprint012 レトロ A-71 / A-72 の運用知見を PR チェックへ反映。                                                                              |
 | 2026-07-30 | v0.8.0 | Sprint014 DAY2 / TASK-901（A-75）。§9.6「CSS 分割の横展開ルール」を追加。対象選定基準（1 ページ専用かつ 50 行以上）・完了条件（残置/重複なし）・回帰観点（両テーマ・375px）・テスト観点・インライン style 回避・共通変数維持を明文化。                             |
+| 2026-09-10 | v0.9.0 | Sprint020 DAY2 / PBI-082 TASK-082-3。§10「SEO / サイトマップ整合（PBI-082）」を追加し、新規ルート追加時の sitemap/SEO テスト・noindex 付与範囲・Lighthouse SEO 95 維持・[seo_operations.md](./seo_operations.md) §6/§7 への双方向リンクを明文化。                  |

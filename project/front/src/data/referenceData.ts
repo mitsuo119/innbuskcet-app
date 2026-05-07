@@ -321,22 +321,22 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
             items: [
               {
                 label: 'パターン一覧へ移動',
-                href: '#/patterns',
-                description: '20パターン全体を俯瞰する',
+                href: '/patterns',
+                description: '20パターン全体を俾瞰する',
               },
               {
                 label: '顧客クレーム（例）',
-                href: '#/patterns/1',
+                href: '/patterns/1',
                 description: '対外対応パターンの詳細を確認する',
               },
               {
                 label: 'プロジェクト遅延（例）',
-                href: '#/patterns/9',
+                href: '/patterns/9',
                 description: '業務/プロジェクト系の骨格を確認する',
               },
               {
                 label: '情報セキュリティインシデント（例）',
-                href: '#/patterns/14',
+                href: '/patterns/14',
                 description: 'リスク系パターンの初動を確認する',
               },
             ],

@@ -72,3 +72,4 @@
 - DoD §10-2: `dangerouslySetInnerHTML` 不使用
 - PBI-058 規律: env 依存値はビルド時注入（src 側 `import.meta.env` 直参照禁止）
 - PBI-059 規律: `import.meta.env.BASE_URL` でサブパス解決
+- PBI-082 / Sprint020: 本ドキュメントを継続活用しつつ、KPI 監視・スプリント横断 SEO チェックリストは [seo_operations.md](./seo_operations.md) に集約。本 §6 audit ID 台帳は同 §6（Lighthouse 定点観測手順）から参照される。
