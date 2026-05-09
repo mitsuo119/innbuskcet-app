@@ -64,3 +64,44 @@
     font-size: 1.25rem;
   }
 }
+
+/* PBI-079 / TASK-079-5: 補助リンク（パターン一覧・解説リファレンス）。
+   - 視覚順序は `<a href="/">` トップへ戻る → 補助リンクの順で、Tab 順序と DOM 順序を一致させる。
+   - リンクは min-height 44px のタップ領域・WCAG AA コントラスト・focus-visible のリングで a11y を担保。 */
+.not-found-view__suggestions {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--border, #d0d7de);
+  text-align: left;
+}
+
+.not-found-view__suggestions-lead {
+  margin: 0 0 0.5rem;
+  color: var(--text-muted, #57606a);
+  font-size: 0.875rem;
+}
+
+.not-found-view__suggestions-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.not-found-view__suggestions-list > li + li {
+  margin-top: 0.5rem;
+}
+
+.not-found-view__suggestion-link {
+  display: inline-block;
+  min-height: 44px;
+  padding: 0.5rem 0.25rem;
+  color: var(--primary, #0969da);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.not-found-view__suggestion-link:hover,
+.not-found-view__suggestion-link:focus-visible {
+  outline: 2px solid var(--primary, #0969da);
+  outline-offset: 2px;
+}

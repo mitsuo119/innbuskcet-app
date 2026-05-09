@@ -26,6 +26,22 @@ export function NotFound() {
       <a href="/" className="not-found-view__home-button">
         トップへ戻る
       </a>
+      {/* PBI-079 / TASK-079-5: 補助リンク（パターン一覧・解説リファレンス）。a11y は `<nav aria-label>` で識別、視覚順序＝DOM 順序＝Tab 順序を維持。 */}
+      <nav className="not-found-view__suggestions" aria-label="関連ページへの補助リンク">
+        <p className="not-found-view__suggestions-lead">こちらもお試しください：</p>
+        <ul className="not-found-view__suggestions-list">
+          <li>
+            <a href="/patterns" className="not-found-view__suggestion-link">
+              パターン一覧（/patterns）
+            </a>
+          </li>
+          <li>
+            <a href="/reference" className="not-found-view__suggestion-link">
+              解説リファレンス（/reference）
+            </a>
+          </li>
+        </ul>
+      </nav>
     </main>
   );
 }

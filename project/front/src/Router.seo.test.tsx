@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { Router } from './Router';
-import { PUBLIC_ROUTE_PATHS } from './routes';
+import { PUBLIC_ROUTE_PATHS, SITEMAP_CASE_IDS, SITEMAP_REFERENCE_CHAPTER_IDS } from './routes';
 
 (globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -196,5 +196,198 @@ describe('PBI-078 公開ルートのメタ重複網羅', () => {
         expect(title).not.toBe('インバスケット - 学習アプリ');
       }
     }
+  });
+});
+
+/**
+ * PBI-079 / TASK-079-6（DAY3 着手分）: 代表ケース 20 件の単独 URL に注入される
+ * BreadcrumbList JSON-LD の単体検証。
+ *
+ * - `<script type="application/ld+json" data-route-jsonld="case-detail">` が
+ *   ケース詳細ルートで 1 タグだけ存在し、@context/@type/itemListElement(4 件) を持つ。
+ * - 公開ルートのうちケース詳細以外（例: トップ・パターン一覧・解説リファレンス）では
+ *   JSON-LD タグが残留しない（撤去される）。
+ */
+describe('PBI-079 ケース詳細 JSON-LD（BreadcrumbList）', () => {
+  let container: HTMLDivElement;
+  let root: Root;
+  const initialTitle = document.title;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+    window.history.replaceState(null, '', '/');
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+    window.history.replaceState(null, '', '/');
+    document.title = initialTitle;
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  it('TASK-079-6: 代表ケース 20 件すべてで BreadcrumbList JSON-LD が 1 件だけ注入される', () => {
+    for (const id of SITEMAP_CASE_IDS) {
+      window.history.replaceState(null, '', `/cases/${id}`);
+      act(() => {
+        root.render(<Router />);
+      });
+
+      const scripts = document.querySelectorAll(
+        'script[type="application/ld+json"][data-route-jsonld="case-detail"]',
+      );
+      expect(scripts, `${id} で JSON-LD タグが 1 つではない`).toHaveLength(1);
+
+      const json = JSON.parse(scripts[0]?.textContent ?? '{}') as {
+        '@context'?: string;
+        '@type'?: string;
+        itemListElement?: unknown[];
+      };
+      expect(json['@context']).toBe('https://schema.org');
+      expect(json['@type']).toBe('BreadcrumbList');
+      expect(json.itemListElement).toHaveLength(4);
+
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+
+  it('TASK-079-6: ケース詳細以外のルートでは JSON-LD タグが残留しない', () => {
+    // 先にケース詳細をマウントして JSON-LD を注入。
+    window.history.replaceState(null, '', '/cases/case-001');
+    act(() => {
+      root.render(<Router />);
+    });
+    expect(
+      document.querySelector('script[type="application/ld+json"][data-route-jsonld="case-detail"]'),
+    ).not.toBeNull();
+
+    act(() => {
+      root.unmount();
+    });
+    root = createRoot(container);
+
+    // 続けて非ケース詳細ルートに遷移すると JSON-LD は撤去される。
+    for (const path of ['/', '/patterns', '/reference', '/reference/chapter01']) {
+      window.history.replaceState(null, '', path);
+      act(() => {
+        root.render(<Router />);
+      });
+      expect(
+        document.querySelector(
+          'script[type="application/ld+json"][data-route-jsonld="case-detail"]',
+        ),
+        `${path} で JSON-LD タグが残留している`,
+      ).toBeNull();
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+});
+
+/**
+ * PBI-080 / TASK-080-5（DAY5）: 解説リファレンス全 12 章ページに注入される
+ * BreadcrumbList JSON-LD の単体検証。
+ *
+ * - 各 `/reference/chapterXX` で `<script data-route-jsonld="reference-chapter">` が
+ *   1 タグだけ存在し、@type=BreadcrumbList・itemListElement(3 件) を持つ。
+ * - ルート切替時にケース詳細との routeKey が混在しない（残留しない）。
+ */
+describe('PBI-080 解説リファレンス章 JSON-LD（BreadcrumbList）', () => {
+  let container: HTMLDivElement;
+  let root: Root;
+  const initialTitle = document.title;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+    window.history.replaceState(null, '', '/');
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+    window.history.replaceState(null, '', '/');
+    document.title = initialTitle;
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  it('TASK-080-5: 全 12 章で BreadcrumbList JSON-LD が 1 件だけ注入される', () => {
+    for (const id of SITEMAP_REFERENCE_CHAPTER_IDS) {
+      window.history.replaceState(null, '', `/reference/${id}`);
+      act(() => {
+        root.render(<Router />);
+      });
+
+      const scripts = document.querySelectorAll(
+        'script[type="application/ld+json"][data-route-jsonld="reference-chapter"]',
+      );
+      expect(scripts, `${id} で JSON-LD タグが 1 つではない`).toHaveLength(1);
+
+      const json = JSON.parse(scripts[0]?.textContent ?? '{}') as {
+        '@context'?: string;
+        '@type'?: string;
+        itemListElement?: unknown[];
+      };
+      expect(json['@context']).toBe('https://schema.org');
+      expect(json['@type']).toBe('BreadcrumbList');
+      expect(json.itemListElement).toHaveLength(3);
+
+      // ケース詳細用 JSON-LD が同時に残留していないこと（routeKey 切替の独立性）。
+      expect(
+        document.querySelector(
+          'script[type="application/ld+json"][data-route-jsonld="case-detail"]',
+        ),
+        `${id} で case-detail JSON-LD が残留している`,
+      ).toBeNull();
+
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+
+  it('TASK-080-5: 全 12 章で title が一意・description に章タイトルが含まれる', () => {
+    const titles = new Set<string>();
+    for (const id of SITEMAP_REFERENCE_CHAPTER_IDS) {
+      window.history.replaceState(null, '', `/reference/${id}`);
+      act(() => {
+        root.render(<Router />);
+      });
+      titles.add(document.title);
+      const description =
+        document
+          .querySelector<HTMLMetaElement>('meta[name="description"]')
+          ?.getAttribute('content') ?? '';
+      expect(description, `${id} の description が空`).not.toBe('');
+      expect(document.title, `${id} の title が既定値に落ちている`).toContain('解説リファレンス：');
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+    expect(titles.size).toBe(SITEMAP_REFERENCE_CHAPTER_IDS.length);
   });
 });

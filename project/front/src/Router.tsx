@@ -36,10 +36,15 @@ import { TermsOfService } from './pages/TermsOfService';
 import { Contact } from './pages/Contact';
 import { PatternList } from './pages/PatternList';
 import { PatternDetail } from './pages/PatternDetail';
+import { CaseDetail } from './pages/CaseDetail';
 import { ReferencePage } from './pages/ReferencePage';
 import { NotFound } from './pages/NotFound';
 import { NAVIGATE_EVENT, isPlainLeftClick, navigate, stripBase, withBase } from './nav';
-import { SITEMAP_REFERENCE_CHAPTER_IDS } from './routes';
+import {
+  CASE_DETAIL_META_BY_ID,
+  SITEMAP_REFERENCE_CHAPTER_IDS,
+  type CaseDetailMeta,
+} from './routes';
 
 const APP_NAME = 'インバスケット - 学習アプリ';
 
@@ -48,6 +53,17 @@ interface RouteSeo {
   description: string;
   /** soft 404 回避用の noindex 付与フラグ（PBI-076）。 */
   noindex?: boolean;
+  /**
+   * JSON-LD として `<head>` に注入する構造化データ（PBI-079 / TASK-079-3）。
+   * `null` を返したルートでは既存の JSON-LD を撤去する。
+   */
+  jsonLd?: Record<string, unknown> | null;
+  /**
+   * `data-route-jsonld` 属性に書き込む routeKey（PBI-080 / TASK-080-5 / DAY5）。
+   * 省略時は既定で `case-detail` を用いる（既存 PBI-079 互換）。
+   * ルートを跨いで JSON-LD を切り替えるため、syncJsonLd は本キーで残留タグを管理する。
+   */
+  jsonLdKey?: string;
 }
 
 function resolveRouteSeo(state: RouterState): RouteSeo {
@@ -58,9 +74,14 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
         if (chapter) {
           // PBI-078 / TASK-078-2: 章タイトルを description に注入し、`/reference` および
           // 他章ページとの description 重複を構造的に防止する。
+          // PBI-080 / TASK-080-5（DAY5）: 各章ページに BreadcrumbList JSON-LD を注入し、
+          // 受入基準「title/description/canonical/BreadcrumbList JSON-LD が一意」を満たす。
+          const jsonLd = buildChapterBreadcrumbJsonLd(chapter.id, chapter.title);
           return {
             title: `解説リファレンス：${chapter.title}`,
             description: `インバスケット学習の「${chapter.title}」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。`,
+            jsonLd,
+            jsonLdKey: 'reference-chapter',
           };
         }
       }
@@ -89,6 +110,23 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
         title: 'パターン詳細',
         description:
           'インバスケット案件のパターン詳細ページです。特徴と優先度判定の観点を確認できます。',
+      };
+    }
+    case 'case-detail': {
+      // PBI-079 / TASK-079-3（DAY2）: 代表ケース 20 件の単独 URL SEO。
+      // パターン名＋難易度を description に注入し title/description の重複を構造的に防ぐ（R-4 対策）。
+      const meta = state.caseId ? CASE_DETAIL_META_BY_ID.get(state.caseId) : undefined;
+      if (meta) {
+        const num = meta.id.replace('case-', '');
+        const title = `ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}）`;
+        const description = `インバスケット代表ケース${num}（パターン${meta.patternId}「${meta.patternName}」・難易度${meta.difficulty}）の本文と解説、模範回答の骨格を確認できる単独URLページです。`;
+        const jsonLd = buildCaseBreadcrumbJsonLd(meta);
+        return { title, description, jsonLd, jsonLdKey: 'case-detail' };
+      }
+      return {
+        title: '代表ケース詳細',
+        description:
+          'インバスケット代表ケースの詳細ページです。パターン別の本文・解説・模範回答の骨格を確認できます。',
       };
     }
     case 'privacy-policy':
@@ -161,6 +199,98 @@ function syncRobotsMeta(noindex: boolean): void {
   element.setAttribute('content', noindex ? 'noindex, follow' : 'index, follow');
 }
 
+/**
+ * PBI-079 / TASK-079-3: ルート別 JSON-LD（構造化データ）を `<head>` に同期する。
+ *
+ * - `data-route-jsonld` 属性付きの `<script type="application/ld+json">` を
+ *   ルートごとに 1 タグだけ管理する（複数注入回避・残留防止）。
+ * - `data` が `null` の場合、既存の data-route-jsonld タグをすべて撤去する。
+ * - PBI-080 / TASK-080-5（DAY4）: routeKey を引数化し case-detail 以外の
+ *   ルート（reference-chapter 等）でも BreadcrumbList JSON-LD を注入できるよう拡張。
+ */
+const JSON_LD_DATA_ATTR = 'data-route-jsonld';
+
+function syncJsonLd(
+  data: Record<string, unknown> | null | undefined,
+  routeKey: string = 'case-detail',
+): void {
+  // ルート切替時に異なる routeKey の残留タグが残らないよう、まず全 data-route-jsonld を撤去する。
+  const allExisting = document.querySelectorAll<HTMLScriptElement>(`script[${JSON_LD_DATA_ATTR}]`);
+  allExisting.forEach((node) => {
+    if (data == null || node.getAttribute(JSON_LD_DATA_ATTR) !== routeKey) {
+      node.remove();
+    }
+  });
+  if (data == null) return;
+  const existing = document.querySelector<HTMLScriptElement>(
+    `script[${JSON_LD_DATA_ATTR}="${routeKey}"]`,
+  );
+  const json = JSON.stringify(data);
+  if (existing) {
+    if (existing.textContent !== json) existing.textContent = json;
+    return;
+  }
+  const script = document.createElement('script');
+  script.setAttribute('type', 'application/ld+json');
+  script.setAttribute(JSON_LD_DATA_ATTR, routeKey);
+  script.textContent = json;
+  document.head.appendChild(script);
+}
+
+/**
+ * 解説リファレンス章ページの BreadcrumbList JSON-LD を生成する（PBI-080 / TASK-080-5 / DAY5）。
+ * 階層: トップ → 解説リファレンス → 章タイトル
+ */
+function buildChapterBreadcrumbJsonLd(
+  chapterId: ReferenceChapterId,
+  chapterTitle: string,
+): Record<string, unknown> {
+  const origin = window.location.origin;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${origin}/` },
+      { '@type': 'ListItem', position: 2, name: '解説リファレンス', item: `${origin}/reference` },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: chapterTitle,
+        item: `${origin}/reference/${chapterId}`,
+      },
+    ],
+  };
+}
+
+/**
+ * 代表ケース詳細ページの BreadcrumbList JSON-LD を生成する。
+ * 階層: トップ → パターン別解説 → パターン{N} → ケース{NNN}
+ */
+function buildCaseBreadcrumbJsonLd(meta: CaseDetailMeta): Record<string, unknown> {
+  const num = meta.id.replace('case-', '');
+  const origin = window.location.origin;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${origin}/` },
+      { '@type': 'ListItem', position: 2, name: 'パターン別解説', item: `${origin}/patterns` },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: `パターン${meta.patternId}「${meta.patternName}」`,
+        item: `${origin}/patterns/${meta.patternId}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: `ケース${num}（${meta.difficulty}）`,
+        item: `${origin}/cases/${meta.id}`,
+      },
+    ],
+  };
+}
+
 export type AppPage =
   | 'home'
   | 'privacy-policy'
@@ -168,6 +298,7 @@ export type AppPage =
   | 'contact'
   | 'patterns'
   | 'pattern-detail'
+  | 'case-detail'
   | 'reference'
   | 'not-found';
 
@@ -175,6 +306,8 @@ interface RouterState {
   page: AppPage;
   /** パターン詳細ページのみで使用するパターンID */
   patternId: number | null;
+  /** 代表ケース詳細ページのみで使用するケースID（PBI-079 / TASK-079-3） */
+  caseId: string | null;
   /** 解説リファレンスページで注目表示する章ID */
   referenceChapterId: ReferenceChapterId | null;
 }
@@ -187,22 +320,22 @@ const VALID_REFERENCE_IDS: ReadonlySet<string> = new Set(SITEMAP_REFERENCE_CHAPT
 function parsePathname(): RouterState {
   const path = stripBase(window.location.pathname);
   if (path === '/' || path === '') {
-    return { page: 'home', patternId: null, referenceChapterId: null };
+    return { page: 'home', patternId: null, caseId: null, referenceChapterId: null };
   }
   if (path === '/privacy-policy') {
-    return { page: 'privacy-policy', patternId: null, referenceChapterId: null };
+    return { page: 'privacy-policy', patternId: null, caseId: null, referenceChapterId: null };
   }
   if (path === '/terms-of-service') {
-    return { page: 'terms-of-service', patternId: null, referenceChapterId: null };
+    return { page: 'terms-of-service', patternId: null, caseId: null, referenceChapterId: null };
   }
   if (path === '/contact') {
-    return { page: 'contact', patternId: null, referenceChapterId: null };
+    return { page: 'contact', patternId: null, caseId: null, referenceChapterId: null };
   }
   if (path === '/patterns') {
-    return { page: 'patterns', patternId: null, referenceChapterId: null };
+    return { page: 'patterns', patternId: null, caseId: null, referenceChapterId: null };
   }
   if (path === '/reference') {
-    return { page: 'reference', patternId: null, referenceChapterId: null };
+    return { page: 'reference', patternId: null, caseId: null, referenceChapterId: null };
   }
 
   const referenceMatch = path.match(/^\/reference\/([^/]+)$/);
@@ -212,22 +345,33 @@ function parsePathname(): RouterState {
       return {
         page: 'reference',
         patternId: null,
+        caseId: null,
         referenceChapterId: id as ReferenceChapterId,
       };
     }
-    return { page: 'not-found', patternId: null, referenceChapterId: null };
+    return { page: 'not-found', patternId: null, caseId: null, referenceChapterId: null };
   }
 
   const patternMatch = path.match(/^\/patterns\/(\d+)$/);
   if (patternMatch) {
     const id = parseInt(patternMatch[1], 10);
     if (Number.isFinite(id) && findPatternById(id)) {
-      return { page: 'pattern-detail', patternId: id, referenceChapterId: null };
+      return { page: 'pattern-detail', patternId: id, caseId: null, referenceChapterId: null };
     }
-    return { page: 'not-found', patternId: null, referenceChapterId: null };
+    return { page: 'not-found', patternId: null, caseId: null, referenceChapterId: null };
   }
 
-  return { page: 'not-found', patternId: null, referenceChapterId: null };
+  // PBI-079 / TASK-079-3: 代表ケース詳細 `/cases/:id`。CASE_DETAIL_META_BY_ID で検証。
+  const caseMatch = path.match(/^\/cases\/([^/]+)$/);
+  if (caseMatch) {
+    const id = caseMatch[1];
+    if (CASE_DETAIL_META_BY_ID.has(id)) {
+      return { page: 'case-detail', patternId: null, caseId: id, referenceChapterId: null };
+    }
+    return { page: 'not-found', patternId: null, caseId: null, referenceChapterId: null };
+  }
+
+  return { page: 'not-found', patternId: null, caseId: null, referenceChapterId: null };
 }
 
 /**
@@ -326,6 +470,9 @@ export function Router() {
     syncCanonicalLink(canonicalUrl);
 
     syncRobotsMeta(seo.noindex === true);
+    // PBI-079 / TASK-079-3: ケース詳細以外のルートでは JSON-LD を撤去する（残留防止）。
+    // PBI-080 / TASK-080-5（DAY5）: routeKey は seo.jsonLdKey から取得（既定 'case-detail'）。
+    syncJsonLd(seo.jsonLd ?? null, seo.jsonLdKey);
   }, [state]);
 
   // PBI-077 / TASK-077-2/3: 各ページの戻る導線・カードを `<a href>` 化したため、
@@ -344,6 +491,8 @@ export function Router() {
       return <PatternList />;
     case 'pattern-detail':
       return <PatternDetail patternId={state.patternId ?? 1} />;
+    case 'case-detail':
+      return <CaseDetail caseId={state.caseId ?? ''} />;
     case 'reference':
       return <ReferencePage focusChapterId={state.referenceChapterId} />;
     case 'not-found':
