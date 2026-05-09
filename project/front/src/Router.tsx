@@ -39,6 +39,7 @@ import { PatternDetail } from './pages/PatternDetail';
 import { ReferencePage } from './pages/ReferencePage';
 import { NotFound } from './pages/NotFound';
 import { NAVIGATE_EVENT, isPlainLeftClick, navigate, stripBase, withBase } from './nav';
+import { SITEMAP_REFERENCE_CHAPTER_IDS } from './routes';
 
 const APP_NAME = 'インバスケット - 学習アプリ';
 
@@ -55,32 +56,33 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
       if (state.referenceChapterId) {
         const chapter = REFERENCE_DATA.find((item) => item.id === state.referenceChapterId);
         if (chapter) {
+          // PBI-078 / TASK-078-2: 章タイトルを description に注入し、`/reference` および
+          // 他章ページとの description 重複を構造的に防止する。
           return {
             title: `解説リファレンス：${chapter.title}`,
-            description:
-              'インバスケットの学習フレームワークを章別に確認できる解説リファレンスページです。',
+            description: `インバスケット学習の「${chapter.title}」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。`,
           };
         }
       }
       return {
         title: '解説リファレンス',
         description:
-          'インバスケットの基礎・採点基準・優先順位づけ・案件パターンを章構成で学べる解説ページです。',
+          'インバスケットの基礎・採点基準・優先順位づけ・案件パターンを章構成で学べる解説リファレンスの目次ページです。',
       };
     }
     case 'patterns':
       return {
         title: 'パターン別解説',
         description:
-          'インバスケット全20パターンの優先度傾向と回答の骨格を確認できるパターン別解説ページです。',
+          'インバスケット全20パターンの優先度傾向と回答の骨格を一覧で確認できるパターン別解説のトップページです。',
       };
     case 'pattern-detail': {
       const pattern = state.patternId ? findPatternById(state.patternId) : undefined;
       if (pattern) {
+        // PBI-078 / TASK-078-2: パターン名・ID を description に注入し、他パターンページとの重複を防止する。
         return {
           title: `パターン${pattern.id}：${pattern.name}`,
-          description:
-            '案件パターンの特徴、優先度の目安、回答の骨格を確認し、実戦での優先順位判断に活かせます。',
+          description: `インバスケット案件パターン${pattern.id}「${pattern.name}」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。`,
         };
       }
       return {
@@ -130,6 +132,21 @@ function setMetaByProperty(property: string, content: string): void {
 }
 
 /**
+ * PBI-078 / TASK-078-3: ルート別 canonical を絶対 URL（origin + pathname）で同期する。
+ * `<link rel="canonical">` が存在しなければ生成し、href を自ルート相当に更新する。
+ * クエリ・ハッシュは canonical の対象外（重複URL収斂目的）。
+ */
+function syncCanonicalLink(absoluteUrl: string): void {
+  let element = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!element) {
+    element = document.createElement('link');
+    element.setAttribute('rel', 'canonical');
+    document.head.appendChild(element);
+  }
+  element.setAttribute('href', absoluteUrl);
+}
+
+/**
  * `meta[name="robots"]` を指定値に同期する。要素が無ければ noindex 付与時のみ生成する。
  * 通常ルートでは `index, follow`（デフォルト相当）を維持する。
  */
@@ -162,12 +179,9 @@ interface RouterState {
   referenceChapterId: ReferenceChapterId | null;
 }
 
-const VALID_REFERENCE_IDS: ReadonlySet<string> = new Set([
-  'chapter01',
-  'chapter02',
-  'chapter05',
-  'chapter08',
-]);
+// PBI-081 / TASK-081-1: 公開ルート単一ソース（src/routes.ts）から導出する。
+// sitemap.xml と Router の有効ルート集合をズレなく同期させるための単一ソース化。
+const VALID_REFERENCE_IDS: ReadonlySet<string> = new Set(SITEMAP_REFERENCE_CHAPTER_IDS);
 
 /** pathname（base prefix 剥がし済）から RouterState を解決する。 */
 function parsePathname(): RouterState {
@@ -307,32 +321,33 @@ export function Router() {
     const currentUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
     setMetaByProperty('og:url', currentUrl);
 
+    // PBI-078 / TASK-078-3: canonical はクエリ・ハッシュを除いた origin + pathname を採用。
+    const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+    syncCanonicalLink(canonicalUrl);
+
     syncRobotsMeta(seo.noindex === true);
   }, [state]);
 
-  const handleBackToHome = () => navigate('/');
-  const handleBackToPatternList = () => navigate('/patterns');
+  // PBI-077 / TASK-077-2/3: 各ページの戻る導線・カードを `<a href>` 化したため、
+  // Router 側で onBack / onSelectPattern を渡す必要は無くなった。
+  // 内部 `<a href>` クリックは Router マウント時に登録した
+  // `handleDelegatedClick` が pushState 化する。
 
   switch (state.page) {
     case 'privacy-policy':
-      return <PrivacyPolicy onBack={handleBackToHome} />;
+      return <PrivacyPolicy />;
     case 'terms-of-service':
-      return <TermsOfService onBack={handleBackToHome} />;
+      return <TermsOfService />;
     case 'contact':
-      return <Contact onBack={handleBackToHome} />;
+      return <Contact />;
     case 'patterns':
-      return (
-        <PatternList
-          onBack={handleBackToHome}
-          onSelectPattern={(id) => navigate(`/patterns/${id}`)}
-        />
-      );
+      return <PatternList />;
     case 'pattern-detail':
-      return <PatternDetail patternId={state.patternId ?? 1} onBack={handleBackToPatternList} />;
+      return <PatternDetail patternId={state.patternId ?? 1} />;
     case 'reference':
-      return <ReferencePage onBack={handleBackToHome} focusChapterId={state.referenceChapterId} />;
+      return <ReferencePage focusChapterId={state.referenceChapterId} />;
     case 'not-found':
-      return <NotFound onBack={handleBackToHome} />;
+      return <NotFound />;
     default:
       return <App />;
   }

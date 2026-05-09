@@ -1,7 +1,8 @@
 /**
  * パターン詳細ページ（PBI-055 / TASK-303）
- * - URLハッシュ #/patterns/:id で表示するパターンIDを指定
- * - 「一覧に戻る」ボタン付き
+ * - URL `/patterns/:id` で表示するパターンIDを指定
+ * - 「一覧に戻る」リンク付き
+ * - PBI-077 / TASK-077-3: 戻る導線を `<a href="/patterns">` 化（onClick 単独遷移 0 件）
  * - SP対応（375px以上）/ ライト・ダーク両テーマ
  * - dangerouslySetInnerHTML 不使用（XSS対策）
  */
@@ -10,7 +11,6 @@ import { GlobalNav } from '../ui/GlobalNav';
 
 interface Props {
   patternId: number;
-  onBack: () => void;
 }
 
 const PRIORITY_LABEL: Record<PatternPriority, string> = {
@@ -20,20 +20,15 @@ const PRIORITY_LABEL: Record<PatternPriority, string> = {
   situational: '状況依存',
 };
 
-export function PatternDetail({ patternId, onBack }: Props) {
+export function PatternDetail({ patternId }: Props) {
   const pattern = findPatternById(patternId);
 
   if (!pattern) {
     return (
       <div className="container">
-        <button
-          type="button"
-          className="legal-back-btn"
-          onClick={onBack}
-          aria-label="パターン一覧に戻る"
-        >
+        <a href="/patterns" className="legal-back-btn" aria-label="パターン一覧に戻る">
           ← 一覧に戻る
-        </button>
+        </a>
         <GlobalNav current="patterns" />
         <p>パターン{patternId}が見つかりませんでした。</p>
       </div>
@@ -43,14 +38,9 @@ export function PatternDetail({ patternId, onBack }: Props) {
   return (
     <div className="container">
       <header className="legal-header">
-        <button
-          type="button"
-          className="legal-back-btn"
-          onClick={onBack}
-          aria-label="パターン一覧に戻る"
-        >
+        <a href="/patterns" className="legal-back-btn" aria-label="パターン一覧に戻る">
           ← 一覧に戻る
-        </button>
+        </a>
         <GlobalNav current="patterns" />
         <h1 className="legal-title">
           パターン{pattern.id}：{pattern.name}

@@ -9,7 +9,6 @@ import { GlobalNav } from '../ui/GlobalNav';
 import './ReferencePage.css';
 
 interface Props {
-  onBack: () => void;
   focusChapterId?: ReferenceChapterId | null;
 }
 
@@ -210,7 +209,7 @@ function renderChapter(chapter: ReferenceChapter) {
   );
 }
 
-export function ReferencePage({ onBack, focusChapterId = null }: Props) {
+export function ReferencePage({ focusChapterId = null }: Props) {
   useEffect(() => {
     if (!focusChapterId) return;
     const section = document.getElementById(`reference-${focusChapterId}`);
@@ -222,14 +221,9 @@ export function ReferencePage({ onBack, focusChapterId = null }: Props) {
   return (
     <div className="container reference-page">
       <header className="reference-page__header">
-        <button
-          type="button"
-          className="reference-page__back"
-          onClick={onBack}
-          aria-label="ホームに戻る"
-        >
+        <a href="/" className="reference-page__back" aria-label="ホームに戻る">
           ← ホームに戻る
-        </button>
+        </a>
         <GlobalNav current="reference" />
         <p className="reference-page__eyebrow">解説リファレンス</p>
         <h1 className="reference-page__title">インバスケット解説リファレンス</h1>

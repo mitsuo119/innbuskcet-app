@@ -2,21 +2,18 @@
  * お問い合わせページ（PBI-051 / TASK-103）
  * - SP対応（375px以上）
  * - dangerouslySetInnerHTML 不使用（XSS対策）
+ * - PBI-077 / TASK-077-3: 戻る導線を `<a href="/">` 化（onClick 単独遷移 0 件・修飾キーで新規タブ可）
  */
 
 import { GlobalNav } from '../ui/GlobalNav';
 
-interface Props {
-  onBack: () => void;
-}
-
-export function Contact({ onBack }: Props) {
+export function Contact() {
   return (
     <div className="container">
       <header className="legal-header">
-        <button type="button" className="legal-back-btn" onClick={onBack} aria-label="ホームに戻る">
+        <a href="/" className="legal-back-btn" aria-label="ホームに戻る">
           ← ホームに戻る
-        </button>
+        </a>
         <GlobalNav current="contact" />
         <h1 className="legal-title">お問い合わせ</h1>
       </header>

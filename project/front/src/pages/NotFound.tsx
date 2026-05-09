@@ -6,15 +6,11 @@
  * - スタイルは `NotFound.css` に集約し、TSX に inline `style=` を持たない（A-75 / DoD §9.6）。
  * - dangerouslySetInnerHTML 不使用（DoD §10-2）。
  * - role="main" + aria-labelledby で a11y を担保（DoD §9-3）。
+ * - PBI-077 / TASK-077-3: トップへ戻る導線を `<a href="/">` 化（onClick 単独遷移 0 件・修飾キーで新規タブ可）。
  */
 import './NotFound.css';
 
-interface NotFoundProps {
-  /** 「トップへ戻る」ボタン押下時のハンドラ。 */
-  onBack: () => void;
-}
-
-export function NotFound({ onBack }: NotFoundProps) {
+export function NotFound() {
   return (
     <main className="not-found-view" role="main" aria-labelledby="not-found-title">
       <p className="not-found-view__code" aria-hidden="true">
@@ -27,9 +23,9 @@ export function NotFound({ onBack }: NotFoundProps) {
         お探しのページは存在しないか、移動・削除された可能性があります。URL
         をご確認のうえ、トップページからお探しください。
       </p>
-      <button type="button" className="not-found-view__home-button" onClick={onBack}>
+      <a href="/" className="not-found-view__home-button">
         トップへ戻る
-      </button>
+      </a>
     </main>
   );
 }
