@@ -132,3 +132,100 @@ describe('ExamResultView ミニタイムライン CSS（PBI-053）', () => {
     expect(timelineMedia!).toMatch(/grid-column:\s*1\s*\/\s*-1/);
   });
 });
+
+describe('ExamResultView 平均基準線（PBI-074）', () => {
+  let container: HTMLDivElement;
+  let root: Root;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+  it('全タイムライン行に「90分 ÷ 問題数」基準線が配置され、left%が一致する', () => {
+    act(() => {
+      root.render(
+        <ExamResultView
+          session={makeSession(3)}
+          history={makeHistory()}
+          elapsedMsList={[0, 60_000, 120_000]}
+          onBackToStudy={() => {}}
+        />,
+      );
+    });
+
+    // 3 問なので各行に 1 本ずつ基準線がある
+    const baselines = container.querySelectorAll<HTMLElement>(
+      '[data-testid="exam-result-timeline-baseline"]',
+    );
+    expect(baselines.length).toBe(3);
+
+    // 90分(=5400000ms) ÷ 3問 ÷ 5400000ms = 1/3 ≒ 33.333...%
+    for (const el of baselines) {
+      expect(el.style.left).toMatch(/^33\.33/);
+    }
+  });
+
+  it('凡例に「平均基準線（90分 ÷ N問 ＝ 1問あたり M:SS）」が表示される', () => {
+    act(() => {
+      root.render(
+        <ExamResultView
+          session={makeSession(2)}
+          history={makeHistory().slice(0, 2)}
+          elapsedMsList={[0, 60_000]}
+          onBackToStudy={() => {}}
+        />,
+      );
+    });
+
+    const legend = container.querySelector('[data-testid="exam-result-timeline-baseline-legend"]');
+    expect(legend).not.toBeNull();
+    // 90 分 ÷ 2 問 ＝ 1 問あたり 45:00
+    expect(legend!.textContent).toContain('平均基準線');
+    expect(legend!.textContent).toContain('90分 ÷ 2問');
+    expect(legend!.textContent).toContain('45:00');
+  });
+
+  it('totalQuestions が 0 の場合は基準線も凡例も描画されない（防御的フォールバック）', () => {
+    act(() => {
+      root.render(
+        <ExamResultView
+          session={makeSession(0)}
+          history={[]}
+          elapsedMsList={[]}
+          onBackToStudy={() => {}}
+        />,
+      );
+    });
+    expect(container.querySelectorAll('[data-testid="exam-result-timeline-baseline"]').length).toBe(
+      0,
+    );
+    expect(
+      container.querySelector('[data-testid="exam-result-timeline-baseline-legend"]'),
+    ).toBeNull();
+  });
+});
+
+describe('ExamResultView 平均基準線 CSS（PBI-074 / コントラスト AA）', () => {
+  it('基準線の border-color に var(--color-text) を用いて両テーマ AA を担保する', () => {
+    const block = css.match(/\.exam-result__timeline-baseline\s*\{[\s\S]*?\}/);
+    expect(block).not.toBeNull();
+    // 破線で塗り棒と差別化し、線色は本文色（両テーマで AA を満たす定義済み変数）
+    expect(block![0]).toMatch(/border-left:\s*2px\s+dashed\s+var\(--color-text\)/);
+    expect(block![0]).toMatch(/position:\s*absolute/);
+  });
+
+  it('凡例スウォッチも同じ破線スタイルで凡例とバッジの一貫性を担保する', () => {
+    const block = css.match(/\.exam-result__timeline-baseline-swatch\s*\{[\s\S]*?\}/);
+    expect(block).not.toBeNull();
+    expect(block![0]).toMatch(/border-top:\s*2px\s+dashed\s+var\(--color-text\)/);
+  });
+});

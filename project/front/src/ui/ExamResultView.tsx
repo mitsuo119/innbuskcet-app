@@ -72,6 +72,23 @@ export function ExamResultView({
 
   const { totalQuestions, correctCount, percentage, elapsedDisplay, byPriority } = summary;
 
+  /**
+   * PBI-074: 平均基準線（90 分 ÷ 問題数）の位置と表示用テキスト。
+   * - totalQuestions が 0 / 不正な場合は基準線を非表示にする。
+   * - widthPercent はミニタイムライン track 内の左端からの相対位置（%）。
+   * - aria 用に「平均1問あたり M:SS」の文字列も併せて算出する。
+   */
+  const baselineInfo = useMemo(() => {
+    const total = session.totalQuestions;
+    if (!Number.isFinite(total) || total <= 0) return null;
+    const baselineMs = TIMELINE_TOTAL_MS / total;
+    const widthPercent = (baselineMs / TIMELINE_TOTAL_MS) * 100;
+    return {
+      widthPercent,
+      label: formatTimelineElapsed(baselineMs),
+    };
+  }, [session.totalQuestions]);
+
   /** PBI-053: Exam90分ミニタイムライン（設問別 elapsedMs 可視化）。 */
   const timelineItems = useMemo(
     () =>
@@ -211,6 +228,15 @@ export function ExamResultView({
         <h3 id="exam-result-view-timeline-heading" className="exam-result__breakdown-heading">
           Exam 90分ミニタイムライン
         </h3>
+        {baselineInfo && (
+          <p
+            className="exam-result__timeline-baseline-legend"
+            data-testid="exam-result-timeline-baseline-legend"
+          >
+            <span className="exam-result__timeline-baseline-swatch" aria-hidden="true" />
+            平均基準線（90分 ÷ {session.totalQuestions}問 ＝ 1問あたり {baselineInfo.label}）
+          </p>
+        )}
         <ol className="exam-result__timeline-list" aria-label="設問ごとの所要時間タイムライン">
           {timelineItems.map((item) => (
             <li key={item.key} className="exam-result__timeline-row" aria-label={item.ariaLabel}>
@@ -224,6 +250,13 @@ export function ExamResultView({
                   }
                   style={{ width: `${item.widthPercent}%` }}
                 />
+                {baselineInfo && (
+                  <span
+                    className="exam-result__timeline-baseline"
+                    style={{ left: `${baselineInfo.widthPercent}%` }}
+                    data-testid="exam-result-timeline-baseline"
+                  />
+                )}
               </div>
               <div className="exam-result__timeline-meta">
                 <span className="exam-result__timeline-time">{item.elapsedText}</span>

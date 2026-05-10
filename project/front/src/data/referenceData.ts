@@ -82,7 +82,7 @@ export interface ReferenceChapter {
 }
 
 /** chapter01 / chapter02 / chapter05 / chapter08 の定義源 */
-export const REFERENCE_DATA: ReferenceChapter[] = [
+const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter01',
     sourcePath: 'ref/chapter01-what-is-inbasket.md',
@@ -156,6 +156,22 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
           {
             kind: 'paragraph',
             text: '論理的思考力や問題分析力そのものは武器になる。使いどころを「自分が解く」から「組織で処理する」に切り替えることが鍵になる。',
+          },
+        ],
+      },
+      {
+        id: 'chapter01-related-patterns',
+        title: '関連パターン',
+        blocks: [
+          {
+            kind: 'link-list',
+            items: [
+              {
+                label: '顧客クレーム（パターン1）',
+                href: '/patterns/1',
+                description: 'A優先度・並行対応の代表例で「組織で処理する」発想を実体験する',
+              },
+            ],
           },
         ],
       },
@@ -234,6 +250,22 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
           },
         ],
       },
+      {
+        id: 'chapter02-related-patterns',
+        title: '関連パターン',
+        blocks: [
+          {
+            kind: 'link-list',
+            items: [
+              {
+                label: '上位方針の伝達・対応（パターン17）',
+                href: '/patterns/17',
+                description: '評価ディメンションを答案に反映するための代表例',
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -286,6 +318,22 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
             kind: 'note',
             title: '答案での明示が加点ポイント',
             text: '「顧客影響が大きく緊急度が高いため最優先で対応する」のように、優先順位と理由を答案に書く。',
+          },
+        ],
+      },
+      {
+        id: 'chapter05-related-patterns',
+        title: '関連パターン',
+        blocks: [
+          {
+            kind: 'link-list',
+            items: [
+              {
+                label: '経費・備品（パターン10）',
+                href: '/patterns/10',
+                description: 'C優先度に振り分ける典型的な定型案件で配分判断を確認する',
+              },
+            ],
           },
         ],
       },
@@ -432,6 +480,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 href: '/reference/chapter05',
                 description: '時間配分の根拠となる優先度判断を確認する',
               },
+              {
+                label: '部下の退職・異動（パターン4）',
+                href: '/patterns/4',
+                description: '傾聴姿勢でマネージャー思考を実体験する関連パターン',
+              },
             ],
           },
         ],
@@ -505,6 +558,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 label: '優先順位づけの技術',
                 href: '/reference/chapter05',
                 description: '配分の前提となる優先度判定を確認する',
+              },
+              {
+                label: '部下の有給（パターン7）',
+                href: '/patterns/7',
+                description: '短時間定型案件の配分目安を実例で確認する',
               },
             ],
           },
@@ -580,6 +638,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 href: '/reference/chapter02',
                 description: '評価ディメンションと3点セットの対応を確認する',
               },
+              {
+                label: '複合案件（パターン20）',
+                href: '/patterns/20',
+                description: '判断・理由・指示の3点セットを複合案件で適用する関連パターン',
+              },
             ],
           },
         ],
@@ -653,6 +716,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 label: '案件パターン別攻略',
                 href: '/reference/chapter08',
                 description: 'パターンごとの委任先候補を確認する',
+              },
+              {
+                label: '新規取引・営業案件（パターン3）',
+                href: '/patterns/3',
+                description: '委任先と裁量範囲の設計を実例で確認する',
               },
             ],
           },
@@ -728,6 +796,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 href: '/reference/chapter06',
                 description: '3点セットと書き方の対応を確認する',
               },
+              {
+                label: '取引先からの要求（パターン2）',
+                href: '/patterns/2',
+                description: '事実と判断を切り分けて記述する代表例',
+              },
             ],
           },
         ],
@@ -800,6 +873,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 label: '採点基準を逆算する',
                 href: '/reference/chapter02',
                 description: '振り返りのディメンションを確認する',
+              },
+              {
+                label: '部下のパフォーマンス（パターン6）',
+                href: '/patterns/6',
+                description: '模試の振り返り素材として典型的な人事系パターンを確認する',
               },
             ],
           },
@@ -876,6 +954,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 href: '/reference/chapter10',
                 description: '振り返りの素材となる模試運用を確認する',
               },
+              {
+                label: 'コンプライアンス違反通報（パターン15）',
+                href: '/patterns/15',
+                description: '弱点になりやすいリスク系の改善サイクル素材を確認する',
+              },
             ],
           },
         ],
@@ -951,6 +1034,11 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
                 href: '/reference/chapter04',
                 description: '残り時間ごとの判断基盤を確認する',
               },
+              {
+                label: 'プロジェクト遅延・品質問題（パターン9）',
+                href: '/patterns/9',
+                description: '想定外が起きやすいパターンで残り時間ごとの行動表を当てはめる',
+              },
             ],
           },
         ],
@@ -958,6 +1046,17 @@ export const REFERENCE_DATA: ReferenceChapter[] = [
     ],
   },
 ];
+
+/**
+ * PBI-083 / TASK-083-2: REFERENCE_DATA は章IDの昇順（chapter01..chapter12）に並べる。
+ * REFERENCE_DATA_SOURCE 内の宣言順は歴史的経緯（PBI-056→PBI-080）で非順序のため、
+ * 利用側に提供する配列は localeCompare で常に章番号昇順に揃える。
+ * これにより ReferencePage.tsx の getChapterNavInfo で計算する prev/next が
+ * 章番号通り（例: chapter03 prev=chapter02 / next=chapter04）になる。
+ */
+export const REFERENCE_DATA: ReferenceChapter[] = [...REFERENCE_DATA_SOURCE].sort((a, b) =>
+  a.id.localeCompare(b.id),
+);
 
 /** 章IDからリファレンス章を取得する */
 export function findReferenceChapterById(id: ReferenceChapterId): ReferenceChapter | undefined {

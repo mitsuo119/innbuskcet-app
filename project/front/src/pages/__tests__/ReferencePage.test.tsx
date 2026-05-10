@@ -56,7 +56,7 @@ describe('PBI-056 解説リファレンス画面', () => {
       expect(html).toContain('href="#reference-chapter-nav"');
     });
 
-    it('先頭章（chapter01）の前の章は aria-disabled、末尾章（chapter08）の次の章は aria-disabled', () => {
+    it('先頭章（chapter01）の前の章は aria-disabled、末尾章（chapter12）の次の章は aria-disabled', () => {
       const html = renderToStaticMarkup(<ReferencePage />);
 
       // chapter01 セクションを取り出す
@@ -71,15 +71,15 @@ describe('PBI-056 解説リファレンス画面', () => {
       expect(ch01Block).toContain('（最初の章です）');
       expect(ch01Block).toContain('href="/reference/chapter02"');
 
-      // chapter08 セクション（末尾章）
-      const ch08Start = html.indexOf('id="reference-chapter08"');
-      const ch08Block = html.slice(ch08Start);
-      expect(ch08Block).toMatch(
+      // chapter12 セクション（末尾章 / PBI-083 全12章展開後）
+      const ch12Start = html.indexOf('id="reference-chapter12"');
+      const ch12Block = html.slice(ch12Start);
+      expect(ch12Block).toMatch(
         /reference-page__pager-link--next[^"]*reference-page__pager-link--disabled/,
       );
-      expect(ch08Block).toContain('（最後の章です）');
-      // 直前章 chapter05 へのリンクが存在する
-      expect(ch08Block).toContain('href="/reference/chapter05"');
+      expect(ch12Block).toContain('（最後の章です）');
+      // 直前章 chapter11 へのリンクが存在する
+      expect(ch12Block).toContain('href="/reference/chapter11"');
     });
 
     it('章スキップナビは番号バッジ＋章タイトルを表示する', () => {
@@ -100,6 +100,102 @@ describe('PBI-056 解説リファレンス画面', () => {
     it('スタイルは ReferencePage.css に集約されており TSX に inline style が無い', () => {
       // TASK-203 の局所化方針: コンポーネント側に style= 属性を持たせない
       expect(source).not.toMatch(/\sstyle=\{/);
+    });
+  });
+
+  describe('PBI-083 全12章への章末ナビ展開', () => {
+    it('全 12 章が描画され、章ごとに3導線（前/一覧/次）が確実に存在する', () => {
+      const html = renderToStaticMarkup(<ReferencePage />);
+      // 12 章 × 3 導線 = 36 件のページャーリンクが期待値
+      const pagerCount = (html.match(/reference-page__pager-link/g) ?? []).length;
+      expect(pagerCount).toBeGreaterThanOrEqual(36);
+
+      const ids = [
+        'chapter01',
+        'chapter02',
+        'chapter03',
+        'chapter04',
+        'chapter05',
+        'chapter06',
+        'chapter07',
+        'chapter08',
+        'chapter09',
+        'chapter10',
+        'chapter11',
+        'chapter12',
+      ] as const;
+      for (const id of ids) {
+        expect(html).toContain(`id="reference-${id}"`);
+      }
+    });
+
+    it('chapter03〜chapter11 の中間章には disabled なページャーが現れず、前後章リンクが正しく配置される', () => {
+      const html = renderToStaticMarkup(<ReferencePage />);
+      const middle = [
+        { id: 'chapter03', prev: 'chapter02', next: 'chapter04' },
+        { id: 'chapter04', prev: 'chapter03', next: 'chapter05' },
+        { id: 'chapter05', prev: 'chapter04', next: 'chapter06' },
+        { id: 'chapter06', prev: 'chapter05', next: 'chapter07' },
+        { id: 'chapter07', prev: 'chapter06', next: 'chapter08' },
+        { id: 'chapter08', prev: 'chapter07', next: 'chapter09' },
+        { id: 'chapter09', prev: 'chapter08', next: 'chapter10' },
+        { id: 'chapter10', prev: 'chapter09', next: 'chapter11' },
+        { id: 'chapter11', prev: 'chapter10', next: 'chapter12' },
+      ] as const;
+
+      for (const m of middle) {
+        const start = html.indexOf(`id="reference-${m.id}"`);
+        const nextIdx = html.indexOf(`id="reference-${m.next}"`);
+        const block = html.slice(start, nextIdx);
+        // 各中間章の章末ナビ内に prev/next の双方リンクが存在
+        expect(block).toContain(`href="/reference/${m.prev}"`);
+        expect(block).toContain(`href="/reference/${m.next}"`);
+        // 中間章は disabled が付与されない（章末ナビ内の Pager で）
+        const pagerSection = block.slice(block.lastIndexOf('reference-page__pager'));
+        expect(pagerSection).not.toContain('reference-page__pager-link--disabled');
+      }
+    });
+
+    it('末尾章 chapter12 の next は aria-disabled で「（最後の章です）」が表示される', () => {
+      const html = renderToStaticMarkup(<ReferencePage />);
+      const start = html.indexOf('id="reference-chapter12"');
+      const block = html.slice(start);
+      expect(block).toMatch(
+        /reference-page__pager-link--next[^"]*reference-page__pager-link--disabled/,
+      );
+      expect(block).toContain('aria-disabled="true"');
+      expect(block).toContain('（最後の章です）');
+      // 直前章 chapter11 への prev リンクが存在
+      expect(block).toContain('href="/reference/chapter11"');
+    });
+
+    it('全 12 章で関連案件パターン（/patterns/:id）への内部リンクが章本文末尾に1件以上存在する', () => {
+      const html = renderToStaticMarkup(<ReferencePage />);
+      const ids = [
+        'chapter01',
+        'chapter02',
+        'chapter03',
+        'chapter04',
+        'chapter05',
+        'chapter06',
+        'chapter07',
+        'chapter08',
+        'chapter09',
+        'chapter10',
+        'chapter11',
+        'chapter12',
+      ] as const;
+      // 各章の <article> 範囲（次の章の article 開始まで、最後の章は末尾まで）に
+      // /patterns/:id への内部リンクが少なくとも1件出現する
+      for (let i = 0; i < ids.length; i++) {
+        const start = html.indexOf(`id="reference-${ids[i]}"`);
+        const end = i < ids.length - 1 ? html.indexOf(`id="reference-${ids[i + 1]}"`) : html.length;
+        const block = html.slice(start, end);
+        // 章末ナビ（pager）より前の本文末尾セクションに /patterns/:id があること
+        const pagerStart = block.indexOf('reference-page__chapter-pager');
+        const beforePager = pagerStart >= 0 ? block.slice(0, pagerStart) : block;
+        expect(beforePager).toMatch(/href="\/patterns\/\d+"/);
+      }
     });
   });
 });

@@ -1483,8 +1483,10 @@ body {
   width: 100%;
   border-radius: 999px;
   background: var(--color-surface-muted);
-  overflow: hidden;
+  /* PBI-074: 平均基準線（縦破線）が track 上下にはみ出して見えるよう
+   * overflow: hidden は採用せず、fill 側の border-radius で角丸を担保する。 */
   min-width: 0;
+  position: relative;
 }
 
 .exam-result__timeline-fill {
@@ -1499,6 +1501,37 @@ body {
 
 .exam-result__timeline-fill--over {
   background: var(--color-danger-text);
+}
+
+/* PBI-074: 平均基準線（90分 ÷ 問題数）。
+ * - 縦の破線で塗り棒と視覚的に差別化（破線スタイル＋枠付き）。
+ * - var(--color-text) を border-color に用い、ライト/ダーク両テーマでコントラスト AA を確保。
+ * - track は overflow:hidden だが基準線は track 内 absolute なので非表示にならない。
+ */
+.exam-result__timeline-baseline {
+  position: absolute;
+  top: -0.15rem;
+  bottom: -0.15rem;
+  width: 0;
+  border-left: 2px dashed var(--color-text);
+  pointer-events: none;
+  transform: translateX(-1px);
+}
+
+.exam-result__timeline-baseline-legend {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.exam-result__timeline-baseline-swatch {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0;
+  border-top: 2px dashed var(--color-text);
 }
 
 .exam-result__timeline-meta {

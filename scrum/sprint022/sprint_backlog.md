@@ -139,6 +139,17 @@
 - [ ] PBI-080: 本番で `/reference/chapter03..12` 8 章がインデックス可能（同上 30 分以内に中村）
 - [x] **K-1**: Search Console KPI 4 種を `seo_operations.md` §9 計測ログへ追記（DAY5 完了・中村）。本番デプロイ前のためクロール待ち＝測定 0 期として記録、本計測は Sprint023 DAY1 に実施。
 
+### 公開後確認・Sprint023 DAY1 D1-d 実施結果（2026-09-30 山本＋中村）
+
+> **本番未到達のため C1〜C3 はすべて未実施 / インピディメント `IMP-002` 起票で対応継続**
+>
+> - 本番 URL `https://katuz.github.io/ai-scrum-inbuscket/` を `Invoke-WebRequest` で確認したところ「Site not found」(404) を返却（DAY1 午前・中村確認）
+> - GitHub Pages 設定未有効（または別ドメイン配信）の疑い → `IMP-002` として `impediment_log.csv` 起票（中村・2026-09-30）
+> - C1（`/cases/:id` × 20）／C2（`/patterns/:id` × 20）／C3（`/reference/chapter03..12` × 8）の Search Console URL 検査は **本番到達後に再実施** する運用へ切替
+> - 技術 SEO 退行ゼロは `vitest run` 565 PASS（`Router.seo.test.tsx` 13 / `seo-assets.test.ts` 33 / `routes.test.ts` 10 / `sitemap-coverage.test.ts` 5）で代理担保継続
+> - A-98「測定前提条件」運用に従い「本番未到達」を §9 Sprint022（更新）行に明示済（[seo_operations.md](../../project/docs/seo_operations.md) §9）
+> - Sprint023 中に `IMP-002` 解消が達成された場合、本欄および §9 Sprint022 / Sprint023 行を実測値で上書き更新する（責任者：中村）
+
 ---
 
 ## 助っ人向け事前メモ（A-96 継続・DAY3 着手 / DAY4 完成）

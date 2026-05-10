@@ -1,1 +1,2 @@
 id,title,description,reported_by,reported_at,status,resolved_at,resolution,sprint
+IMP-002,GitHub Pages 本番 URL が 404,Sprint023 DAY1 ハンドオフ TASK-D1-a で本番 URL https://katuz.github.io/ai-scrum-inbuscket/ を確認したところ「Site not found」(404) を返却。GitHub Pages 設定未有効または別ドメイン配信の可能性。K-1/K-1'/C1〜C3 の本番計測がブロックされ A-98「本番未到達」運用へ切替。代理計測（dist Lighthouse・vitest 565）で技術 SEO 退行ゼロは継続担保。,中村,2026-09-30,Open,,,sprint023
