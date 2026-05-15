@@ -704,6 +704,43 @@ export default function App() {
           )}
         </header>
 
+        {/*
+          PBI-090 / TASK-090-1: トップ本文「このサイトについて」段落（200〜400字）。
+          AdSense クローラ・JS 無効環境向けに、本サイトの目的・対象読者・無料学習である旨と、
+          主要コンテンツ（全12章解説 / 20パターン / 20ケース / Quick/Deep/Exam の3モード）を
+          プレーンテキスト中心で表示する。h1（既存「インバスケット」）→ h2（本セクション）の
+          見出し階層を維持し、a11y 退行ゼロを担保する。
+        */}
+        <section className="home-about" aria-labelledby="home-about-heading">
+          <h2 id="home-about-heading" className="home-about__title">
+            このサイトについて
+          </h2>
+          <p className="home-about__lead">
+            InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、
+            案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験まで、
+            ブラウザ上で体系的に<strong>無料</strong>で学べる日本語の学習Webサービスです。
+          </p>
+          <p className="home-about__lead">
+            想定読者は、管理職昇進試験を控える社会人や、優先順位判断・委任・意思決定スキルを
+            体系的に学びたい方です。コンテンツは、全12章の解説リファレンス、
+            全20パターンのケース別解説、代表ケース20件の単独URL演習、
+            <strong>Quick（速習）</strong>／<strong>Deep（記述）</strong>／
+            <strong>Exam（模試）</strong>
+            の3つの学習モードで構成され、繰り返しの訓練を通じて合格水準の判断力と回答骨格を身につけられます。
+          </p>
+          <p className="home-about__links">
+            詳細は
+            <a href="/about" className="home-about__link">
+              運営者情報
+            </a>
+            ／
+            <a href="/terms" className="home-about__link">
+              サービス利用規約
+            </a>
+            をご覧ください。
+          </p>
+        </section>
+
         <AdSlot label="広告（ヘッダー下バナー）" className="ad-slot--header" />
 
         {examResult ? (
@@ -837,6 +874,30 @@ export default function App() {
                 </span>
                 <a href="/terms-of-service" className="app-footer__legal-link">
                   利用規約
+                </a>
+                <span className="app-footer__legal-sep" aria-hidden="true">
+                  |
+                </span>
+                <a href="/contact" className="app-footer__legal-link">
+                  お問い合わせ
+                </a>
+              </nav>
+              {/* PBI-088 / 089 (TASK-088-1 / TASK-089-1): AdSense再申請向け運営者情報・利用規約 短URL動線 */}
+              <nav className="app-footer__legal" aria-label="運営者情報・規約（短URL）">
+                <a href="/about" className="app-footer__legal-link">
+                  運営者情報
+                </a>
+                <span className="app-footer__legal-sep" aria-hidden="true">
+                  |
+                </span>
+                <a href="/terms" className="app-footer__legal-link">
+                  サービス利用規約
+                </a>
+                <span className="app-footer__legal-sep" aria-hidden="true">
+                  |
+                </span>
+                <a href="/privacy-policy" className="app-footer__legal-link">
+                  プライバシー
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |

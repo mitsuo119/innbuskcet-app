@@ -33,6 +33,8 @@ import { REFERENCE_DATA, type ReferenceChapterId } from './data/referenceData';
 import { findPatternById } from './data/patternData';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
+import { About } from './pages/About';
+import { Terms } from './pages/Terms';
 import { Contact } from './pages/Contact';
 import { PatternList } from './pages/PatternList';
 import { PatternDetail } from './pages/PatternDetail';
@@ -138,6 +140,22 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
       return {
         title: '利用規約',
         description: 'インバスケット学習アプリの利用条件と禁止事項を記載しています。',
+      };
+    case 'about':
+      // PBI-088 / TASK-088-1: 運営者情報ページ。title/description を他ルートと一意にして
+      // PBI-078 のメタ重複検知テスト（`Router.seo.test.tsx`）を通す。
+      return {
+        title: '運営者情報',
+        description:
+          'インバスケット学習アプリ InBusket の運営者・サイト目的・コンテンツ作成方針・連絡手段・更新ポリシーをまとめた運営者情報ページです。',
+      };
+    case 'terms':
+      // PBI-089 / TASK-089-1: サービス利用規約ページ（短い canonical URL 版）。
+      // 既存 /terms-of-service（「利用規約」）とは title/description を一意にする。
+      return {
+        title: 'サービス利用規約',
+        description:
+          'インバスケット学習アプリ InBusket の利用条件・免責・著作権・禁止事項・準拠法・改定方針を簡潔にまとめたサービス利用規約の要旨ページです。',
       };
     case 'contact':
       return {
@@ -295,6 +313,8 @@ export type AppPage =
   | 'home'
   | 'privacy-policy'
   | 'terms-of-service'
+  | 'about'
+  | 'terms'
   | 'contact'
   | 'patterns'
   | 'pattern-detail'
@@ -327,6 +347,12 @@ function parsePathname(): RouterState {
   }
   if (path === '/terms-of-service') {
     return { page: 'terms-of-service', patternId: null, caseId: null, referenceChapterId: null };
+  }
+  if (path === '/about') {
+    return { page: 'about', patternId: null, caseId: null, referenceChapterId: null };
+  }
+  if (path === '/terms') {
+    return { page: 'terms', patternId: null, caseId: null, referenceChapterId: null };
   }
   if (path === '/contact') {
     return { page: 'contact', patternId: null, caseId: null, referenceChapterId: null };
@@ -485,6 +511,10 @@ export function Router() {
       return <PrivacyPolicy />;
     case 'terms-of-service':
       return <TermsOfService />;
+    case 'about':
+      return <About />;
+    case 'terms':
+      return <Terms />;
     case 'contact':
       return <Contact />;
     case 'patterns':

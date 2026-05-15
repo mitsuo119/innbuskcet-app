@@ -41,6 +41,8 @@ export interface PublicRoute {
  */
 export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   { path: '/', changefreq: 'weekly', priority: 1.0 },
+  { path: '/about', changefreq: 'monthly', priority: 0.5 },
+  { path: '/terms', changefreq: 'yearly', priority: 0.3 },
   { path: '/patterns', changefreq: 'monthly', priority: 0.8 },
   { path: '/reference', changefreq: 'monthly', priority: 0.8 },
   { path: '/reference/chapter01', changefreq: 'monthly', priority: 0.7 },

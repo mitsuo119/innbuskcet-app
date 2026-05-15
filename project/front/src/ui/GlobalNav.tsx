@@ -12,6 +12,8 @@ export type GlobalNavPage =
   | 'home'
   | 'reference'
   | 'patterns'
+  | 'about'
+  | 'terms'
   | 'privacy-policy'
   | 'terms-of-service'
   | 'contact';
@@ -26,14 +28,16 @@ interface NavItem {
 }
 
 /**
- * ナビ項目定義（順序固定: 問題回答 → 解説 → パターン → 法務）。
+ * ナビ項目定義（順序固定: 問題回答 → 解説 → パターン → 運営者情報 → 法務）。
  * - 「法務」枠はプライバシーポリシーを代表表示とし、規約・お問い合わせはページ内の
  *   既存リンクから辿れる構成（PBI-051 整合）。
+ * - PBI-088 / TASK-088-1: AdSense 再申請要件として /about をナビ追加。
  */
 const NAV_ITEMS: readonly NavItem[] = [
   { id: 'home', label: '問題回答', href: '/' },
   { id: 'reference', label: '解説リファレンス', href: '/reference' },
   { id: 'patterns', label: 'パターン別解説', href: '/patterns' },
+  { id: 'about', label: '運営者情報', href: '/about' },
   { id: 'privacy-policy', label: 'プライバシー', href: '/privacy-policy' },
 ];
 

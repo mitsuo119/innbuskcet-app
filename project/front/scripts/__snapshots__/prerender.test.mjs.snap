@@ -1,0 +1,55 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/ ルート / 退行検知） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。" />
+    <link rel="canonical" href="https://example.test/" />
+    <meta property="og:title" content="インバスケット - 学習アプリ" />
+    <meta property="og:description" content="管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。" />
+    <meta property="og:url" content="https://example.test/" />
+    <meta name="twitter:title" content="インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。" />
+    <title>インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="home" hidden aria-hidden="true">
+        <h1>インバスケット</h1>
+        <p>InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験まで、ブラウザ上で体系的に無料で学べる日本語の学習Webサービスです。</p>
+        <p>想定読者は管理職昇進試験を控える社会人や、優先順位判断・委任・意思決定スキルを体系的に学びたい方です。コンテンツは全12章の解説リファレンス、全20パターンのケース別解説、代表ケース20件の単独URL演習、Quick（速習）／Deep（記述）／Exam（模試）の3つの学習モードで構成されます。</p>
+        <p>詳細は <a href="/about">運営者情報</a> ／ <a href="/terms">サービス利用規約</a> をご覧ください。</p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/reference/chapter01 ルート / 退行検知） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット学習の「インバスケットとは何か」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <link rel="canonical" href="https://example.test/reference/chapter01" />
+    <meta property="og:title" content="解説リファレンス：インバスケットとは何か | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット学習の「インバスケットとは何か」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <meta property="og:url" content="https://example.test/reference/chapter01" />
+    <meta name="twitter:title" content="解説リファレンス：インバスケットとは何か | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット学習の「インバスケットとは何か」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <title>解説リファレンス：インバスケットとは何か | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="reference-chapter01" hidden aria-hidden="true">
+        <h1>解説リファレンス：インバスケットとは何か</h1>
+        <p>インバスケット試験は、架空の管理職に着任した初日に未処理案件を制限時間内で処理するシミュレーションです。評価対象は「承認したか」よりも、なぜそう判断し、誰にどう指示したかというマネージャーとしての行動パターンです。</p>
+        <p>本章では試験の正体と、エンジニアが求められる思考シフト（プレイヤー思考からマネージャー思考へ）を整理します。論理的思考力や問題分析力そのものは武器になりますが、使いどころを「自分が解く」から「組織で処理する」に切り替えることが合格の鍵です。</p>
+        <p>関連パターン：<a href="/patterns/1">顧客クレーム（パターン1）</a> — A優先度・並行対応の代表例で「組織で処理する」発想を実体験できます。</p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
