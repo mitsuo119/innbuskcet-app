@@ -20,7 +20,7 @@ export function About() {
         </a>
         <GlobalNav current="about" />
         <h1 className="legal-title">運営者情報（このサイトについて）</h1>
-        <p className="legal-updated">最終更新日: 2026年10月8日</p>
+        <p className="legal-updated">最終更新日: 2026年5月16日</p>
       </header>
 
       <main className="legal-body">

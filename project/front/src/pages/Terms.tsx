@@ -24,7 +24,7 @@ export function Terms() {
         </a>
         <GlobalNav current="terms" />
         <h1 className="legal-title">サービス利用規約</h1>
-        <p className="legal-updated">最終更新日: 2026年10月8日</p>
+        <p className="legal-updated">最終更新日: 2026年5月16日</p>
       </header>
 
       <main className="legal-body">

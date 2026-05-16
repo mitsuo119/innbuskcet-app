@@ -7,6 +7,7 @@
  * - dangerouslySetInnerHTML 不使用（XSS対策）
  */
 import { findPatternById, type PatternPriority } from '../data/patternData';
+import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 
 interface Props {
@@ -42,6 +43,13 @@ export function PatternDetail({ patternId }: Props) {
           ← 一覧に戻る
         </a>
         <GlobalNav current="patterns" />
+        <Breadcrumb
+          items={[
+            { label: 'ホーム', href: '/' },
+            { label: 'パターン別解説', href: '/patterns' },
+            { label: `パターン${pattern.id}「${pattern.name}」` },
+          ]}
+        />
         <h1 className="legal-title">
           パターン{pattern.id}：{pattern.name}
         </h1>

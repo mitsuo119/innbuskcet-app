@@ -9,6 +9,7 @@
  */
 import casesData from '../data/cases.json';
 import { CASE_DETAIL_META_BY_ID, type CaseDetailMeta } from '../routes';
+import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 
 interface CaseRecord {
@@ -62,6 +63,17 @@ export function CaseDetail({ caseId }: Props) {
           ← パターン一覧へ
         </a>
         <GlobalNav current="patterns" />
+        <Breadcrumb
+          items={[
+            { label: 'ホーム', href: '/' },
+            { label: 'パターン別解説', href: '/patterns' },
+            {
+              label: `パターン${meta.patternId}「${meta.patternName}」`,
+              href: `/patterns/${meta.patternId}`,
+            },
+            { label: `ケース${record.id.replace('case-', '')}（${meta.difficulty}）` },
+          ]}
+        />
         <h1 className="legal-title">
           ケース{record.id.replace('case-', '')}：{record.title}
         </h1>

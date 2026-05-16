@@ -18,7 +18,7 @@ export function PrivacyPolicy() {
         </a>
         <GlobalNav current="privacy-policy" />
         <h1 className="legal-title">プライバシーポリシー</h1>
-        <p className="legal-updated">最終更新日: 2026年7月15日</p>
+        <p className="legal-updated">最終更新日: 2026年5月16日</p>
       </header>
 
       <main className="legal-body">

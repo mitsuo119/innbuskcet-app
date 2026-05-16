@@ -103,9 +103,13 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
       const pattern = state.patternId ? findPatternById(state.patternId) : undefined;
       if (pattern) {
         // PBI-078 / TASK-078-2: パターン名・ID を description に注入し、他パターンページとの重複を防止する。
+        // PBI-091 / TASK-091-1（Sprint025 DAY5）: パンくず BreadcrumbList JSON-LD を注入する。
+        const jsonLd = buildPatternBreadcrumbJsonLd(pattern.id, pattern.name);
         return {
           title: `パターン${pattern.id}：${pattern.name}`,
           description: `インバスケット案件パターン${pattern.id}「${pattern.name}」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。`,
+          jsonLd,
+          jsonLdKey: 'pattern-detail',
         };
       }
       return {
@@ -275,6 +279,31 @@ function buildChapterBreadcrumbJsonLd(
         position: 3,
         name: chapterTitle,
         item: `${origin}/reference/${chapterId}`,
+      },
+    ],
+  };
+}
+
+/**
+ * パターン詳細ページの BreadcrumbList JSON-LD を生成する（PBI-091 / TASK-091-1 / Sprint025 DAY5）。
+ * 階層: トップ → パターン別解説 → パターン{N}「{name}」
+ */
+function buildPatternBreadcrumbJsonLd(
+  patternId: number,
+  patternName: string,
+): Record<string, unknown> {
+  const origin = window.location.origin;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${origin}/` },
+      { '@type': 'ListItem', position: 2, name: 'パターン別解説', item: `${origin}/patterns` },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: `パターン${patternId}「${patternName}」`,
+        item: `${origin}/patterns/${patternId}`,
       },
     ],
   };

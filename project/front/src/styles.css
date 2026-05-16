@@ -2962,3 +2962,119 @@ body {
     width: 100%;
   }
 }
+
+
+/* ============================================================
+   PBI-091 / TASK-091-1（Sprint025 DAY5）
+   パンくず視覚UI - ホーム→中間→現在地の3〜4階層を順序リストで表現
+   - ライト/ダーク両テーマで AA コントラスト確保（color-text-muted / color-text）
+   - 375px 幅でも横スクロール不要（flex-wrap）
+   - タップ領域 44px 以上（min-height: 44px のリンク余白）
+   ============================================================ */
+.breadcrumb {
+  margin: 0.75rem 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.breadcrumb__list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.4rem;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.breadcrumb__link {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  padding: 0.35rem 0.1rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.breadcrumb__link:hover,
+.breadcrumb__link:focus-visible {
+  color: var(--color-link-hover, var(--color-link));
+  text-decoration-thickness: 2px;
+}
+
+.breadcrumb__current {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.breadcrumb__sep {
+  color: var(--color-text-muted);
+  margin: 0 0.25rem;
+  user-select: none;
+}
+
+
+
+/* ============================================================
+   PBI-091 / TASK-091-1（Sprint025 DAY5）
+   パンくず視覚UI - ホーム→中間→現在地の3〜4階層を順序リストで表現
+   - ライト/ダーク両テーマで AA コントラスト確保（color-text-muted / color-text）
+   - 375px 幅でも横スクロール不要（flex-wrap）
+   - タップ領域 44px 以上（min-height: 44px のリンク余白）
+   ============================================================ */
+.breadcrumb {
+  margin: 0.75rem 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.breadcrumb__list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.4rem;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.breadcrumb__link {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  padding: 0.35rem 0.1rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.breadcrumb__link:hover,
+.breadcrumb__link:focus-visible {
+  color: var(--color-link-hover, var(--color-link));
+  text-decoration-thickness: 2px;
+}
+
+.breadcrumb__current {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.breadcrumb__sep {
+  color: var(--color-text-muted);
+  margin: 0 0.25rem;
+  user-select: none;
+}
+

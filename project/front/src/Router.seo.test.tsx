@@ -391,3 +391,233 @@ describe('PBI-080 解説リファレンス章 JSON-LD（BreadcrumbList）', () =
     expect(titles.size).toBe(SITEMAP_REFERENCE_CHAPTER_IDS.length);
   });
 });
+
+
+/**
+ * PBI-091 / TASK-091-1（Sprint025 DAY5）: パンくず BreadcrumbList JSON-LD 拡張
+ * - パターン詳細（/patterns/:id）に BreadcrumbList JSON-LD（itemListElement 3 件）が注入される
+ * - 3 系統（reference-chapter / case-detail / pattern-detail）の routeKey 切替時に残留しない
+ * - パターン詳細以外のルートでは pattern-detail JSON-LD が撤去される
+ */
+describe('PBI-091 パターン詳細 JSON-LD（BreadcrumbList）', () => {
+  let container: HTMLDivElement;
+  let root: Root;
+  const initialTitle = document.title;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+    window.history.replaceState(null, '', '/');
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+    window.history.replaceState(null, '', '/');
+    document.title = initialTitle;
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  it('TASK-091-1: 代表 3 パターン（1/10/20）で BreadcrumbList JSON-LD が 1 件だけ注入される', () => {
+    for (const id of [1, 10, 20]) {
+      window.history.replaceState(null, '', `/patterns/${id}`);
+      act(() => {
+        root.render(<Router />);
+      });
+
+      const scripts = document.querySelectorAll(
+        'script[type="application/ld+json"][data-route-jsonld="pattern-detail"]',
+      );
+      expect(scripts, `/patterns/${id} で JSON-LD タグが 1 つではない`).toHaveLength(1);
+
+      const json = JSON.parse(scripts[0]?.textContent ?? '{}') as {
+        '@context'?: string;
+        '@type'?: string;
+        itemListElement?: unknown[];
+      };
+      expect(json['@context']).toBe('https://schema.org');
+      expect(json['@type']).toBe('BreadcrumbList');
+      expect(json.itemListElement).toHaveLength(3);
+
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+
+  it('TASK-091-1: パターン詳細以外のルートでは pattern-detail JSON-LD が残留しない', () => {
+    window.history.replaceState(null, '', '/patterns/1');
+    act(() => {
+      root.render(<Router />);
+    });
+    expect(
+      document.querySelector(
+        'script[type="application/ld+json"][data-route-jsonld="pattern-detail"]',
+      ),
+    ).not.toBeNull();
+
+    act(() => {
+      root.unmount();
+    });
+    root = createRoot(container);
+
+    for (const path of ['/', '/patterns', '/reference/chapter01', '/cases/case-001']) {
+      window.history.replaceState(null, '', path);
+      act(() => {
+        root.render(<Router />);
+      });
+      expect(
+        document.querySelector(
+          'script[type="application/ld+json"][data-route-jsonld="pattern-detail"]',
+        ),
+        `${path} で pattern-detail JSON-LD が残留している`,
+      ).toBeNull();
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+
+  it('TASK-091-1: 3 系統ルートで視覚パンくず（nav[aria-label="パンくず"]）が表示される', () => {
+    for (const path of ['/patterns/1', '/cases/case-001', '/reference/chapter01']) {
+      window.history.replaceState(null, '', path);
+      act(() => {
+        root.render(<Router />);
+      });
+      const nav = container.querySelector('nav[aria-label="パンくず"]');
+      expect(nav, `${path} で視覚パンくず nav が存在しない`).not.toBeNull();
+      // 現在地は aria-current="page" の span として表示される（リンク化されない）。
+      const current = nav?.querySelector('[aria-current="page"]');
+      expect(current, `${path} で現在地（aria-current="page"）が存在しない`).not.toBeNull();
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+});
+
+
+/**
+ * PBI-091 / TASK-091-1（Sprint025 DAY5）: パンくず BreadcrumbList JSON-LD 拡張
+ * - パターン詳細（/patterns/:id）に BreadcrumbList JSON-LD（itemListElement 3 件）が注入される
+ * - 3 系統（reference-chapter / case-detail / pattern-detail）の routeKey 切替時に残留しない
+ * - パターン詳細以外のルートでは pattern-detail JSON-LD が撤去される
+ */
+describe('PBI-091 パターン詳細 JSON-LD（BreadcrumbList）', () => {
+  let container: HTMLDivElement;
+  let root: Root;
+  const initialTitle = document.title;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+    window.history.replaceState(null, '', '/');
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+    window.history.replaceState(null, '', '/');
+    document.title = initialTitle;
+    document
+      .querySelectorAll('script[type="application/ld+json"][data-route-jsonld]')
+      .forEach((node) => node.remove());
+  });
+
+  it('TASK-091-1: 代表 3 パターン（1/10/20）で BreadcrumbList JSON-LD が 1 件だけ注入される', () => {
+    for (const id of [1, 10, 20]) {
+      window.history.replaceState(null, '', `/patterns/${id}`);
+      act(() => {
+        root.render(<Router />);
+      });
+
+      const scripts = document.querySelectorAll(
+        'script[type="application/ld+json"][data-route-jsonld="pattern-detail"]',
+      );
+      expect(scripts, `/patterns/${id} で JSON-LD タグが 1 つではない`).toHaveLength(1);
+
+      const json = JSON.parse(scripts[0]?.textContent ?? '{}') as {
+        '@context'?: string;
+        '@type'?: string;
+        itemListElement?: unknown[];
+      };
+      expect(json['@context']).toBe('https://schema.org');
+      expect(json['@type']).toBe('BreadcrumbList');
+      expect(json.itemListElement).toHaveLength(3);
+
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+
+  it('TASK-091-1: パターン詳細以外のルートでは pattern-detail JSON-LD が残留しない', () => {
+    window.history.replaceState(null, '', '/patterns/1');
+    act(() => {
+      root.render(<Router />);
+    });
+    expect(
+      document.querySelector(
+        'script[type="application/ld+json"][data-route-jsonld="pattern-detail"]',
+      ),
+    ).not.toBeNull();
+
+    act(() => {
+      root.unmount();
+    });
+    root = createRoot(container);
+
+    for (const path of ['/', '/patterns', '/reference/chapter01', '/cases/case-001']) {
+      window.history.replaceState(null, '', path);
+      act(() => {
+        root.render(<Router />);
+      });
+      expect(
+        document.querySelector(
+          'script[type="application/ld+json"][data-route-jsonld="pattern-detail"]',
+        ),
+        `${path} で pattern-detail JSON-LD が残留している`,
+      ).toBeNull();
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+
+  it('TASK-091-1: 3 系統ルートで視覚パンくず（nav[aria-label="パンくず"]）が表示される', () => {
+    for (const path of ['/patterns/1', '/cases/case-001', '/reference/chapter01']) {
+      window.history.replaceState(null, '', path);
+      act(() => {
+        root.render(<Router />);
+      });
+      const nav = container.querySelector('nav[aria-label="パンくず"]');
+      expect(nav, `${path} で視覚パンくず nav が存在しない`).not.toBeNull();
+      // 現在地は aria-current="page" の span として表示される（リンク化されない）。
+      const current = nav?.querySelector('[aria-current="page"]');
+      expect(current, `${path} で現在地（aria-current="page"）が存在しない`).not.toBeNull();
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+    }
+  });
+});

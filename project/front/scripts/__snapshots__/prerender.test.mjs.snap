@@ -27,6 +27,168 @@ exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生�
 </html>"
 `;
 
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/cases/case-001 ルート / 第3段階先頭） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット代表ケース001（パターン1「顧客クレーム」・難易度上級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <link rel="canonical" href="https://example.test/cases/case-001" />
+    <meta property="og:title" content="ケース001：パターン1「顧客クレーム」（上級） | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット代表ケース001（パターン1「顧客クレーム」・難易度上級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <meta property="og:url" content="https://example.test/cases/case-001" />
+    <meta name="twitter:title" content="ケース001：パターン1「顧客クレーム」（上級） | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット代表ケース001（パターン1「顧客クレーム」・難易度上級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <title>ケース001：パターン1「顧客クレーム」（上級） | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="case-case-001" hidden aria-hidden="true">
+        <h1>ケース001：パターン1「顧客クレーム」（上級）</h1>
+        <p>本ページは代表ケース001を題材に、インバスケット試験で頻出する「顧客クレーム」（パターン1・難易度上級）の判断・指示・委任のポイントを、単独URLで体系的に学べるよう構成しています。</p>
+        <p>想定読者は管理職昇進試験などで「顧客クレーム」型の案件処理を訓練したい社会人です。本ケースを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。</p>
+        <p>関連リンク：<a href="/patterns/1">パターン1「顧客クレーム」</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/cases/case-029 ルート / 第3段階中央代表） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット代表ケース029（パターン9「プロジェクト遅延・品質問題」・難易度上級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <link rel="canonical" href="https://example.test/cases/case-029" />
+    <meta property="og:title" content="ケース029：パターン9「プロジェクト遅延・品質問題」（上級） | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット代表ケース029（パターン9「プロジェクト遅延・品質問題」・難易度上級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <meta property="og:url" content="https://example.test/cases/case-029" />
+    <meta name="twitter:title" content="ケース029：パターン9「プロジェクト遅延・品質問題」（上級） | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット代表ケース029（パターン9「プロジェクト遅延・品質問題」・難易度上級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <title>ケース029：パターン9「プロジェクト遅延・品質問題」（上級） | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="case-case-029" hidden aria-hidden="true">
+        <h1>ケース029：パターン9「プロジェクト遅延・品質問題」（上級）</h1>
+        <p>本ページは代表ケース029を題材に、インバスケット試験で頻出する「プロジェクト遅延・品質問題」（パターン9・難易度上級）の判断・指示・委任のポイントを、単独URLで体系的に学べるよう構成しています。</p>
+        <p>想定読者は管理職昇進試験などで「プロジェクト遅延・品質問題」型の案件処理を訓練したい社会人です。本ケースを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。</p>
+        <p>関連リンク：<a href="/patterns/9">パターン9「プロジェクト遅延・品質問題」</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/cases/case-053 ルート / 第3段階末尾） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット代表ケース053（パターン2「取引先からの要求（値引き・仕様変更等）」・難易度初級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <link rel="canonical" href="https://example.test/cases/case-053" />
+    <meta property="og:title" content="ケース053：パターン2「取引先からの要求（値引き・仕様変更等）」（初級） | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット代表ケース053（パターン2「取引先からの要求（値引き・仕様変更等）」・難易度初級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <meta property="og:url" content="https://example.test/cases/case-053" />
+    <meta name="twitter:title" content="ケース053：パターン2「取引先からの要求（値引き・仕様変更等）」（初級） | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット代表ケース053（パターン2「取引先からの要求（値引き・仕様変更等）」・難易度初級）の本文と解説、模範回答の骨格を確認できる単独URLページです。" />
+    <title>ケース053：パターン2「取引先からの要求（値引き・仕様変更等）」（初級） | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="case-case-053" hidden aria-hidden="true">
+        <h1>ケース053：パターン2「取引先からの要求（値引き・仕様変更等）」（初級）</h1>
+        <p>本ページは代表ケース053を題材に、インバスケット試験で頻出する「取引先からの要求（値引き・仕様変更等）」（パターン2・難易度初級）の判断・指示・委任のポイントを、単独URLで体系的に学べるよう構成しています。</p>
+        <p>想定読者は管理職昇進試験などで「取引先からの要求（値引き・仕様変更等）」型の案件処理を訓練したい社会人です。本ケースを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。</p>
+        <p>関連リンク：<a href="/patterns/2">パターン2「取引先からの要求（値引き・仕様変更等）」</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/patterns/1 ルート / 第4段階先頭代表） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット案件パターン1「顧客クレーム」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <link rel="canonical" href="https://example.test/patterns/1" />
+    <meta property="og:title" content="パターン1：顧客クレーム | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット案件パターン1「顧客クレーム」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <meta property="og:url" content="https://example.test/patterns/1" />
+    <meta name="twitter:title" content="パターン1：顧客クレーム | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット案件パターン1「顧客クレーム」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <title>パターン1：顧客クレーム | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="pattern-1" hidden aria-hidden="true">
+        <h1>パターン1：顧客クレーム</h1>
+        <p>本ページではインバスケット試験で頻出する案件パターン1「顧客クレーム」の特徴と優先度判定の観点、回答骨格（誰に・何を・いつまでに）を体系的に確認できます。</p>
+        <p>想定読者は管理職昇進試験などで「顧客クレーム」型の案件処理を訓練したい社会人です。本パターンを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。</p>
+        <p>関連リンク：<a href="/patterns">パターン別解説（全20パターン）</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/patterns/10 ルート / 第4段階中央代表） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット案件パターン10「予算承認・経費申請」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <link rel="canonical" href="https://example.test/patterns/10" />
+    <meta property="og:title" content="パターン10：予算承認・経費申請 | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット案件パターン10「予算承認・経費申請」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <meta property="og:url" content="https://example.test/patterns/10" />
+    <meta name="twitter:title" content="パターン10：予算承認・経費申請 | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット案件パターン10「予算承認・経費申請」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <title>パターン10：予算承認・経費申請 | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="pattern-10" hidden aria-hidden="true">
+        <h1>パターン10：予算承認・経費申請</h1>
+        <p>本ページではインバスケット試験で頻出する案件パターン10「予算承認・経費申請」の特徴と優先度判定の観点、回答骨格（誰に・何を・いつまでに）を体系的に確認できます。</p>
+        <p>想定読者は管理職昇進試験などで「予算承認・経費申請」型の案件処理を訓練したい社会人です。本パターンを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。</p>
+        <p>関連リンク：<a href="/patterns">パターン別解説（全20パターン）</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/patterns/20 ルート / 第4段階末尾） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット案件パターン20「複合案件（複数パターンの組み合わせ）」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <link rel="canonical" href="https://example.test/patterns/20" />
+    <meta property="og:title" content="パターン20：複合案件（複数パターンの組み合わせ） | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット案件パターン20「複合案件（複数パターンの組み合わせ）」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <meta property="og:url" content="https://example.test/patterns/20" />
+    <meta name="twitter:title" content="パターン20：複合案件（複数パターンの組み合わせ） | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット案件パターン20「複合案件（複数パターンの組み合わせ）」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。" />
+    <title>パターン20：複合案件（複数パターンの組み合わせ） | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="pattern-20" hidden aria-hidden="true">
+        <h1>パターン20：複合案件（複数パターンの組み合わせ）</h1>
+        <p>本ページではインバスケット試験で頻出する案件パターン20「複合案件（複数パターンの組み合わせ）」の特徴と優先度判定の観点、回答骨格（誰に・何を・いつまでに）を体系的に確認できます。</p>
+        <p>想定読者は管理職昇進試験などで「複合案件（複数パターンの組み合わせ）」型の案件処理を訓練したい社会人です。本パターンを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。</p>
+        <p>関連リンク：<a href="/patterns">パターン別解説（全20パターン）</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
 exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/reference/chapter01 ルート / 退行検知） 1`] = `
 "<!doctype html>
 <html lang="ja">
@@ -45,9 +207,63 @@ exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生�
   <body>
     <div id="root"><div data-prerender="reference-chapter01" hidden aria-hidden="true">
         <h1>解説リファレンス：インバスケットとは何か</h1>
-        <p>インバスケット試験は、架空の管理職に着任した初日に未処理案件を制限時間内で処理するシミュレーションです。評価対象は「承認したか」よりも、なぜそう判断し、誰にどう指示したかというマネージャーとしての行動パターンです。</p>
+        <p>インバスケット試験は架空の管理職に着任した初日に未処理案件を制限時間内で処理するシミュレーションです。評価対象は「承認したか」よりも、なぜそう判断し誰にどう指示したかというマネージャーとしての行動パターンです。</p>
         <p>本章では試験の正体と、エンジニアが求められる思考シフト（プレイヤー思考からマネージャー思考へ）を整理します。論理的思考力や問題分析力そのものは武器になりますが、使いどころを「自分が解く」から「組織で処理する」に切り替えることが合格の鍵です。</p>
-        <p>関連パターン：<a href="/patterns/1">顧客クレーム（パターン1）</a> — A優先度・並行対応の代表例で「組織で処理する」発想を実体験できます。</p>
+        <p>関連リンク：<a href="/patterns/1">顧客クレーム（パターン1）</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/reference/chapter06 ルート / 第2段階代表） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット学習の「意思決定フレームワーク」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <link rel="canonical" href="https://example.test/reference/chapter06" />
+    <meta property="og:title" content="解説リファレンス：意思決定フレームワーク | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット学習の「意思決定フレームワーク」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <meta property="og:url" content="https://example.test/reference/chapter06" />
+    <meta name="twitter:title" content="解説リファレンス：意思決定フレームワーク | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット学習の「意思決定フレームワーク」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <title>解説リファレンス：意思決定フレームワーク | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="reference-chapter06" hidden aria-hidden="true">
+        <h1>解説リファレンス：意思決定フレームワーク</h1>
+        <p>案件ごとの意思決定を場当たり的に行うと判断の質と速度がぶれます。フレームワーク化することで、限られた情報の中でも一貫した根拠で判断を下せるようになります。</p>
+        <p>本章では「事実確認 → 影響範囲評価 → 選択肢列挙 → 判断基準適用 → 指示・委任」の 5 ステップで意思決定を組み立てる手順を整理します。判断の根拠を 1 文で添える型は採点 6 軸の判断力／問題分析力を同時に押し上げます。</p>
+        <p>関連リンク：<a href="/reference/chapter07">委任と組織活用の技術（chapter07）</a></p>
+      </div></div>
+    <script type="module" src="/assets/index.js"></script>
+  </body>
+</html>"
+`;
+
+exports[`PBI-086 transformTemplateForRoute（view-source: 静的可視） > 生成 HTML 全体スナップショット（/reference/chapter12 ルート / 第2段階末尾） 1`] = `
+"<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="インバスケット学習の「本番当日の戦略」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <link rel="canonical" href="https://example.test/reference/chapter12" />
+    <meta property="og:title" content="解説リファレンス：本番当日の戦略 | インバスケット - 学習アプリ" />
+    <meta property="og:description" content="インバスケット学習の「本番当日の戦略」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <meta property="og:url" content="https://example.test/reference/chapter12" />
+    <meta name="twitter:title" content="解説リファレンス：本番当日の戦略 | インバスケット - 学習アプリ" />
+    <meta name="twitter:description" content="インバスケット学習の「本番当日の戦略」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。" />
+    <title>解説リファレンス：本番当日の戦略 | インバスケット - 学習アプリ</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"><div data-prerender="reference-chapter12" hidden aria-hidden="true">
+        <h1>解説リファレンス：本番当日の戦略</h1>
+        <p>本番当日のパフォーマンスは前日からの準備で 8 割決まります。持ち物・睡眠・到着時刻・直前の心構えまで設計しておくことで、当日の動揺要素を最小化できます。</p>
+        <p>本章では本番前日と当日朝の準備・試験開始 5 分間の動き・終了直前の見直しまで、得点を最大化するための行動計画を整理します。新しい解法を試さず練習通りに振る舞うことが当日最重要のルールです。</p>
+        <p>関連リンク：<a href="/reference/chapter10">模擬試験の進め方（chapter10）</a></p>
       </div></div>
     <script type="module" src="/assets/index.js"></script>
   </body>

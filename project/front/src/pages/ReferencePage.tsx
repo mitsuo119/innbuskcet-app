@@ -5,6 +5,7 @@ import {
   type ReferenceChapter,
   type ReferenceChapterId,
 } from '../data/referenceData';
+import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 import './ReferencePage.css';
 
@@ -218,6 +219,10 @@ export function ReferencePage({ focusChapterId = null }: Props) {
     heading?.focus();
   }, [focusChapterId]);
 
+  const focusedChapter = focusChapterId
+    ? REFERENCE_DATA.find((c) => c.id === focusChapterId)
+    : undefined;
+
   return (
     <div className="container reference-page">
       <header className="reference-page__header">
@@ -225,6 +230,17 @@ export function ReferencePage({ focusChapterId = null }: Props) {
           ← ホームに戻る
         </a>
         <GlobalNav current="reference" />
+        {focusedChapter ? (
+          <Breadcrumb
+            items={[
+              { label: 'ホーム', href: '/' },
+              { label: '解説リファレンス', href: '/reference' },
+              { label: focusedChapter.title },
+            ]}
+          />
+        ) : (
+          <Breadcrumb items={[{ label: 'ホーム', href: '/' }, { label: '解説リファレンス' }]} />
+        )}
         <p className="reference-page__eyebrow">解説リファレンス</p>
         <h1 className="reference-page__title">インバスケット解説リファレンス</h1>
         <p className="reference-page__lead">
