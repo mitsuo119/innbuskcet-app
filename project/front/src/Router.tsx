@@ -367,7 +367,17 @@ const VALID_REFERENCE_IDS: ReadonlySet<string> = new Set(SITEMAP_REFERENCE_CHAPT
 
 /** pathname（base prefix 剥がし済）から RouterState を解決する。 */
 function parsePathname(): RouterState {
-  const path = stripBase(window.location.pathname);
+  // PBI-102 / TASK-102-1: 末尾スラッシュ正規化（order017 P0 根治）。
+  // GitHub Pages サブパス時代に発生した「`/about/` 等の末尾スラッシュ付き URL が JS 実行後に
+  // not-found 解決され soft 404 化する」問題（クローラー経由で AdSense 審査落ちの直接要因）を
+  // ルータ側で根治する。`stripBase()` 後の path に対し root（`/` または空）以外は連続末尾スラッシュ
+  // を 1 箇所で正規化してから既存の一致判定に渡す。これにより全ルート（/about, /privacy-policy,
+  // /terms-of-service, /terms, /contact, /reference, /reference/:chapterId, /patterns,
+  // /patterns/:id, /cases/:id）が末尾スラッシュ有無を問わず同一ページに解決される。
+  // canonical は `window.location.pathname` を直接参照しているため副作用なし（既存テストの
+  // canonical 検証は末尾スラッシュ無し URL で実施されており回帰しない）。
+  const raw = stripBase(window.location.pathname);
+  const path = raw !== '/' && raw !== '' ? raw.replace(/\/+$/, '') || '/' : raw;
   if (path === '/' || path === '') {
     return { page: 'home', patternId: null, caseId: null, referenceChapterId: null };
   }
