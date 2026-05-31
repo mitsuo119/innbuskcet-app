@@ -7,6 +7,7 @@ import {
 } from '../data/referenceData';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
+import { AdSlot } from '../ui/AdSlot';
 import './ReferencePage.css';
 
 interface Props {
@@ -247,6 +248,11 @@ export function ReferencePage({ focusChapterId = null }: Props) {
           インバスケットの基礎・採点基準・優先順位づけ・案件パターン分類までを
           1画面で往復できるようにまとめた解説エリアです。
         </p>
+        {!focusedChapter && (
+          <p className="reference-page__lead reference-page__lead--howto">
+            使い方の目安：第1〜3章で試験の正体と採点6軸を理解し、第4〜7章で時間配分・優先順位・意思決定・委任のコアテクニックを学び、第8〜9章で頻出20パターンと答案文章術を習得し、第10〜11章で模擬試験と弱点改善サイクルを回し、第12章で本番当日の戦略を確認します。各章タイトルから詳細ページへ遷移し、章末の関連リンクで隣接トピックへ横断できます。
+          </p>
+        )}
       </header>
 
       <nav
@@ -267,6 +273,9 @@ export function ReferencePage({ focusChapterId = null }: Props) {
                 第{index + 1}章
               </span>
               <span className="reference-page__chapter-link-title">{chapter.title}</span>
+              <span className="reference-page__chapter-link-description">
+                {chapter.description}
+              </span>
             </a>
           );
         })}
@@ -274,6 +283,13 @@ export function ReferencePage({ focusChapterId = null }: Props) {
 
       <main className="reference-page__main">
         {REFERENCE_DATA.map((chapter) => renderChapter(chapter))}
+        {/* PBI-100 / TASK-100-3: 章詳細（focusChapterId 付）のみ広告表示。
+            /reference（一覧）は kind='reference-list' で shouldShowAds=false により非表示。 */}
+        <AdSlot
+          label="広告（コンテンツ下）"
+          className="ad-slot--footer"
+          pageMeta={{ kind: focusChapterId ? 'reference-chapter' : 'reference-list' }}
+        />
       </main>
     </div>
   );

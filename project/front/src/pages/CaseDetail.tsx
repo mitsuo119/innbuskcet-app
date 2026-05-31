@@ -11,6 +11,7 @@ import casesData from '../data/cases.json';
 import { CASE_DETAIL_META_BY_ID, type CaseDetailMeta } from '../routes';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
+import { AdSlot } from '../ui/AdSlot';
 
 interface CaseRecord {
   id: string;
@@ -123,6 +124,12 @@ export function CaseDetail({ caseId }: Props) {
             </li>
           </ul>
         </section>
+        {/* PBI-100 / TASK-100-3: 代表ケース詳細は kind='case-detail' で広告表示。 */}
+        <AdSlot
+          label="広告（コンテンツ下）"
+          className="ad-slot--footer"
+          pageMeta={{ kind: 'case-detail' }}
+        />
       </main>
     </div>
   );

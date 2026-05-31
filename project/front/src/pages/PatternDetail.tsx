@@ -9,6 +9,7 @@
 import { findPatternById, type PatternPriority } from '../data/patternData';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
+import { AdSlot } from '../ui/AdSlot';
 
 interface Props {
   patternId: number;
@@ -99,6 +100,12 @@ export function PatternDetail({ patternId }: Props) {
             <p>{pattern.notes}</p>
           </section>
         )}
+        {/* PBI-100 / TASK-100-3: パターン詳細は kind='pattern-detail' で広告表示。 */}
+        <AdSlot
+          label="広告（コンテンツ下）"
+          className="ad-slot--footer"
+          pageMeta={{ kind: 'pattern-detail' }}
+        />
       </main>
     </div>
   );

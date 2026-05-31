@@ -741,7 +741,12 @@ export default function App() {
           </p>
         </section>
 
-        <AdSlot label="広告（ヘッダー下バナー）" className="ad-slot--header" />
+        {/* PBI-100 / TASK-100-3: 学習トップ（kind='home'）はポリシー上 表示可。 */}
+        <AdSlot
+          label="広告（ヘッダー下バナー）"
+          className="ad-slot--header"
+          pageMeta={{ kind: 'home' }}
+        />
 
         {examResult ? (
           <ExamResultView
@@ -920,7 +925,12 @@ export default function App() {
             </footer>
           </>
         )}
-        <AdSlot label="広告（メインコンテンツ下）" className="ad-slot--footer" />
+        {/* PBI-100 / TASK-100-3: 学習トップ（kind='home'）はポリシー上 表示可。 */}
+        <AdSlot
+          label="広告（メインコンテンツ下）"
+          className="ad-slot--footer"
+          pageMeta={{ kind: 'home' }}
+        />
       </main>
       <ConfirmDialog
         open={dialogState.open}

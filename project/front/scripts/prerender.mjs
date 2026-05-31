@@ -33,7 +33,7 @@
 // 依存追加: なし（Node 標準のみ）。
 
 import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
-import { constants } from 'node:fs';
+import { constants, readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -41,8 +41,155 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const FRONT_DIR = resolve(__dirname, '..');
 const DIST_DIR = resolve(FRONT_DIR, 'dist');
 const TEMPLATE = resolve(DIST_DIR, 'index.html');
+// Sprint026 PBI-098 第1段階: `ref/chapterXX-*.md` から章本文（600字+）を取り込み、
+// プリレンダ本文として焼き込む（AdSense審査の「薄いプリレンダ」根治）。
+const REF_DIR = resolve(FRONT_DIR, '..', '..', 'ref');
+// Sprint026 PBI-098 第2段階 / TASK-098-3: `src/data/cases.json` から代表ケース20件の
+// 本文・解説・模範回答を取り込み、プリレンダ本文として焼き込む。
+const CASES_JSON = resolve(FRONT_DIR, 'src', 'data', 'cases.json');
 
 const APP_NAME = 'インバスケット - 学習アプリ';
+
+// =====================================================================
+// Sprint026 PBI-098 第1段階 / TASK-098-1
+// Markdown → HTML 変換（依存追加なし / Node 標準のみ / 同期 readFileSync で
+// ROUTES 評価時に章本文を取り込み view-source: で 600 字以上可視出力する）
+// =====================================================================
+
+/** インライン記法（**bold** / `code`）と HTML エスケープを行う。 */
+function mdInline(s) {
+  const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return esc
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+/**
+ * 章Markdown を view-source: 向けの簡素な HTML に変換する。
+ * 対応要素: ##/### 見出し / 段落 / `- ` 箇条書き / GFM 表 / **bold** / `inline`
+ * 非対応・除外: フロントマター / `---` 区切り / コードブロック / admonition
+ */
+export function mdToHtml(md) {
+  let s = md.replace(/^---[\s\S]*?---\s*\n/, ''); // frontmatter
+  s = s.replace(/```[\s\S]*?```/g, ''); // code fences
+  const lines = s.split(/\r?\n/);
+
+  const out = [];
+  let listBuf = [];
+  let tableBuf = [];
+  let paraBuf = [];
+
+  const flushPara = () => {
+    if (paraBuf.length) {
+      const text = mdInline(paraBuf.join(' ').trim());
+      if (text) out.push(`<p>${text}</p>`);
+      paraBuf = [];
+    }
+  };
+  const flushList = () => {
+    if (listBuf.length) {
+      out.push('<ul>' + listBuf.map((li) => `<li>${mdInline(li)}</li>`).join('') + '</ul>');
+      listBuf = [];
+    }
+  };
+  const flushTable = () => {
+    if (tableBuf.length >= 2) {
+      const cells = (row) =>
+        row
+          .replace(/^\||\|$/g, '')
+          .split('|')
+          .map((c) => c.trim());
+      const head = cells(tableBuf[0]);
+      const body = tableBuf.slice(2).map(cells);
+      const thead =
+        '<thead><tr>' + head.map((c) => `<th>${mdInline(c)}</th>`).join('') + '</tr></thead>';
+      const tbody =
+        '<tbody>' +
+        body
+          .map((r) => '<tr>' + r.map((c) => `<td>${mdInline(c)}</td>`).join('') + '</tr>')
+          .join('') +
+        '</tbody>';
+      out.push(`<table>${thead}${tbody}</table>`);
+    }
+    tableBuf = [];
+  };
+
+  for (const raw of lines) {
+    const line = raw.replace(/\s+$/, '');
+    const trimmed = line.trim();
+    if (trimmed.startsWith('## ')) {
+      flushPara();
+      flushList();
+      flushTable();
+      out.push(`<h2>${mdInline(trimmed.slice(3).trim())}</h2>`);
+    } else if (trimmed.startsWith('### ')) {
+      flushPara();
+      flushList();
+      flushTable();
+      out.push(`<h3>${mdInline(trimmed.slice(4).trim())}</h3>`);
+    } else if (/^- /.test(trimmed)) {
+      flushPara();
+      flushTable();
+      listBuf.push(trimmed.slice(2).trim());
+    } else if (/^\|.*\|$/.test(trimmed)) {
+      flushPara();
+      flushList();
+      tableBuf.push(trimmed);
+    } else if (trimmed === '' || /^-{3,}$/.test(trimmed) || trimmed.startsWith(':::')) {
+      flushPara();
+      flushList();
+      flushTable();
+    } else {
+      flushList();
+      flushTable();
+      paraBuf.push(trimmed);
+    }
+  }
+  flushPara();
+  flushList();
+  flushTable();
+  return out.join('\n');
+}
+
+/** 章ID → `ref/` 内の Markdown ファイル名解決（chapterXX- プレフィクス一致）。 */
+function resolveChapterMdPath(id) {
+  const files = readdirSync(REF_DIR);
+  const name = files.find((f) => f.startsWith(`${id}-`) && f.endsWith('.md'));
+  if (!name) {
+    throw new Error(`[prerender] ${id} に対応する Markdown が ref/ 配下に見つかりません`);
+  }
+  return resolve(REF_DIR, name);
+}
+
+/** 章ID → プリレンダ本文 HTML（同期読み込み）。テスト時も import 時に確定する。 */
+function loadChapterBodyHtml(id) {
+  const md = readFileSync(resolveChapterMdPath(id), 'utf-8');
+  return mdToHtml(md);
+}
+
+/**
+ * Sprint026 PBI-098 第2段階 / TASK-098-3
+ * `src/data/cases.json` を同期読み込みし `id → caseEntry` の Map を返す。
+ * 本文・解説・模範回答を buildCaseRoute から焼き込むためのデータソース。
+ */
+function loadCasesById() {
+  const raw = readFileSync(CASES_JSON, 'utf-8');
+  /** @type {Array<Record<string, unknown>>} */
+  const arr = JSON.parse(raw);
+  /** @type {Map<string, Record<string, unknown>>} */
+  const map = new Map();
+  for (const c of arr) {
+    if (typeof c?.id === 'string') map.set(c.id, c);
+  }
+  return map;
+}
+
+const CASES_BY_ID = loadCasesById();
+
+/** プリレンダ HTML 本文部から可視テキスト文字数を概算する（タグ・空白を除く）。 */
+export function countVisibleText(html) {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, '').length;
+}
 
 /**
  * `transform-seo-tokens.mjs` と同等のロジックで siteUrl を解決する
@@ -199,17 +346,22 @@ const CHAPTERS = [
 function buildChapterRoute(meta) {
   const fullTitle = `解説リファレンス：${meta.title} | ${APP_NAME}`;
   const description = `インバスケット学習の「${meta.title}」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。`;
+  // Sprint026 PBI-098 第1段階 / TASK-098-1
+  // ref/chapterXX-*.md の本文を mdToHtml で焼き込み、view-source: で 600 字以上の
+  // 本文を可視出力する（AdSense審査落ち「薄いプリレンダ」根治）。
+  const chapterBody = loadChapterBodyHtml(meta.id);
   return {
     path: `/reference/${meta.id}`,
     outRelative: `reference/${meta.id}/index.html`,
     title: fullTitle,
     description,
     bodyHtml: `
-      <div data-prerender="reference-${meta.id}" hidden aria-hidden="true">
+      <div data-prerender="reference-${meta.id}">
         <h1>解説リファレンス：${meta.title}</h1>
         <p>${meta.summary}</p>
         <p>${meta.intro}</p>
-        <p>関連リンク：<a href="${meta.relatedPath}">${meta.relatedLabel}</a></p>
+        ${chapterBody}
+        <p>関連リンク：<a href="${meta.relatedPath}">${meta.relatedLabel}</a> ／ <a href="/reference">解説リファレンス（章一覧）</a></p>
       </div>
     `.trim(),
   };
@@ -273,6 +425,10 @@ const CASES = [
 /**
  * 代表ケース 1 件をプリレンダリング ROUTES 形式に変換するヘルパー。
  * title/description は `Router.tsx#resolveRouteSeo`（`case-detail` 分岐）と意味的に一致。
+ *
+ * Sprint026 PBI-098 第2段階 / TASK-098-3:
+ *   `src/data/cases.json` から本文・解説・模範回答（判断/理由/対応）・登場人物・関係部署・
+ *   テーマを焼き込み、view-source: で 600 字以上の本文を可視出力する。
  */
 function buildCaseRoute(meta) {
   const num = meta.id.replace('case-', '');
@@ -280,17 +436,63 @@ function buildCaseRoute(meta) {
   const description = `インバスケット代表ケース${num}（パターン${meta.patternId}「${meta.patternName}」・難易度${meta.difficulty}）の本文と解説、模範回答の骨格を確認できる単独URLページです。`;
   const summary = `本ページは代表ケース${num}を題材に、インバスケット試験で頻出する「${meta.patternName}」（パターン${meta.patternId}・難易度${meta.difficulty}）の判断・指示・委任のポイントを、単独URLで体系的に学べるよう構成しています。`;
   const intro = `想定読者は管理職昇進試験などで「${meta.patternName}」型の案件処理を訓練したい社会人です。本ケースを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。`;
+
+  // cases.json から実本文を取得（取得できないケースは ID 不整合）。
+  const entry = CASES_BY_ID.get(meta.id);
+  if (!entry) {
+    throw new Error(`[prerender] cases.json に ${meta.id} が見つかりません`);
+  }
+  const caseTitle = String(entry.title ?? '');
+  const body = String(entry.body ?? '');
+  const explanation = String(entry.explanation ?? '');
+  const correctPriority = String(entry.correctPriority ?? '');
+  const theme = String(entry.theme ?? '');
+  const characters = Array.isArray(entry.characters) ? entry.characters.map(String) : [];
+  const departments = Array.isArray(entry.departments) ? entry.departments.map(String) : [];
+  const ma = entry.modelAnswer ?? {};
+  const judgment = String(ma.judgment ?? '');
+  const reason = String(ma.reason ?? '');
+  const action = String(ma.action ?? '');
+
+  const priorityLabel =
+    correctPriority === 'A'
+      ? 'A優先（最優先）'
+      : correctPriority === 'B'
+        ? 'B優先（要計画対応）'
+        : correctPriority === 'C'
+          ? 'C優先（空き時間処理）'
+          : `${correctPriority}優先`;
+
+  const charsHtml = characters.length
+    ? `<p>登場人物：${characters.map((c) => escapeHtml(c)).join(' / ')}</p>`
+    : '';
+  const deptsHtml = departments.length
+    ? `<p>関係部署：${departments.map((d) => escapeHtml(d)).join(' / ')}</p>`
+    : '';
+  const themeHtml = theme ? `<p>テーマ分類：${escapeHtml(theme)}</p>` : '';
+
   return {
     path: `/cases/${meta.id}`,
     outRelative: `cases/${meta.id}/index.html`,
     title: fullTitle,
     description,
     bodyHtml: `
-      <div data-prerender="case-${meta.id}" hidden aria-hidden="true">
+      <div data-prerender="case-${meta.id}">
         <h1>ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}）</h1>
         <p>${summary}</p>
         <p>${intro}</p>
-        <p>関連リンク：<a href="/patterns/${meta.patternId}">パターン${meta.patternId}「${meta.patternName}」</a></p>
+        <h2>ケース概要：${escapeHtml(caseTitle)}</h2>
+        <p>${escapeHtml(body)}</p>
+        ${charsHtml}
+        ${deptsHtml}
+        ${themeHtml}
+        <h2>正解優先度：${escapeHtml(priorityLabel)}</h2>
+        <p>${escapeHtml(explanation)}</p>
+        <h2>模範回答の骨格</h2>
+        <p>判断：${escapeHtml(judgment)}</p>
+        <p>理由：${escapeHtml(reason)}</p>
+        <p>対応：${escapeHtml(action)}</p>
+        <p>関連リンク：<a href="/patterns/${meta.patternId}">パターン${meta.patternId}「${escapeHtml(meta.patternName)}」</a> ／ <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（chapter08）</a></p>
       </div>
     `.trim(),
   };
@@ -303,28 +505,95 @@ function buildCaseRoute(meta) {
  * （ID昇順）。`Router.tsx#resolveRouteSeo`（`pattern-detail` 分岐）の
  * title/description テンプレートに合わせて view-source: 取得時の SEO 退行ゼロを担保する。
  */
-const PATTERNS = [
-  { id: 1, name: '顧客クレーム' },
-  { id: 2, name: '取引先からの要求（値引き・仕様変更等）' },
-  { id: 3, name: '新規取引・営業案件' },
-  { id: 4, name: '部下の退職・異動の相談' },
-  { id: 5, name: '部下間の対立・人間関係トラブル' },
-  { id: 6, name: '部下のパフォーマンス問題' },
-  { id: 7, name: '部下の有給・休暇申請' },
-  { id: 8, name: 'ハラスメント報告' },
-  { id: 9, name: 'プロジェクト遅延・品質問題' },
-  { id: 10, name: '予算承認・経費申請' },
-  { id: 11, name: '業務改善提案' },
-  { id: 12, name: '会議・セミナーへの参加依頼' },
-  { id: 13, name: '事故・災害報告' },
-  { id: 14, name: '情報セキュリティインシデント' },
-  { id: 15, name: 'コンプライアンス違反（不正行為）' },
-  { id: 16, name: '組織変更・人員配置' },
-  { id: 17, name: '上位方針の伝達・対応' },
-  { id: 18, name: '他部署からの依頼・調整' },
-  { id: 19, name: '前任者の未完了案件' },
-  { id: 20, name: '複合案件（複数パターンの組み合わせ）' },
-];
+// Sprint026 PBI-098 第3段階 / TASK-098-4
+// `src/data/patternData.ts` から PATTERN_DATA を同期読み込みし、
+// id → meta の Map を返す。本文・特徴・回答骨格・キーフレーズ・注意事項を
+// buildPatternRoute から焼き込むためのデータソース（依存追加なし / 簡易TS パーサ）。
+const PATTERN_DATA_TS = resolve(FRONT_DIR, 'src', 'data', 'patternData.ts');
+
+/**
+ * patternData.ts から PATTERN_DATA リテラルをパースする（依存追加なし）。
+ * - `export const PATTERN_DATA: PatternItem[] = [...]` を抽出
+ * - TS シンタックス（trailing カンマ、シングルクォート、コメント）は本ソース運用上不要なため
+ *   許容範囲のみ対応：シングルクォート → ダブルクォート、trailing カンマ除去、keyless オブジェクト無効
+ */
+function loadPatternData() {
+  const src = readFileSync(PATTERN_DATA_TS, 'utf-8');
+  const startMatch = src.match(/export const PATTERN_DATA[^=]*=\s*\[/);
+  if (!startMatch) throw new Error('[prerender] PATTERN_DATA 配列の開始が見つかりません');
+  const startIdx = startMatch.index + startMatch[0].length - 1; // `[` の位置
+  // 角括弧の深さで対応する `]` を探す（文字列内の `[` `]` も簡易検知）。
+  let depth = 0;
+  let endIdx = -1;
+  let inStr = false;
+  let strCh = '';
+  for (let i = startIdx; i < src.length; i++) {
+    const c = src[i];
+    if (inStr) {
+      if (c === '\\') {
+        i++;
+        continue;
+      }
+      if (c === strCh) inStr = false;
+      continue;
+    }
+    if (c === "'" || c === '"') {
+      inStr = true;
+      strCh = c;
+      continue;
+    }
+    if (c === '[') depth++;
+    else if (c === ']') {
+      depth--;
+      if (depth === 0) {
+        endIdx = i;
+        break;
+      }
+    }
+  }
+  if (endIdx < 0) throw new Error('[prerender] PATTERN_DATA 配列の終端が見つかりません');
+  let literal = src.slice(startIdx, endIdx + 1);
+  // コメント除去（行コメント）。
+  literal = literal.replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  // シングルクォート文字列 → ダブルクォート（中に " が無い前提：patternData.ts は遵守）。
+  literal = literal.replace(
+    /'([^'\\]*(?:\\.[^'\\]*)*)'/g,
+    (_m, body) => `"${body.replace(/"/g, '\\"')}"`,
+  );
+  // キーをダブルクォート化（識別子のみ）。
+  literal = literal.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":');
+  // trailing カンマ除去。
+  literal = literal.replace(/,(\s*[\]}])/g, '$1');
+  return JSON.parse(literal);
+}
+
+const PATTERN_DATA = loadPatternData();
+/** @type {Map<number, Record<string, unknown>>} */
+const PATTERNS_BY_ID = new Map(PATTERN_DATA.map((p) => [p.id, p]));
+
+const PATTERNS = PATTERN_DATA.map((p) => ({ id: p.id, name: p.name }));
+
+const PRIORITY_LABEL_FOR_PATTERN = {
+  A: 'A優先（最重要・緊急）',
+  B: 'B優先（重要）',
+  C: 'C優先（低優先度）',
+  situational: '状況依存（案件の条件で判断）',
+};
+
+const CATEGORY_DESCRIPTION = {
+  対外対応パターン:
+    '顧客・取引先・営業先など社外関係者を相手にした案件群。初動の速度と顧客視点の指示が評価の中心になります。',
+  '人事・部下マネジメントパターン':
+    '部下の育成・配置・対人トラブルなど、ヒューマンスキルが問われる案件群。事実確認と本人の意思尊重、対面コミュニケーションが鍵になります。',
+  '業務・プロジェクトパターン':
+    '日常業務やプロジェクト運営に関する案件群。計画組織力と問題分析力で、リソース配分と進捗管理を構造化する判断が求められます。',
+  'リスク・トラブルパターン':
+    '事故・コンプライアンス・情報セキュリティなど、組織の存続に関わるリスク案件群。最優先（A優先）扱いで、封じ込めと報告系統の即時起動が求められます。',
+  '組織・方針パターン':
+    '組織変更・上位方針・部署間調整など、構造や戦略に関わる案件群。利害関係者の整理と段階的な実施計画、納得感の醸成が評価の中心になります。',
+  その他のパターン:
+    '前任引継ぎや複数パターンの複合案件など、定型化しにくい案件群。前提条件の確認と要素分解、優先順位の高い要素からの着手が求められます。',
+};
 
 /**
  * パターン詳細 1 件をプリレンダリング ROUTES 形式に変換するヘルパー。
@@ -335,17 +604,53 @@ function buildPatternRoute(meta) {
   const description = `インバスケット案件パターン${meta.id}「${meta.name}」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。`;
   const summary = `本ページではインバスケット試験で頻出する案件パターン${meta.id}「${meta.name}」の特徴と優先度判定の観点、回答骨格（誰に・何を・いつまでに）を体系的に確認できます。`;
   const intro = `想定読者は管理職昇進試験などで「${meta.name}」型の案件処理を訓練したい社会人です。本パターンを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。`;
+
+  // Sprint026 PBI-098 第3段階 / TASK-098-4
+  // patternData.ts の実データ（characteristics / answerSkeleton / keyPhrases / notes / category /
+  // typicalPriority）を view-source: で 600 字以上可視出力する形に焼き込む。
+  const entry = PATTERNS_BY_ID.get(meta.id);
+  if (!entry) {
+    throw new Error(`[prerender] patternData.ts に id=${meta.id} が見つかりません`);
+  }
+  const category = String(entry.category ?? '');
+  const characteristics = String(entry.characteristics ?? '');
+  const typicalPriority = String(entry.typicalPriority ?? '');
+  const priorityLabel = PRIORITY_LABEL_FOR_PATTERN[typicalPriority] ?? typicalPriority;
+  const categoryDesc = CATEGORY_DESCRIPTION[category] ?? '';
+  const skeleton = Array.isArray(entry.answerSkeleton) ? entry.answerSkeleton.map(String) : [];
+  const keyPhrases = Array.isArray(entry.keyPhrases) ? entry.keyPhrases.map(String) : [];
+  const notes = String(entry.notes ?? '');
+
+  const skeletonHtml = skeleton.length
+    ? `<h2>回答の骨格（誰に・何を・いつまでに）</h2><ol>${skeleton.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>`
+    : '';
+  const keyPhrasesHtml = keyPhrases.length
+    ? `<h2>キーフレーズ例</h2><ul>${keyPhrases.map((p) => `<li>「${escapeHtml(p)}」</li>`).join('')}</ul>`
+    : '';
+  const notesHtml = notes ? `<h2>対応ポイント・注意事項</h2><p>${escapeHtml(notes)}</p>` : '';
+  const learningHint = `学習のポイント：本パターンは「${category}」に属し、優先度の目安は${escapeHtml(priorityLabel)}です。回答骨格を反復して身につけたうえで、関連する代表ケースで実戦演習し、答案には判断・指示・期限を明示する型を徹底してください。`;
+  const evaluationHint = `採点6軸への接続：本パターンの判断・指示・委任は判断力／統率力／問題分析力／計画組織力／対人関係力／主体性の全体に影響します。回答骨格に沿って素早く意思決定し、関係者・期限・成果物・報告タイミングを必ず明文化することで、限られた時間でも質の高い答案を組み立てられます。`;
+
   return {
     path: `/patterns/${meta.id}`,
     outRelative: `patterns/${meta.id}/index.html`,
     title: fullTitle,
     description,
     bodyHtml: `
-      <div data-prerender="pattern-${meta.id}" hidden aria-hidden="true">
+      <div data-prerender="pattern-${meta.id}">
         <h1>パターン${meta.id}：${meta.name}</h1>
         <p>${summary}</p>
         <p>${intro}</p>
-        <p>関連リンク：<a href="/patterns">パターン別解説（全20パターン）</a></p>
+        <h2>カテゴリ：${escapeHtml(category)}</h2>
+        <p>${escapeHtml(categoryDesc)}</p>
+        <h2>優先度の目安：${escapeHtml(priorityLabel)}</h2>
+        <p>${escapeHtml(characteristics)}</p>
+        ${skeletonHtml}
+        ${keyPhrasesHtml}
+        ${notesHtml}
+        <p>${learningHint}</p>
+        <p>${evaluationHint}</p>
+        <p>関連リンク：<a href="/patterns">パターン別解説（全20パターン）</a> ／ <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（chapter08）</a></p>
       </div>
     `.trim(),
   };
@@ -368,7 +673,7 @@ export const ROUTES = [
     description:
       '管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。',
     bodyHtml: `
-      <div data-prerender="home" hidden aria-hidden="true">
+      <div data-prerender="home">
         <h1>インバスケット</h1>
         <p>InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験まで、ブラウザ上で体系的に無料で学べる日本語の学習Webサービスです。</p>
         <p>想定読者は管理職昇進試験を控える社会人や、優先順位判断・委任・意思決定スキルを体系的に学びたい方です。コンテンツは全12章の解説リファレンス、全20パターンのケース別解説、代表ケース20件の単独URL演習、Quick（速習）／Deep（記述）／Exam（模試）の3つの学習モードで構成されます。</p>
@@ -383,7 +688,7 @@ export const ROUTES = [
     description:
       'インバスケット学習アプリ InBusket の運営者・サイト目的・コンテンツ作成方針・連絡手段・更新ポリシーをまとめた運営者情報ページです。',
     bodyHtml: `
-      <div data-prerender="about" hidden aria-hidden="true">
+      <div data-prerender="about">
         <h1>運営者情報（このサイトについて）</h1>
         <p>InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験までブラウザ上で体系的に無料学習できるようにすることを目的とした学習Webサービスです。</p>
         <p>本ページでは運営目的・想定読者・コンテンツ作成方針・連絡手段・更新ポリシーを公開しています。紙ベース・有料研修中心になりがちなインバスケット学習を、いつでもどこでも繰り返し訓練できる環境にすることで学習機会の格差解消を目指します。</p>
@@ -398,7 +703,7 @@ export const ROUTES = [
     description:
       'インバスケット学習アプリ InBusket の利用条件・免責・著作権・禁止事項・準拠法・改定方針を簡潔にまとめたサービス利用規約の要旨ページです。',
     bodyHtml: `
-      <div data-prerender="terms" hidden aria-hidden="true">
+      <div data-prerender="terms">
         <h1>サービス利用規約</h1>
         <p>本規約は、InBusket（インバスケット学習アプリ）の利用条件を簡潔にまとめたものです。利用者は本サービスを利用することで、本規約に同意したものとみなします。詳細条項は利用規約（条文版）を参照してください。</p>
         <p>本サービスはどなたでも無料でご利用いただけます。本規約および <a href="/privacy-policy">プライバシーポリシー</a> に同意できない場合は、本サービスのご利用をお控えください。</p>
@@ -414,7 +719,7 @@ export const ROUTES = [
     description:
       'インバスケット学習アプリ InBusket の個人情報の取り扱い方針（収集情報・利用目的・第三者提供・問い合わせ窓口）をまとめたプライバシーポリシーです。',
     bodyHtml: `
-      <div data-prerender="privacy-policy" hidden aria-hidden="true">
+      <div data-prerender="privacy-policy">
         <h1>プライバシーポリシー</h1>
         <p>本ポリシーは、InBusket（インバスケット学習アプリ）における個人情報の取り扱い方針を定めたものです。本サービスは学習進捗・回答履歴をブラウザ内（localStorage / sessionStorage）に限定して保存し、サーバーへ送信しません。</p>
         <p>利用目的・収集情報・第三者提供・Cookie/広告（AdSense）・問い合わせ窓口・改定方針を明示し、利用者の不安を可視化のもとで解消することを目指します。</p>
@@ -430,7 +735,7 @@ export const ROUTES = [
     description:
       'インバスケット学習アプリ InBusket へのお問い合わせ方法・連絡先・対応範囲・回答目安をまとめた連絡窓口ページです。',
     bodyHtml: `
-      <div data-prerender="contact" hidden aria-hidden="true">
+      <div data-prerender="contact">
         <h1>お問い合わせ</h1>
         <p>本ページは、InBusket（インバスケット学習アプリ）に関するお問い合わせ方法を案内する連絡窓口ページです。学習内容・採点ロジック・不具合・改善要望などのご連絡を受け付けます。</p>
         <p>対応範囲（運営者によるベストエフォート対応）・回答目安・連絡手段を公開し、利用者と運営の双方向コミュニケーションを担保します。</p>
@@ -441,6 +746,47 @@ export const ROUTES = [
   ...CHAPTERS.map(buildChapterRoute),
   ...CASES.map(buildCaseRoute),
   ...PATTERNS.map(buildPatternRoute),
+  // Sprint026 PBI-099 / TASK-099-1
+  // 一覧プリレンダ化（/reference, /patterns）。各項目に1〜2文の説明文＋導入文を
+  // 静的HTMLとして焼き込み、view-source: で本文を可視化する（広告掲載最小基準充足）。
+  {
+    path: '/reference',
+    outRelative: 'reference/index.html',
+    title: `解説リファレンス（章一覧） | ${APP_NAME}`,
+    description:
+      'インバスケット学習アプリ InBusket の解説リファレンス全12章を一覧で確認できる索引ページです。基礎理解からコアテクニック、当日戦略までを章ごとの要旨付きで整理しています。',
+    bodyHtml: `
+      <div data-prerender="reference-index">
+        <h1>解説リファレンス（章一覧）</h1>
+        <p>本ページはインバスケット学習アプリ InBusket の解説リファレンス全12章の索引です。第1〜3章で試験の正体と採点6軸を理解し、第4〜7章で時間配分・優先順位・意思決定・委任のコアテクニックを学び、第8〜9章で頻出20パターンと答案文章術を習得し、第10〜11章で模擬試験と弱点改善サイクルを回し、第12章で本番当日の戦略を確認する構成です。</p>
+        <p>使い方の目安：まず通しで一読し、その後は第10章の模擬試験に取り組みながら、苦手分野を該当章で繰り返し復習するとマネージャー思考が定着しやすくなります。各章タイトルから詳細ページへ遷移し、章末の関連リンクで隣接トピックへ横断できます。</p>
+        <ul>${CHAPTERS.map(
+          (c) =>
+            `<li><a href="/reference/${c.id}">${escapeHtml(c.title)}</a>：${escapeHtml(c.summary)}</li>`,
+        ).join('')}</ul>
+        <p>関連リンク：<a href="/patterns">案件パターン別解説（全20パターン）</a> ／ <a href="/about">運営者情報</a></p>
+      </div>
+    `.trim(),
+  },
+  {
+    path: '/patterns',
+    outRelative: 'patterns/index.html',
+    title: `案件パターン別解説（全20パターン） | ${APP_NAME}`,
+    description:
+      'インバスケット試験で頻出する案件20パターンの索引ページです。各パターンの特徴・優先度の目安・回答骨格（誰に・何を・いつまでに）を確認できます。',
+    bodyHtml: `
+      <div data-prerender="patterns-index">
+        <h1>案件パターン別解説（全20パターン）</h1>
+        <p>本ページはインバスケット試験で頻出する案件20パターンの索引です。対外対応・人事マネジメント・業務プロジェクト・リスクトラブル・組織方針・その他の6カテゴリに分類し、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べる構成です。</p>
+        <p>使い方の目安：まず各パターンの「優先度傾向」と「特徴」を一覧で押さえ、本番で迷いなくマトリクス分類できる状態を作ります。その上で頻出パターン（顧客クレーム・部下退職相談・プロジェクト遅延・情報セキュリティインシデント等）の回答骨格を反復し、代表ケース20件で実戦演習する流れが効果的です。</p>
+        <ul>${PATTERNS.map(
+          (p) =>
+            `<li><a href="/patterns/${p.id}">パターン${p.id}：${escapeHtml(p.name)}</a>：管理職昇進試験で頻出する「${escapeHtml(p.name)}」型の案件処理の特徴・優先度・回答骨格を確認できます。</li>`,
+        ).join('')}</ul>
+        <p>関連リンク：<a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（chapter08）</a> ／ <a href="/reference">解説リファレンス（章一覧）</a></p>
+      </div>
+    `.trim(),
+  },
 ];
 
 /** title 要素の中身を差し替える（テンプレート 1 件のみ存在前提）。 */

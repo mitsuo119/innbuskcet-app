@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { shouldShowAds, type AdPageMeta } from './adPolicy';
 
 /**
  * Google AdSense の広告枠（PBI-050 / TASK-201）。
@@ -33,6 +34,12 @@ export interface AdSlotProps {
   label?: string;
   /** 追加 className（マージン・罫線等のレイアウトは TASK-204 で配置側 CSS から付与）。 */
   className?: string;
+  /**
+   * 広告配置ポリシー（PBI-100 / TASK-100-2）入力メタ。
+   * 指定時は `shouldShowAds(pageMeta)` が false の場合に何もレンダリングしない。
+   * 省略時は従来通り（環境変数フォールバックのみ）。
+   */
+  pageMeta?: AdPageMeta;
 }
 
 // `window.adsbygoogle` のグローバル拡張（AdSense 公式仕様：未定義時は配列として push）。
@@ -58,12 +65,17 @@ export function AdSlot(props: AdSlotProps) {
     responsive = true,
     label = '広告',
     className,
+    pageMeta,
   } = props;
 
   // 同一マウント内で push を 1 回に限定するためのフラグ（StrictMode 二重発火対策）。
   const pushedRef = useRef(false);
 
+  // 広告配置ポリシー判定（PBI-100）: pageMeta 指定時のみ評価し、不適なら表示しない。
+  const allowedByPolicy = pageMeta ? shouldShowAds(pageMeta) : true;
+
   useEffect(() => {
+    if (!allowedByPolicy) return;
     if (!clientId || !slotId) return;
     if (pushedRef.current) return;
     pushedRef.current = true;
@@ -75,9 +87,10 @@ export function AdSlot(props: AdSlotProps) {
     } catch {
       // 広告配信エラーで本体機能を停止させない（学習アプリの可用性を最優先 / DoD §10-1）。
     }
-  }, [clientId, slotId]);
+  }, [allowedByPolicy, clientId, slotId]);
 
-  // 未設定時は安全フォールバックとして何もレンダリングしない（PBI-050 受入基準）。
+  // 配置ポリシー違反または未設定時は安全フォールバックとして何もレンダリングしない。
+  if (!allowedByPolicy) return null;
   if (!clientId || !slotId) {
     return null;
   }
