@@ -180,9 +180,7 @@ async function checkJsAfterDom(page, url) {
 // ===== メイン =====
 async function main() {
   const paths = await loadRoutes();
-  console.log(
-    `[check-routes-outcome] target=${TARGET} baseUrl=${BASE_URL} routes=${paths.length}`,
-  );
+  console.log(`[check-routes-outcome] target=${TARGET} baseUrl=${BASE_URL} routes=${paths.length}`);
 
   const browser = await chromium.launch();
   const context = await browser.newContext({ userAgent: 'inbusket-outcome-check/1.0' });
@@ -262,9 +260,7 @@ async function main() {
   lines.push('');
   await mkdir(dirname(REPORT_PATH), { recursive: true });
   await writeFile(REPORT_PATH, lines.join('\n'), 'utf-8');
-  console.log(
-    `\n[check-routes-outcome] PASS=${passCount} FAIL=${failCount} report=${REPORT_PATH}`,
-  );
+  console.log(`\n[check-routes-outcome] PASS=${passCount} FAIL=${failCount} report=${REPORT_PATH}`);
 
   process.exit(failCount === 0 ? 0 : 1);
 }

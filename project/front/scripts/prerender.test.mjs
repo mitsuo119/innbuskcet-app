@@ -61,11 +61,18 @@ describe('PBI-086 prerender 純関数', () => {
     );
   });
 
-  it('Sprint025 PBI-087 第1〜4段階 + Sprint026 PBI-099 一覧 の 59 ルート（/, /about, /terms, /privacy-policy, /contact, /reference/chapter01〜12, /cases/case-XXX × 20, /patterns/1〜20, /reference, /patterns）を含む', () => {
+  it('Sprint025 PBI-087 第1〜4段階 + Sprint026 PBI-099 一覧 + Sprint027 PBI-106 /terms-of-service の 60 ルート（/, /about, /terms, /terms-of-service, /privacy-policy, /contact, /reference/chapter01〜12, /cases/case-XXX × 20, /patterns/1〜20, /reference, /patterns）を含む', () => {
     const paths = ROUTES.map((r) => r.path);
-    expect(paths).toHaveLength(59);
-    expect(paths.slice(0, 5)).toEqual(['/', '/about', '/terms', '/privacy-policy', '/contact']);
-    expect(paths.slice(5, 17)).toEqual([
+    expect(paths).toHaveLength(60);
+    expect(paths.slice(0, 6)).toEqual([
+      '/',
+      '/about',
+      '/terms',
+      '/terms-of-service',
+      '/privacy-policy',
+      '/contact',
+    ]);
+    expect(paths.slice(6, 18)).toEqual([
       '/reference/chapter01',
       '/reference/chapter02',
       '/reference/chapter03',
@@ -79,7 +86,7 @@ describe('PBI-086 prerender 純関数', () => {
       '/reference/chapter11',
       '/reference/chapter12',
     ]);
-    expect(paths.slice(17, 37)).toEqual([
+    expect(paths.slice(18, 38)).toEqual([
       '/cases/case-001',
       '/cases/case-002',
       '/cases/case-004',
@@ -101,7 +108,7 @@ describe('PBI-086 prerender 純関数', () => {
       '/cases/case-048',
       '/cases/case-053',
     ]);
-    expect(paths.slice(37, 57)).toEqual([
+    expect(paths.slice(38, 58)).toEqual([
       '/patterns/1',
       '/patterns/2',
       '/patterns/3',
@@ -124,18 +131,20 @@ describe('PBI-086 prerender 純関数', () => {
       '/patterns/20',
     ]);
     // Sprint026 PBI-099 一覧プリレンダ追加分
-    expect(paths.slice(57)).toEqual(['/reference', '/patterns']);
+    expect(paths.slice(58)).toEqual(['/reference', '/patterns']);
     expect(ROUTES[0].outRelative).toBe('index.html');
     expect(ROUTES[1].outRelative).toBe('about/index.html');
-    expect(ROUTES[3].outRelative).toBe('privacy-policy/index.html');
-    expect(ROUTES[4].outRelative).toBe('contact/index.html');
-    expect(ROUTES[5].outRelative).toBe('reference/chapter01/index.html');
-    expect(ROUTES[16].outRelative).toBe('reference/chapter12/index.html');
-    expect(ROUTES[17].outRelative).toBe('cases/case-001/index.html');
-    expect(ROUTES[36].outRelative).toBe('cases/case-053/index.html');
-    expect(ROUTES[37].outRelative).toBe('patterns/1/index.html');
-    expect(ROUTES[56].outRelative).toBe('patterns/20/index.html');
-    expect(ROUTES[57].outRelative).toBe('reference/index.html');
+    expect(ROUTES[2].outRelative).toBe('terms/index.html');
+    expect(ROUTES[3].outRelative).toBe('terms-of-service/index.html');
+    expect(ROUTES[4].outRelative).toBe('privacy-policy/index.html');
+    expect(ROUTES[5].outRelative).toBe('contact/index.html');
+    expect(ROUTES[6].outRelative).toBe('reference/chapter01/index.html');
+    expect(ROUTES[17].outRelative).toBe('reference/chapter12/index.html');
+    expect(ROUTES[18].outRelative).toBe('cases/case-001/index.html');
+    expect(ROUTES[37].outRelative).toBe('cases/case-053/index.html');
+    expect(ROUTES[38].outRelative).toBe('patterns/1/index.html');
+    expect(ROUTES[57].outRelative).toBe('patterns/20/index.html');
+    expect(ROUTES[58].outRelative).toBe('reference/index.html');
     expect(ROUTES.at(-1)?.outRelative).toBe('patterns/index.html');
   });
 });
