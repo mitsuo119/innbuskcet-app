@@ -8,6 +8,7 @@
  * - dangerouslySetInnerHTML 不使用（DoD §10-2）／コントラスト・フォーカス順序は既存スタイル踏襲。
  */
 import casesData from '../data/cases.json';
+import { findCaseDeepDive } from '../data/deepDive';
 import { CASE_DETAIL_META_BY_ID, type CaseDetailMeta } from '../routes';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
@@ -44,6 +45,7 @@ interface Props {
 export function CaseDetail({ caseId }: Props) {
   const meta: CaseDetailMeta | undefined = CASE_DETAIL_META_BY_ID.get(caseId);
   const record = CASES.find((c) => c.id === caseId);
+  const deepDive = findCaseDeepDive(caseId);
 
   if (!meta || !record) {
     return (
@@ -97,6 +99,38 @@ export function CaseDetail({ caseId }: Props) {
           <p>{record.explanation}</p>
         </section>
 
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">案件文から読み取るべきこと</h2>
+            <p>{deepDive.situationAnalysis}</p>
+          </section>
+        )}
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">優先度判定の論拠</h2>
+            <p>{deepDive.priorityRationale}</p>
+          </section>
+        )}
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">よくある誤答</h2>
+            <ul className="legal-list">
+              {deepDive.pitfalls.map((pitfall, i) => (
+                <li key={i}>{pitfall}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">回答例文</h2>
+            <p>{deepDive.answerExample}</p>
+          </section>
+        )}
+
         {record.modelAnswer && (
           <section className="legal-section">
             <h2 className="legal-section__title">モデル回答</h2>
@@ -108,6 +142,13 @@ export function CaseDetail({ caseId }: Props) {
               <dt>具体行動</dt>
               <dd>{record.modelAnswer.action}</dd>
             </dl>
+          </section>
+        )}
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">一次対応の後にやること</h2>
+            <p>{deepDive.followUp}</p>
           </section>
         )}
 

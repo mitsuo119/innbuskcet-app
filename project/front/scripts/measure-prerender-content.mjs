@@ -79,7 +79,7 @@ const now = new Date().toISOString().slice(0, 10);
 const lines = [];
 lines.push(`# プリレンダ本文文字数レポート（52ページ）`);
 lines.push('');
-lines.push(`- 計測日: ${now}（Sprint026 DAY4 / PBI-098 第3段階完了時点）`);
+lines.push(`- 計測日: ${now}`);
 lines.push(
   `- 対象: dist/<path>/index.html の \`<div data-prerender="...">\` 可視テキスト（タグ・空白除外）`,
 );

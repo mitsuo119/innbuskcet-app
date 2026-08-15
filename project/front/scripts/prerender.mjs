@@ -47,6 +47,10 @@ const REF_DIR = resolve(FRONT_DIR, '..', '..', 'ref');
 // Sprint026 PBI-098 第2段階 / TASK-098-3: `src/data/cases.json` から代表ケース20件の
 // 本文・解説・模範回答を取り込み、プリレンダ本文として焼き込む。
 const CASES_JSON = resolve(FRONT_DIR, 'src', 'data', 'cases.json');
+// AdSense「有用性の低いコンテンツ」対応: ページ固有の深掘り解説（出題場面／優先度の論拠／
+// よくある失敗／回答例文／評価者視点）を焼き込む。全ページ共通の定型文は使用しない。
+const PATTERN_DEEP_DIVE_JSON = resolve(FRONT_DIR, 'src', 'data', 'patternDeepDive.json');
+const CASE_DEEP_DIVE_JSON = resolve(FRONT_DIR, 'src', 'data', 'caseDeepDive.json');
 
 const APP_NAME = 'インバスケット - 学習アプリ';
 
@@ -185,6 +189,22 @@ function loadCasesById() {
 }
 
 const CASES_BY_ID = loadCasesById();
+
+/** パターン／ケースの深掘り解説（ページ固有本文）。定義源は React 側と共通の JSON。 */
+const PATTERN_DEEP_DIVE = JSON.parse(readFileSync(PATTERN_DEEP_DIVE_JSON, 'utf-8'));
+const CASE_DEEP_DIVE = JSON.parse(readFileSync(CASE_DEEP_DIVE_JSON, 'utf-8'));
+
+/** 深掘り解説ブロックを `<h2>` + 本文の HTML に整形する（値が無い項目は出力しない）。 */
+function deepDiveSectionsHtml(sections) {
+  return sections
+    .filter(([, value]) => (Array.isArray(value) ? value.length > 0 : Boolean(value)))
+    .map(([heading, value]) =>
+      Array.isArray(value)
+        ? `<h2>${escapeHtml(heading)}</h2><ul>${value.map((v) => `<li>${escapeHtml(String(v))}</li>`).join('')}</ul>`
+        : `<h2>${escapeHtml(heading)}</h2><p>${escapeHtml(String(value))}</p>`,
+    )
+    .join('');
+}
 
 /** プリレンダ HTML 本文部から可視テキスト文字数を概算する（タグ・空白を除く）。 */
 export function countVisibleText(html) {
@@ -434,8 +454,6 @@ function buildCaseRoute(meta) {
   const num = meta.id.replace('case-', '');
   const fullTitle = `ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}） | ${APP_NAME}`;
   const description = `インバスケット代表ケース${num}（パターン${meta.patternId}「${meta.patternName}」・難易度${meta.difficulty}）の本文と解説、模範回答の骨格を確認できる単独URLページです。`;
-  const summary = `本ページは代表ケース${num}を題材に、インバスケット試験で頻出する「${meta.patternName}」（パターン${meta.patternId}・難易度${meta.difficulty}）の判断・指示・委任のポイントを、単独URLで体系的に学べるよう構成しています。`;
-  const intro = `想定読者は管理職昇進試験などで「${meta.patternName}」型の案件処理を訓練したい社会人です。本ケースを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。`;
 
   // cases.json から実本文を取得（取得できないケースは ID 不整合）。
   const entry = CASES_BY_ID.get(meta.id);
@@ -471,6 +489,16 @@ function buildCaseRoute(meta) {
     : '';
   const themeHtml = theme ? `<p>テーマ分類：${escapeHtml(theme)}</p>` : '';
 
+  // ページ固有の深掘り解説（AdSense「有用性の低いコンテンツ」対応）。
+  const dd = CASE_DEEP_DIVE[meta.id] ?? {};
+  const analysisHtml = deepDiveSectionsHtml([
+    ['案件文から読み取るべきこと', dd.situationAnalysis],
+    ['優先度判定の論拠', dd.priorityRationale],
+    ['よくある誤答', dd.pitfalls],
+    ['回答例文', dd.answerExample],
+  ]);
+  const followUpHtml = deepDiveSectionsHtml([['一次対応の後にやること', dd.followUp]]);
+
   return {
     path: `/cases/${meta.id}`,
     outRelative: `cases/${meta.id}/index.html`,
@@ -479,8 +507,6 @@ function buildCaseRoute(meta) {
     bodyHtml: `
       <div data-prerender="case-${meta.id}">
         <h1>ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}）</h1>
-        <p>${summary}</p>
-        <p>${intro}</p>
         <h2>ケース概要：${escapeHtml(caseTitle)}</h2>
         <p>${escapeHtml(body)}</p>
         ${charsHtml}
@@ -488,10 +514,12 @@ function buildCaseRoute(meta) {
         ${themeHtml}
         <h2>正解優先度：${escapeHtml(priorityLabel)}</h2>
         <p>${escapeHtml(explanation)}</p>
+        ${analysisHtml}
         <h2>模範回答の骨格</h2>
         <p>判断：${escapeHtml(judgment)}</p>
         <p>理由：${escapeHtml(reason)}</p>
         <p>対応：${escapeHtml(action)}</p>
+        ${followUpHtml}
         <p>関連リンク：<a href="/patterns/${meta.patternId}">パターン${meta.patternId}「${escapeHtml(meta.patternName)}」</a> ／ <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（chapter08）</a></p>
       </div>
     `.trim(),
@@ -602,8 +630,6 @@ const CATEGORY_DESCRIPTION = {
 function buildPatternRoute(meta) {
   const fullTitle = `パターン${meta.id}：${meta.name} | ${APP_NAME}`;
   const description = `インバスケット案件パターン${meta.id}「${meta.name}」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。`;
-  const summary = `本ページではインバスケット試験で頻出する案件パターン${meta.id}「${meta.name}」の特徴と優先度判定の観点、回答骨格（誰に・何を・いつまでに）を体系的に確認できます。`;
-  const intro = `想定読者は管理職昇進試験などで「${meta.name}」型の案件処理を訓練したい社会人です。本パターンを通じて、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、採点6軸（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）に直結する行動を学べます。`;
 
   // Sprint026 PBI-098 第3段階 / TASK-098-4
   // patternData.ts の実データ（characteristics / answerSkeleton / keyPhrases / notes / category /
@@ -628,8 +654,18 @@ function buildPatternRoute(meta) {
     ? `<h2>キーフレーズ例</h2><ul>${keyPhrases.map((p) => `<li>「${escapeHtml(p)}」</li>`).join('')}</ul>`
     : '';
   const notesHtml = notes ? `<h2>対応ポイント・注意事項</h2><p>${escapeHtml(notes)}</p>` : '';
-  const learningHint = `学習のポイント：本パターンは「${category}」に属し、優先度の目安は${escapeHtml(priorityLabel)}です。回答骨格を反復して身につけたうえで、関連する代表ケースで実戦演習し、答案には判断・指示・期限を明示する型を徹底してください。`;
-  const evaluationHint = `採点6軸への接続：本パターンの判断・指示・委任は判断力／統率力／問題分析力／計画組織力／対人関係力／主体性の全体に影響します。回答骨格に沿って素早く意思決定し、関係者・期限・成果物・報告タイミングを必ず明文化することで、限られた時間でも質の高い答案を組み立てられます。`;
+
+  // ページ固有の深掘り解説（AdSense「有用性の低いコンテンツ」対応）。
+  const dd = PATTERN_DEEP_DIVE[String(meta.id)] ?? {};
+  const situationHtml = deepDiveSectionsHtml([
+    ['出題される場面の読み解き', dd.situation],
+    ['なぜこの優先度になるのか', dd.priorityRationale],
+  ]);
+  const practiceHtml = deepDiveSectionsHtml([
+    ['よくある失敗', dd.commonMistakes],
+    ['回答例文', dd.answerExample],
+    ['評価者はどこを見ているか', dd.evaluatorView],
+  ]);
 
   return {
     path: `/patterns/${meta.id}`,
@@ -639,17 +675,15 @@ function buildPatternRoute(meta) {
     bodyHtml: `
       <div data-prerender="pattern-${meta.id}">
         <h1>パターン${meta.id}：${meta.name}</h1>
-        <p>${summary}</p>
-        <p>${intro}</p>
         <h2>カテゴリ：${escapeHtml(category)}</h2>
         <p>${escapeHtml(categoryDesc)}</p>
         <h2>優先度の目安：${escapeHtml(priorityLabel)}</h2>
         <p>${escapeHtml(characteristics)}</p>
+        ${situationHtml}
         ${skeletonHtml}
+        ${practiceHtml}
         ${keyPhrasesHtml}
         ${notesHtml}
-        <p>${learningHint}</p>
-        <p>${evaluationHint}</p>
         <p>関連リンク：<a href="/patterns">パターン別解説（全20パターン）</a> ／ <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（chapter08）</a></p>
       </div>
     `.trim(),
@@ -676,8 +710,14 @@ export const ROUTES = [
       <div data-prerender="home">
         <h1>インバスケット</h1>
         <p>InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験まで、ブラウザ上で体系的に無料で学べる日本語の学習Webサービスです。</p>
-        <p>想定読者は管理職昇進試験を控える社会人や、優先順位判断・委任・意思決定スキルを体系的に学びたい方です。コンテンツは全12章の解説リファレンス、全20パターンのケース別解説、代表ケース20件の単独URL演習、Quick（速習）／Deep（記述）／Exam（模試）の3つの学習モードで構成されます。</p>
-        <p>詳細は <a href="/about">運営者情報</a> ／ <a href="/terms">サービス利用規約</a> をご覧ください。</p>
+        <p>想定読者は管理職昇進試験を控える社会人や、優先順位判断・委任・意思決定スキルを体系的に学びたい方です。コンテンツは全12章の解説リファレンス、全20パターンのケース別解説、代表ケース20件の単独URL演習、Quick（速習）／Deep（記述）／Exam（模試）の3つの学習モードで構成され、繰り返しの訓練を通じて合格水準の判断力と回答骨格を身につけられます。</p>
+        <h2>インバスケット試験で問われること</h2>
+        <p>インバスケット試験は、架空の管理職に着任した初日に、未処理のまま溜まった案件を制限時間内で処理するシミュレーションです。制限時間は60〜90分、案件数は15〜25件が典型で、前任者が不在、自分もこの後すぐ出張に出るといった制約が設定されます。採点対象は「承認したか否か」という結論ではなく、なぜそう判断したのか、誰にどの期限で何を指示したのかという行動の中身です。そのため、正解を暗記する学習ではなく、限られた時間で優先順位を決め、判断の根拠を言語化し、適切に委任する型を身につける訓練が有効になります。</p>
+        <h2>学習の進め方</h2>
+        <p>初めての方は、まず解説リファレンス第1章から第3章で試験の全体像と評価の観点をつかみ、続いて第4章から第7章で時間管理・優先順位付け・意思決定・委任という4つの基本スキルを学ぶ流れをおすすめします。基礎を押さえたら、Quickモードで案件の優先度判定を反復し、判断のスピードを上げます。判断が安定してきたらDeepモードに切り替え、判断・理由・具体行動を文章で書く練習に移ります。仕上げとして、本番と同じ時間制約で複数案件を処理するExamモードに取り組み、時間切れになりやすい箇所を特定して弱点を補強します。</p>
+        <h2>収録コンテンツ</h2>
+        <p>解説リファレンスは全12章で、試験の概要、採点基準、マネージャーとしての思考の切り替え、時間管理、優先順位付け、意思決定フレームワーク、委任、案件パターン別の攻略、記述の技法、模擬試験、振り返りの方法、試験当日の戦略までを扱います。パターン別解説では、顧客クレーム、部下の退職相談、ハラスメント報告、情報セキュリティインシデント、複合案件など20種類の頻出パターンについて、出題される場面の読み解き、優先度判定の論拠、よくある失敗、回答例文、評価者の着眼点を掲載しています。代表ケース20件には、案件文・正解優先度・解説・模範回答に加えて、誤答パターンと一次対応後のフォローアップまで収録しています。</p>
+        <p>詳細は <a href="/about">運営者情報</a> ／ <a href="/terms">サービス利用規約</a> をご覧ください。学習コンテンツは <a href="/reference">解説リファレンス</a> ／ <a href="/patterns">パターン別解説</a> から一覧できます。</p>
       </div>
     `.trim(),
   },

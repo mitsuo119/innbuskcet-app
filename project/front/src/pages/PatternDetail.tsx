@@ -7,6 +7,7 @@
  * - dangerouslySetInnerHTML 不使用（XSS対策）
  */
 import { findPatternById, type PatternPriority } from '../data/patternData';
+import { findPatternDeepDive } from '../data/deepDive';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 import { AdSlot } from '../ui/AdSlot';
@@ -24,6 +25,7 @@ const PRIORITY_LABEL: Record<PatternPriority, string> = {
 
 export function PatternDetail({ patternId }: Props) {
   const pattern = findPatternById(patternId);
+  const deepDive = findPatternDeepDive(patternId);
 
   if (!pattern) {
     return (
@@ -74,6 +76,20 @@ export function PatternDetail({ patternId }: Props) {
           <p>{pattern.characteristics}</p>
         </section>
 
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">出題される場面の読み解き</h2>
+            <p>{deepDive.situation}</p>
+          </section>
+        )}
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">なぜこの優先度になるのか</h2>
+            <p>{deepDive.priorityRationale}</p>
+          </section>
+        )}
+
         <section className="legal-section">
           <h2 className="legal-section__title">回答の骨格</h2>
           <ol className="legal-list">
@@ -82,6 +98,31 @@ export function PatternDetail({ patternId }: Props) {
             ))}
           </ol>
         </section>
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">よくある失敗</h2>
+            <ul className="legal-list">
+              {deepDive.commonMistakes.map((mistake, i) => (
+                <li key={i}>{mistake}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">回答例文</h2>
+            <p>{deepDive.answerExample}</p>
+          </section>
+        )}
+
+        {deepDive && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">評価者はどこを見ているか</h2>
+            <p>{deepDive.evaluatorView}</p>
+          </section>
+        )}
 
         {pattern.keyPhrases && pattern.keyPhrases.length > 0 && (
           <section className="legal-section">

@@ -272,19 +272,21 @@ describe('PBI-097 クローキング解消（hidden aria-hidden 除去）', () =
 });
 
 // Sprint026 PBI-098 第1段階 / TASK-098-2
-// プリレンダ本文文字数下限（600字）の自動検証。referenceData/cases/patternData に
-// 由来する実本文を view-source: で 600 字以上可視出力することを担保し、
-// AdSense審査の「薄いプリレンダ」根治退行を CI で検知する。
-describe('PBI-098 プリレンダ本文文字数下限（600字以上 / 章 + 詳細ページ）', () => {
+// プリレンダ本文文字数下限の自動検証。referenceData/cases/patternData に
+// 由来する実本文とページ固有の深掘り解説を view-source: で十分な量可視出力することを
+// 担保し、AdSense審査の「有用性の低いコンテンツ」判定の退行を CI で検知する。
+const MIN_BODY_CHARS = 1000;
+
+describe('プリレンダ本文文字数下限（1000字以上 / 章 + 詳細ページ）', () => {
   // 第1段階: reference chapter01〜12（mdToHtml で ref/ 本文を焼き込み）
   const chapterRoutes = ROUTES.filter((r) => /^\/reference\/chapter\d{2}$/.test(r.path));
   it('reference 章ルートが 12 件存在する', () => {
     expect(chapterRoutes).toHaveLength(12);
   });
   for (const route of chapterRoutes) {
-    it(`${route.path} の bodyHtml 可視テキストが 600 字以上`, () => {
+    it(`${route.path} の bodyHtml 可視テキストが ${MIN_BODY_CHARS} 字以上`, () => {
       const len = countVisibleText(route.bodyHtml);
-      expect(len).toBeGreaterThanOrEqual(600);
+      expect(len).toBeGreaterThanOrEqual(MIN_BODY_CHARS);
     });
   }
 
@@ -295,9 +297,9 @@ describe('PBI-098 プリレンダ本文文字数下限（600字以上 / 章 + �
     expect(caseRoutes).toHaveLength(20);
   });
   for (const route of caseRoutes) {
-    it(`${route.path} の bodyHtml 可視テキストが 600 字以上`, () => {
+    it(`${route.path} の bodyHtml 可視テキストが ${MIN_BODY_CHARS} 字以上`, () => {
       const len = countVisibleText(route.bodyHtml);
-      expect(len).toBeGreaterThanOrEqual(600);
+      expect(len).toBeGreaterThanOrEqual(MIN_BODY_CHARS);
     });
   }
   it('代表ケース case-001 / case-010 / case-053（ID昇順末尾）の本文に解説と模範回答セクションが含まれる', () => {
@@ -321,9 +323,9 @@ describe('PBI-098 プリレンダ本文文字数下限（600字以上 / 章 + �
     expect(patternRoutes).toHaveLength(20);
   });
   for (const route of patternRoutes) {
-    it(`${route.path} の bodyHtml 可視テキストが 600 字以上`, () => {
+    it(`${route.path} の bodyHtml 可視テキストが ${MIN_BODY_CHARS} 字以上`, () => {
       const len = countVisibleText(route.bodyHtml);
-      expect(len).toBeGreaterThanOrEqual(600);
+      expect(len).toBeGreaterThanOrEqual(MIN_BODY_CHARS);
     });
   }
   it('代表パターン /patterns/1 / /patterns/10 / /patterns/20 の本文に主要セクションが含まれる', () => {
@@ -334,6 +336,35 @@ describe('PBI-098 プリレンダ本文文字数下限（600字以上 / 章 + �
       expect(r.bodyHtml).toContain('<h2>カテゴリ：');
       expect(r.bodyHtml).toContain('<h2>優先度の目安：');
       expect(r.bodyHtml).toContain('<h2>回答の骨格');
+    }
+  });
+
+  // AdSense「有用性の低いコンテンツ」対応: ページ固有の深掘り解説が全件焼き込まれていること。
+  it('パターン詳細20件全件に深掘り解説セクションが含まれる', () => {
+    for (const r of patternRoutes) {
+      expect(r.bodyHtml, r.path).toContain('<h2>出題される場面の読み解き</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>なぜこの優先度になるのか</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>よくある失敗</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>回答例文</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>評価者はどこを見ているか</h2>');
+    }
+  });
+  it('代表ケース20件全件に深掘り解説セクションが含まれる', () => {
+    for (const r of caseRoutes) {
+      expect(r.bodyHtml, r.path).toContain('<h2>案件文から読み取るべきこと</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>優先度判定の論拠</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>よくある誤答</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>回答例文</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>一次対応の後にやること</h2>');
+    }
+  });
+  // 全ページ共通の定型文（重複コンテンツ）を再導入しないこと。
+  it('詳細ページに全件共通の定型文が含まれない', () => {
+    const boilerplate = ['想定読者は管理職昇進試験などで', '採点6軸への接続：', '学習のポイント：'];
+    for (const r of [...patternRoutes, ...caseRoutes]) {
+      for (const phrase of boilerplate) {
+        expect(r.bodyHtml, `${r.path} に定型文「${phrase}」が残存`).not.toContain(phrase);
+      }
     }
   });
 });

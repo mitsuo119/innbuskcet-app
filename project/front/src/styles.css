@@ -313,6 +313,13 @@ body {
   line-height: 1.75;
 }
 
+.home-about__subtitle {
+  margin: 1.1rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .home-about__links {
   margin: 0;
   line-height: 1.75;
