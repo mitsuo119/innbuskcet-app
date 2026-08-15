@@ -1,7 +1,7 @@
 # アウトカム検証レポート（PBI-104）
 
-- 計測日時: 2026-08-15T12:59:07.882Z
-- 対象: preview (`http://localhost:4173`)
+- 計測日時: 2026-08-15T13:03:21.102Z
+- 対象: prod (`https://inbasket-app.com`)
 - ルート数: 43 / **PASS: 43 / FAIL: 0**
 - 検証項目: (a) サーバ HTML に hidden/aria-hidden なし / (b) 本文 600 字以上（シェル 100 字以上）/ (c) JS 実行後 <h1> が NotFound でない
 
