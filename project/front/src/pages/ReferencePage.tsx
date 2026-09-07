@@ -223,6 +223,7 @@ export function ReferencePage({ focusChapterId = null }: Props) {
   const focusedChapter = focusChapterId
     ? REFERENCE_DATA.find((c) => c.id === focusChapterId)
     : undefined;
+  const visibleChapters = focusedChapter ? [focusedChapter] : REFERENCE_DATA;
 
   return (
     <div className="container reference-page">
@@ -243,10 +244,12 @@ export function ReferencePage({ focusChapterId = null }: Props) {
           <Breadcrumb items={[{ label: 'ホーム', href: '/' }, { label: '解説リファレンス' }]} />
         )}
         <p className="reference-page__eyebrow">解説リファレンス</p>
-        <h1 className="reference-page__title">インバスケット解説リファレンス</h1>
+        <h1 className="reference-page__title">
+          {focusedChapter?.title ?? 'インバスケット解説リファレンス'}
+        </h1>
         <p className="reference-page__lead">
-          インバスケットの基礎・採点基準・優先順位づけ・案件パターン分類までを
-          1画面で往復できるようにまとめた解説エリアです。
+          {focusedChapter?.description ??
+            'インバスケットの基礎、判断の観点、優先順位づけ、委任、振り返りを全12章で整理します。'}
         </p>
         {!focusedChapter && (
           <p className="reference-page__lead reference-page__lead--howto">
@@ -282,7 +285,7 @@ export function ReferencePage({ focusChapterId = null }: Props) {
       </nav>
 
       <main className="reference-page__main">
-        {REFERENCE_DATA.map((chapter) => renderChapter(chapter))}
+        {visibleChapters.map((chapter) => renderChapter(chapter))}
         {/* PBI-100 / TASK-100-3: 章詳細（focusChapterId 付）のみ広告表示。
             /reference（一覧）は kind='reference-list' で shouldShowAds=false により非表示。 */}
         <AdSlot

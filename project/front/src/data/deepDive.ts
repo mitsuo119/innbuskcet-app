@@ -35,6 +35,7 @@ export interface CaseDeepDive {
   answerExample: string;
   /** 一次対応後のフォローアップ */
   followUp: string;
+  sources?: { label: string; href: string }[];
 }
 
 const PATTERN_DEEP_DIVE = patternDeepDiveJson as Record<string, PatternDeepDive>;

@@ -1,52 +1,50 @@
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import App from './App';
+import guide from './data/homeStudyGuide.json';
+import { PUBLIC_ROUTES } from './routes';
+import { ROUTES } from '../scripts/prerender.mjs';
 
-/**
- * PBI-090 / TASK-090-2 (Sprint024 DAY4):
- * トップ本文「このサイトについて」セクション（home-about）の存在検証。
- *
- * 受入基準:
- * - h2「このサイトについて」セクションが存在する
- * - 本文の文字数が 200 字以上（200〜400 字目安）
- * - 主要コンテンツ概要（全12章 / 20パターン / 20ケース / Quick / Deep / Exam）に言及
- * - JS 無効でも表示されるプレーンテキスト中心の構造
- * - a11y: aria-labelledby で h2 と紐付け
- */
-describe('PBI-090 トップ「このサイトについて」セクション', () => {
+describe('トップの実践解説', () => {
   const html = renderToStaticMarkup(<App />);
+  const document = new DOMParser().parseFromString(html, 'text/html');
+  const staticDocument = new DOMParser().parseFromString(
+    ROUTES.find((route: { path: string }) => route.path === '/')!.bodyHtml,
+    'text/html',
+  );
 
   it('home-about セクションが aria-labelledby 付きで存在する', () => {
     expect(html).toContain('<section class="home-about" aria-labelledby="home-about-heading">');
-    expect(html).toMatch(/<h2[^>]*id="home-about-heading"[^>]*>このサイトについて<\/h2>/);
+    expect(document.getElementById('home-about-heading')?.textContent).toBe(guide.title);
   });
 
-  it('セクション内の本文テキストが 200 字以上である', () => {
-    // home-about セクション部分のみを抽出して文字数を検証する。
-    const match = html.match(/<section class="home-about"[\s\S]*?<\/section>/);
-    expect(match).not.toBeNull();
-    const sectionHtml = match![0];
-    // タグを除去したプレーンテキスト長を計測する（ホワイトスペースは 1 字に正規化）。
-    const text = sectionHtml
-      .replace(/<[^>]+>/g, '')
-      .replace(/\s+/g, '')
-      .trim();
-    expect(text.length).toBeGreaterThanOrEqual(200);
+  it('演習条件・判断根拠・回答比較・条件変更・振り返りを画面と静的HTMLで共有する', () => {
+    for (const section of guide.sections) {
+      for (const text of [section.heading, ...section.paragraphs, ...section.points]) {
+        expect(document.body.textContent).toContain(text);
+        expect(staticDocument.body.textContent).toContain(text);
+      }
+    }
+    expect(document.body.textContent).toContain('公式正答や合格基準ではありません');
+    expect(staticDocument.body.textContent).toContain(guide.introduction);
+    expect(document.body.textContent).not.toContain('合格水準');
   });
 
-  it('主要コンテンツ概要（12章 / 20パターン / 20ケース / Quick・Deep・Exam）に言及している', () => {
-    const sectionHtml = html.match(/<section class="home-about"[\s\S]*?<\/section>/)![0];
-    expect(sectionHtml).toContain('全12章');
-    expect(sectionHtml).toContain('全20パターン');
-    expect(sectionHtml).toContain('代表ケース20件');
-    expect(sectionHtml).toContain('Quick');
-    expect(sectionHtml).toContain('Deep');
-    expect(sectionHtml).toContain('Exam');
+  it('問題回答欄の後に記事を置き、記事へのリンクを先に表示する', () => {
+    expect(html.indexOf('優先度を選択')).toBeLessThan(html.indexOf('id="home-about-heading"'));
+    expect(document.querySelector('a[href="#home-about-heading"]')).not.toBeNull();
+    expect(html).not.toContain('広告（ヘッダー下バナー）');
   });
 
-  it('運営者情報・利用規約への動線リンクを含む', () => {
-    const sectionHtml = html.match(/<section class="home-about"[\s\S]*?<\/section>/)![0];
-    expect(sectionHtml).toMatch(/<a [^>]*href="\/about"/);
-    expect(sectionHtml).toMatch(/<a [^>]*href="\/terms"/);
+  it('関連記事と運営者情報のリンク先が実在し、静的HTMLにも含まれる', () => {
+    const paths = PUBLIC_ROUTES.map((route) => route.path);
+    for (const link of [
+      ...guide.sections.flatMap((section) => section.links),
+      ...guide.siteLinks,
+    ]) {
+      expect(paths).toContain(link.href);
+      expect(document.querySelector(`.home-about a[href="${link.href}"]`)).not.toBeNull();
+      expect(staticDocument.querySelector(`a[href="${link.href}"]`)).not.toBeNull();
+    }
   });
 });

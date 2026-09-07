@@ -74,19 +74,19 @@ export function evaluateJudgment(userJudgment: string, correctPriority: string):
   }
   const diff = Math.abs(priorityIndex(user) - priorityIndex(correct));
   if (diff === 0) {
-    return { category, score: '◎', comment: '判断が正解と一致しています。' };
+    return { category, score: '◎', comment: '記述中の優先度が教材の分類例と一致しています。' };
   }
   if (diff === 1) {
     return {
       category,
       score: '○',
-      comment: '判断は概ね妥当ですが、優先度を再考してください。',
+      comment: '記述中の優先度が教材の分類例と1段階異なります。前提と理由を比較してください。',
     };
   }
   return {
     category,
     score: '△',
-    comment: '判断に大きなずれがあります。模範解答を確認してください。',
+    comment: '記述中の優先度が教材の分類例と2段階異なります。前提と理由を比較してください。',
     suggestion: SUGGESTION_TEMPLATES['判断'],
   };
 }
@@ -100,9 +100,11 @@ function countToScore(count: number): FeedbackScore {
 
 /** 観点ごとの定型コメント（◎ / ○ / △）。 */
 function commentFor(category: string, score: FeedbackScore): string {
-  if (score === '◎') return `${category}の観点が十分に盛り込まれています。`;
-  if (score === '○') return `${category}の観点が一部含まれています。さらに具体化しましょう。`;
-  return `${category}の観点が不足しています。記述を見直してください。`;
+  if (score === '◎')
+    return `${category}に対応する語句・形式の一致が多めです。内容の適切さは別途確認してください。`;
+  if (score === '○')
+    return `${category}に対応する語句・形式の一致が一部あります。実際の指示内容を確認してください。`;
+  return `${category}に対応する語句・形式を検出できませんでした。内容の不足とは限りません。`;
 }
 
 /**

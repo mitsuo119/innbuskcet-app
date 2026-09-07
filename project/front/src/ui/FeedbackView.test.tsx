@@ -56,18 +56,22 @@ describe('FeedbackView（PBI-029 / TASK-010）', () => {
     expect(container.querySelector('.feedback-view')).toBeNull();
   });
 
-  it('overall=◎ で aria-label="AI評価フィードバック" + 総合バッジ + 7 観点を表示する', () => {
+  it('overall=◎ でも答案の品質を保証せず、照合結果と7観点を表示する', () => {
     act(() => {
       root.render(<FeedbackView feedback={makeFeedback()} visible={true} />);
     });
-    const section = container.querySelector('section[aria-label="AI評価フィードバック"]');
+    const section = container.querySelector('section[aria-label="記述の自動チェック"]');
     expect(section).not.toBeNull();
 
     // 総合バッジ
     const overall = container.querySelector('.feedback-view__overall-badge');
     expect(overall).not.toBeNull();
     expect(overall!.textContent).toBe('◎');
-    expect(container.textContent).toContain('総合評価: 優秀');
+    expect(container.textContent).toContain('照合の目安: 語句・形式の一致が多め');
+    expect(container.textContent).toContain('文章の意味や正しさ、試験の得点は判定しません');
+    expect(container.textContent).not.toContain('総合評価: 優秀');
+    expect(container.textContent).not.toContain('AI 評価');
+    expect(container.querySelector('a[href="/reference/chapter02"]')).not.toBeNull();
 
     // 判断 1 件 + 理由 3 件 + アクション 3 件 = 7 観点
     const items = container.querySelectorAll('.feedback-view__item');

@@ -11,6 +11,7 @@ import { findPatternDeepDive } from '../data/deepDive';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 import { AdSlot } from '../ui/AdSlot';
+import contentNotice from '../data/learningContentNotice.json';
 
 interface Props {
   patternId: number;
@@ -60,6 +61,9 @@ export function PatternDetail({ patternId }: Props) {
       </header>
 
       <main className="legal-body">
+        <p className="legal-note">
+          {contentNotice.text} <a href={contentNotice.href}>{contentNotice.label}</a>
+        </p>
         <section className="legal-section">
           <h2 className="legal-section__title">優先度の目安</h2>
           <p>
@@ -119,7 +123,7 @@ export function PatternDetail({ patternId }: Props) {
 
         {deepDive && (
           <section className="legal-section">
-            <h2 className="legal-section__title">評価者はどこを見ているか</h2>
+            <h2 className="legal-section__title">答案を振り返る観点</h2>
             <p>{deepDive.evaluatorView}</p>
           </section>
         )}

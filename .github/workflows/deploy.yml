@@ -100,7 +100,7 @@ jobs:
 
       # DoD §5-1 に基づき High/Critical 脆弱性ゼロを必須ゲート化。
       - name: pnpm audit (High/Critical をブロック)
-        run: pnpm audit --prod --audit-level high
+        run: pnpm audit --audit-level high
 
       - name: Build (本番ベース URL 注入)
         env:

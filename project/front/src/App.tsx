@@ -19,6 +19,7 @@ import { ConfirmDialog, type ConfirmDialogAction } from './ui/ConfirmDialog';
 import { SelfScoreInput } from './ui/SelfScoreInput';
 import { RadarChart } from './ui/RadarChart';
 import { WeaknessPatternTop3 } from './ui/WeaknessPatternTop3';
+import { HomeStudyGuide } from './ui/HomeStudyGuide';
 import type { Case, Priority } from './domain/case';
 import { evaluateWriting, type WritingFeedback } from './domain/feedback';
 import {
@@ -699,84 +700,15 @@ export default function App() {
             rollingN={10}
           />
           <GlobalNav current="home" />
+          {!isExam && (
+            <a href="#home-about-heading" className="home-about__link">
+              5件の案件を比較する実践解説
+            </a>
+          )}
           {isExam && examSession !== null && (
             <ExamTimer session={examSession} onTimeUp={handleExamTimeUp} />
           )}
         </header>
-
-        {/*
-          PBI-090 / TASK-090-1: トップ本文「このサイトについて」段落（200〜400字）。
-          AdSense クローラ・JS 無効環境向けに、本サイトの目的・対象読者・無料学習である旨と、
-          主要コンテンツ（全12章解説 / 20パターン / 20ケース / Quick/Deep/Exam の3モード）を
-          プレーンテキスト中心で表示する。h1（既存「インバスケット」）→ h2（本セクション）の
-          見出し階層を維持し、a11y 退行ゼロを担保する。
-        */}
-        <section className="home-about" aria-labelledby="home-about-heading">
-          <h2 id="home-about-heading" className="home-about__title">
-            このサイトについて
-          </h2>
-          <p className="home-about__lead">
-            InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、
-            案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験まで、
-            ブラウザ上で体系的に<strong>無料</strong>で学べる日本語の学習Webサービスです。
-          </p>
-          <p className="home-about__lead">
-            想定読者は、管理職昇進試験を控える社会人や、優先順位判断・委任・意思決定スキルを
-            体系的に学びたい方です。コンテンツは、全12章の解説リファレンス、
-            全20パターンのケース別解説、代表ケース20件の単独URL演習、
-            <strong>Quick（速習）</strong>／<strong>Deep（記述）</strong>／
-            <strong>Exam（模試）</strong>
-            の3つの学習モードで構成され、繰り返しの訓練を通じて合格水準の判断力と回答骨格を身につけられます。
-          </p>
-
-          <h3 className="home-about__subtitle">インバスケット試験で問われること</h3>
-          <p className="home-about__lead">
-            {
-              'インバスケット試験は、架空の管理職に着任した初日に、未処理のまま溜まった案件を制限時間内で処理するシミュレーションです。制限時間は60〜90分、案件数は15〜25件が典型で、前任者が不在、自分もこの後すぐ出張に出るといった制約が設定されます。採点対象は「承認したか否か」という結論ではなく、なぜそう判断したのか、誰にどの期限で何を指示したのかという行動の中身です。そのため、正解を暗記する学習ではなく、限られた時間で優先順位を決め、判断の根拠を言語化し、適切に委任する型を身につける訓練が有効になります。'
-            }
-          </p>
-
-          <h3 className="home-about__subtitle">学習の進め方</h3>
-          <p className="home-about__lead">
-            {
-              '初めての方は、まず解説リファレンス第1章から第3章で試験の全体像と評価の観点をつかみ、続いて第4章から第7章で時間管理・優先順位付け・意思決定・委任という4つの基本スキルを学ぶ流れをおすすめします。基礎を押さえたら、Quickモードで案件の優先度判定を反復し、判断のスピードを上げます。判断が安定してきたらDeepモードに切り替え、判断・理由・具体行動を文章で書く練習に移ります。仕上げとして、本番と同じ時間制約で複数案件を処理するExamモードに取り組み、時間切れになりやすい箇所を特定して弱点を補強します。'
-            }
-          </p>
-
-          <h3 className="home-about__subtitle">収録コンテンツ</h3>
-          <p className="home-about__lead">
-            {
-              '解説リファレンスは全12章で、試験の概要、採点基準、マネージャーとしての思考の切り替え、時間管理、優先順位付け、意思決定フレームワーク、委任、案件パターン別の攻略、記述の技法、模擬試験、振り返りの方法、試験当日の戦略までを扱います。パターン別解説では、顧客クレーム、部下の退職相談、ハラスメント報告、情報セキュリティインシデント、複合案件など20種類の頻出パターンについて、出題される場面の読み解き、優先度判定の論拠、よくある失敗、回答例文、評価者の着眼点を掲載しています。代表ケース20件には、案件文・正解優先度・解説・模範回答に加えて、誤答パターンと一次対応後のフォローアップまで収録しています。'
-            }
-          </p>
-
-          <p className="home-about__links">
-            詳細は
-            <a href="/about" className="home-about__link">
-              運営者情報
-            </a>
-            ／
-            <a href="/terms" className="home-about__link">
-              サービス利用規約
-            </a>
-            をご覧ください。学習コンテンツは
-            <a href="/reference" className="home-about__link">
-              解説リファレンス
-            </a>
-            ／
-            <a href="/patterns" className="home-about__link">
-              パターン別解説
-            </a>
-            から一覧できます。
-          </p>
-        </section>
-
-        {/* PBI-100 / TASK-100-3: 学習トップ（kind='home'）はポリシー上 表示可。 */}
-        <AdSlot
-          label="広告（ヘッダー下バナー）"
-          className="ad-slot--header"
-          pageMeta={{ kind: 'home' }}
-        />
 
         {examResult ? (
           <ExamResultView
@@ -826,11 +758,14 @@ export default function App() {
                       type="button"
                       className="writing-input__ai"
                       onClick={handleEvaluateWriting}
-                      aria-label="AIに評価を依頼する"
+                      aria-label="記述の語句・形式をチェックする"
                     >
-                      AIに見てもらう
+                      記述をチェック
                     </button>
                   </div>
+                )}
+                {isDeep && (
+                  <FeedbackView feedback={writingFeedback} visible={writingFeedback !== null} />
                 )}
                 <AnswerButtons selected={selected} locked={locked} onSelect={handleSelect} />
                 {judgement && selected && (
@@ -845,10 +780,6 @@ export default function App() {
                           modelAnswer={current.modelAnswer}
                           visible={!!judgement}
                           correctPriority={current.correctPriority}
-                        />
-                        <FeedbackView
-                          feedback={writingFeedback}
-                          visible={writingFeedback !== null}
                         />
                       </>
                     )}
@@ -894,6 +825,8 @@ export default function App() {
                 </button>
               )}
             </div>
+
+            {!isExam && <HomeStudyGuide />}
 
             <footer className="app-footer" aria-label="キーボードショートカット">
               <small>
@@ -955,12 +888,13 @@ export default function App() {
             </footer>
           </>
         )}
-        {/* PBI-100 / TASK-100-3: 学習トップ（kind='home'）はポリシー上 表示可。 */}
-        <AdSlot
-          label="広告（メインコンテンツ下）"
-          className="ad-slot--footer"
-          pageMeta={{ kind: 'home' }}
-        />
+        {!isExam && !examResult && current && (
+          <AdSlot
+            label="広告（メインコンテンツ下）"
+            className="ad-slot--footer"
+            pageMeta={{ kind: 'home' }}
+          />
+        )}
       </main>
       <ConfirmDialog
         open={dialogState.open}

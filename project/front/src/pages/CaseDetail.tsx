@@ -13,6 +13,7 @@ import { CASE_DETAIL_META_BY_ID, type CaseDetailMeta } from '../routes';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 import { AdSlot } from '../ui/AdSlot';
+import contentNotice from '../data/learningContentNotice.json';
 
 interface CaseRecord {
   id: string;
@@ -86,13 +87,16 @@ export function CaseDetail({ caseId }: Props) {
       </header>
 
       <main className="legal-body">
+        <p className="legal-note">
+          {contentNotice.text} <a href={contentNotice.href}>{contentNotice.label}</a>
+        </p>
         <section className="legal-section">
           <h2 className="legal-section__title">ケース本文</h2>
           <p>{record.body}</p>
         </section>
 
         <section className="legal-section">
-          <h2 className="legal-section__title">正答ランクと解説</h2>
+          <h2 className="legal-section__title">教材の分類例と解説</h2>
           <p>
             <strong>{PRIORITY_LABEL[record.correctPriority] ?? record.correctPriority}</strong>
           </p>
@@ -149,6 +153,22 @@ export function CaseDetail({ caseId }: Props) {
           <section className="legal-section">
             <h2 className="legal-section__title">一次対応の後にやること</h2>
             <p>{deepDive.followUp}</p>
+          </section>
+        )}
+
+        {deepDive?.sources && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">制度を確認する公的資料</h2>
+            <p>学習例を実務へ適用する際は、最新の制度と所属組織の規程を確認してください。</p>
+            <ul className="legal-list">
+              {deepDive.sources.map((source) => (
+                <li key={source.href}>
+                  <a href={source.href} target="_blank" rel="noopener noreferrer">
+                    {source.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 

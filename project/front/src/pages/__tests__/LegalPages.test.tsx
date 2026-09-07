@@ -10,7 +10,8 @@ describe('PBI-051 法務ページスモークテスト', () => {
 
     expect(html).toContain('プライバシーポリシー');
     expect(html).toContain('Google AdSense');
-    expect(html).toContain('Cookieの使用');
+    expect(html).toContain('広告とCookieの選択');
+    expect(html).toContain('これらはCookieとは異なる保存機能');
   });
 
   it('TermsOfService がタイトルと主要テキストを表示する', () => {

@@ -308,7 +308,7 @@ describe('プリレンダ本文文字数下限（1000字以上 / 章 + 詳細ペ
       const r = caseRoutes.find((x) => x.path === path);
       expect(r, `${path} が ROUTES に存在しない`).toBeDefined();
       expect(r.bodyHtml).toContain('<h2>ケース概要：');
-      expect(r.bodyHtml).toContain('<h2>正解優先度：');
+      expect(r.bodyHtml).toContain('<h2>教材の分類例：');
       expect(r.bodyHtml).toContain('<h2>模範回答の骨格</h2>');
       expect(r.bodyHtml).toContain('判断：');
       expect(r.bodyHtml).toContain('理由：');
@@ -346,7 +346,7 @@ describe('プリレンダ本文文字数下限（1000字以上 / 章 + 詳細ペ
       expect(r.bodyHtml, r.path).toContain('<h2>なぜこの優先度になるのか</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>よくある失敗</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>回答例文</h2>');
-      expect(r.bodyHtml, r.path).toContain('<h2>評価者はどこを見ているか</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>答案を振り返る観点</h2>');
     }
   });
   it('代表ケース20件全件に深掘り解説セクションが含まれる', () => {

@@ -9,9 +9,9 @@ export interface FeedbackViewProps {
 
 /** 総合評価バッジ用の定型メッセージ。 */
 const OVERALL_MESSAGE: Record<FeedbackScore, string> = {
-  '◎': '総合評価: 優秀。判断・理由・アクションの観点が十分に揃っています。',
-  '○': '総合評価: 良好。観点は概ね揃っていますが、さらに具体化の余地があります。',
-  '△': '総合評価: 改善の余地あり。模範解答を参考に観点を補強してください。',
+  '◎': '照合の目安: 語句・形式の一致が多めです。',
+  '○': '照合の目安: 語句・形式の一致が一部あります。',
+  '△': '照合の目安: 語句・形式の一致が少なめです。',
 };
 
 /** スコア記号 → CSS 修飾子（◎=good / ○=ok / △=ng）。 */
@@ -41,7 +41,7 @@ function FeedbackItemRow({ item }: { item: FeedbackItem }) {
         <span className="feedback-view__category">{item.category}</span>
         <span
           className={`feedback-view__score feedback-view__score--${mod}`}
-          aria-label={`評価 ${item.score}`}
+          aria-label={`照合結果 ${item.score}`}
         >
           {item.score}
         </span>
@@ -67,12 +67,12 @@ function FeedbackItemRow({ item }: { item: FeedbackItem }) {
 }
 
 /**
- * AI 評価フィードバック表示コンポーネント（PBI-029 / TASK-010）。
+ * 記述のルールベース照合結果を表示するコンポーネント。
  *
  * - `visible=false` または `feedback=null` の場合は何も描画しない（null を返す）。
  * - 全体評価バッジ（◎ / ○ / △ + 定型メッセージ）+ 判断 1 行 + 理由 3 観点 + アクション 3 観点。
  * - DoD §10-2: テキストノードのみで構成し `dangerouslySetInnerHTML` 不使用（XSS 安全）。
- * - DoD §9-3: `aria-label="AI評価フィードバック"` をセクションに付与。`<dl>` で観点と評価を意味的に対応付け。
+ * - DoD §9-3: `<dl>` で観点と照合結果を意味的に対応付け。
  */
 export function FeedbackView({ feedback, visible }: FeedbackViewProps) {
   if (!visible || feedback === null) return null;
@@ -80,9 +80,13 @@ export function FeedbackView({ feedback, visible }: FeedbackViewProps) {
   const overallMod = scoreModifier(feedback.overall);
 
   return (
-    <section className="feedback-view" aria-label="AI評価フィードバック">
+    <section className="feedback-view" aria-label="記述の自動チェック">
       <header className="feedback-view__header">
-        <h3 className="feedback-view__title">AI 評価フィードバック</h3>
+        <h3 className="feedback-view__title">記述の自動チェック</h3>
+        <p className="legal-note">
+          語句・形式の照合結果です。文章の意味や正しさ、試験の得点は判定しません。
+          <a href="/reference/chapter02">判定の前提と限界</a>
+        </p>
         <div
           className={`feedback-view__overall feedback-view__overall--${overallMod}`}
           role="status"
@@ -90,7 +94,7 @@ export function FeedbackView({ feedback, visible }: FeedbackViewProps) {
         >
           <span
             className={`feedback-view__overall-badge feedback-view__overall-badge--${overallMod}`}
-            aria-label={`総合評価 ${feedback.overall}`}
+            aria-label={`全体の照合結果 ${feedback.overall}`}
           >
             {feedback.overall}
           </span>

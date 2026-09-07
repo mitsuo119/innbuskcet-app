@@ -36,9 +36,46 @@ describe('パターン深掘り解説', () => {
     const texts = PATTERN_DATA.map((p) => findPatternDeepDive(p.id)!.situation);
     expect(new Set(texts).size).toBe(texts.length);
   });
+
+  it('振り返りの観点は実際の採点者や配点を断定しない', () => {
+    for (const pattern of PATTERN_DATA) {
+      expect(findPatternDeepDive(pattern.id)!.evaluatorView).not.toMatch(
+        /採点者|加点|減点|満点|高評価/,
+      );
+    }
+  });
+
+  it('回答例は調査未了の確約や休暇中の報告を要求しない', () => {
+    expect(findPatternDeepDive(1)!.answerExample).toContain('次回の経過報告時刻');
+    expect(findPatternDeepDive(7)!.answerExample).toContain('休暇中の定例報告は不要');
+    expect(findPatternDeepDive(8)!.answerExample).toContain('匿名性を完全には保証できない');
+  });
 });
 
 describe('代表ケース深掘り解説', () => {
+  it('重大な不具合は未確認事項と安全を確認し、解決日ではなく経過報告を約束する', () => {
+    const detail = findCaseDeepDive('case-001')!;
+    expect(detail.situationAnalysis).toContain('未確認');
+    expect(detail.priorityRationale).toContain('安全');
+    expect(detail.answerExample).toContain('次回の経過報告時刻');
+    expect(detail.answerExample).not.toContain('正式回答は明後日中');
+    expect(detail.situationAnalysis).not.toContain('不具合の内容そのものではなく');
+  });
+
+  it('匿名相談は守秘の限界と共有範囲を説明し、結論を断定しない', () => {
+    const detail = findCaseDeepDive('case-004')!;
+    expect(detail.answerExample).toContain('匿名性を完全には保証できない');
+    expect(detail.answerExample).toContain('誰に何を共有してよいか');
+    expect(detail.priorityRationale).not.toContain('唯一の正解');
+  });
+
+  it('休暇の引き継ぎは勤務時間内に終え、休暇当日の報告を求めない', () => {
+    const detail = findCaseDeepDive('case-019')!;
+    expect(detail.answerExample).toContain('休暇前の勤務時間内');
+    expect(detail.answerExample).toContain('休暇中の定例報告は不要');
+    expect(detail.answerExample).not.toContain('当日朝に引き継ぎ状況を本人から一報');
+  });
+
   it('代表 20 ケースに解説が存在する', () => {
     expect(CASE_DETAIL_META).toHaveLength(20);
     for (const meta of CASE_DETAIL_META) {

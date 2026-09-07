@@ -2,7 +2,64 @@ import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { About } from '../About';
 import { Terms } from '../Terms';
+import { Contact } from '../Contact';
+import { PrivacyPolicy } from '../PrivacyPolicy';
+import information from '../../data/siteInformation.json';
 import { PUBLIC_ROUTES } from '../../routes';
+import { ROUTES } from '../../../scripts/prerender.mjs';
+
+describe('運営情報とプライバシーの表示一致', () => {
+  const pages = [
+    { path: '/about', page: <About />, content: information.about },
+    { path: '/contact', page: <Contact />, content: information.contact },
+    { path: '/privacy-policy', page: <PrivacyPolicy />, content: information.privacy },
+  ];
+
+  for (const entry of pages) {
+    it(`${entry.path} は全段落・連絡先・更新日を画面と静的HTMLで共有する`, () => {
+      const live = new DOMParser().parseFromString(renderToStaticMarkup(entry.page), 'text/html');
+      const staticPage = new DOMParser().parseFromString(
+        ROUTES.find((route: { path: string }) => route.path === entry.path)!.bodyHtml,
+        'text/html',
+      );
+      for (const output of [live, staticPage]) {
+        expect(output.body.textContent).toContain(entry.content.introduction);
+        expect(output.querySelector('time')?.getAttribute('datetime')).toBe(entry.content.updated);
+        for (const section of entry.content.sections) {
+          for (const text of [section.heading, ...section.paragraphs, ...section.points]) {
+            expect(output.body.textContent).toContain(text);
+          }
+          for (const link of section.links) {
+            expect(output.querySelector(`a[href="${link.href}"]`)).not.toBeNull();
+          }
+        }
+      }
+    });
+  }
+
+  it('問い合わせが実際のIssue作成先に届き、公開範囲を明示する', () => {
+    const html = renderToStaticMarkup(<Contact />);
+    expect(html).toContain('href="https://github.com/mitsuo119/innbuskcet-app/issues/new"');
+    expect(html).not.toContain('href="https://github.com"');
+    expect(html).toContain('投稿内容はインターネット上に公開');
+    expect(html).not.toContain('別途ご連絡方法をご案内');
+  });
+
+  it('架空の専門家監修や外部AIによる採点をうたわない', () => {
+    const html = renderToStaticMarkup(<About />);
+    expect(html).toContain('AIを教材の草案作成と実装に利用');
+    expect(html).toContain('公式採点基準、配点、合格ラインを示すものではありません');
+    expect(html).toContain('ブラウザ内での語句・形式のチェック');
+  });
+
+  it('Cookieとブラウザ保存を区別し、Googleのデータ利用説明にリンクする', () => {
+    const html = renderToStaticMarkup(<PrivacyPolicy />);
+    expect(html).toContain('これらはCookieとは異なる保存機能');
+    expect(html).toContain('IPアドレス');
+    expect(html).toContain('ウェブビーコン');
+    expect(html).toContain('https://policies.google.com/technologies/partner-sites?hl=ja');
+  });
+});
 
 /**
  * PBI-088 / TASK-088-3 (Sprint024 DAY4):

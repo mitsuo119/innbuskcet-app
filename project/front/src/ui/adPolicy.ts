@@ -5,7 +5,7 @@
  * 1 つの純関数 `shouldShowAds(pageMeta)` に集約する。AdSlot.tsx 側はこの判定の上位レイヤーで
  * 呼び出し、true の場合のみ `<AdSlot />` をレンダリングする。
  *
- * - C1（本文600字以上）: `bodyCharCount` で判定（省略時は kind の既定値で判断）。
+ * - C1（内部の本文欠落検知）: `bodyCharCount` で判定（省略時はビルド時検証を利用）。
  * - C2（非ナビゲーション）: `kind` が一覧（reference-list / pattern-list）の場合は false。
  * - C3（独自）/ C4（完成済）: 運営側が `kind` 単位で保証（コードでは kind 別に許可）。
  * - C5（非法務固定）: `kind = legal` は false。
@@ -33,7 +33,7 @@ export interface AdPageMeta {
   kind: AdPageKind;
   /**
    * プリレンダ本文文字数（C1 判定）。
-   * 省略時は kind の既定値で判断する（home / SEO 詳細は 600+ を満たす前提）。
+   * 省略時は kind の既定値で判断する（本文は別途ビルド時に検証）。
    */
   bodyCharCount?: number;
 }
@@ -46,20 +46,23 @@ const SHOWABLE_KINDS = new Set<AdPageKind>([
   'pattern-detail',
 ]);
 
-/** 本文600字以上の C1 基準値 */
-export const MIN_BODY_CHAR_COUNT = 600;
+/** 本文欠落検知の内部基準。Googleの審査基準ではない。 */
+export const MIN_BODY_CHAR_COUNT = 1000;
 
 /**
  * 広告掲載の可否を判定する純関数（広告配置ポリシーの単一判定窓口）。
  *
  * - SHOWABLE_KINDS に含まれる kind かつ
- * - bodyCharCount が省略または >= 600 の場合のみ true。
+ * - bodyCharCount が省略または有限数で >= 1000 の場合のみ true。
  *
  * それ以外（一覧 / 法務 / 検索 / 404 / エラー / 本文不足）は false。
  */
 export function shouldShowAds(pageMeta: AdPageMeta): boolean {
   if (!SHOWABLE_KINDS.has(pageMeta.kind)) return false;
-  if (pageMeta.bodyCharCount !== undefined && pageMeta.bodyCharCount < MIN_BODY_CHAR_COUNT) {
+  if (
+    pageMeta.bodyCharCount !== undefined &&
+    (!Number.isFinite(pageMeta.bodyCharCount) || pageMeta.bodyCharCount < MIN_BODY_CHAR_COUNT)
+  ) {
     return false;
   }
   return true;

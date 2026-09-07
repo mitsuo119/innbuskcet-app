@@ -3,6 +3,7 @@
  * ref/chapter01-what-is-inbasket.md / chapter02-scoring-criteria.md を
  * 安全な TypeScript 定数として構造化する。
  */
+import scoringGuide from './scoringGuide.json';
 
 /** 参照章ID */
 export type ReferenceChapterId =
@@ -177,97 +178,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
       },
     ],
   },
-  {
-    id: 'chapter02',
-    sourcePath: 'ref/chapter02-scoring-criteria.md',
-    title: '採点基準を逆算する',
-    description: '評価ディメンションを把握し、高得点行動と低評価行動を見分ける。',
-    learningGoals: [
-      '6つの評価ディメンションを説明できる',
-      '高得点行動と低評価行動の差を判断できる',
-      '意思決定力が最重要である理由を理解できる',
-    ],
-    sections: [
-      {
-        id: 'chapter02-why-scoring-matters',
-        title: 'なぜ採点基準を知るべきか',
-        blocks: [
-          {
-            kind: 'paragraph',
-            text: 'インバスケットは採点軸が分かると解答の書き方が変わる。何が評価されるかを知ることが最短の攻略法である。',
-          },
-          {
-            kind: 'paragraph',
-            text: '多くの試験では評価軸が6つのディメンションに集約されるため、各案件でどの観点を見せるかを意識して書く必要がある。',
-          },
-        ],
-      },
-      {
-        id: 'chapter02-dimensions',
-        title: '6つの評価ディメンション',
-        blocks: [
-          {
-            kind: 'table',
-            headers: ['ディメンション', '高得点の要点'],
-            rows: [
-              ['問題発見力', '表面事象だけでなく背景・原因・案件間の関連性まで見る'],
-              ['問題分析力', '関係者・影響範囲・不足情報を整理してから判断する'],
-              ['意思決定力', '方向性を明示し、理由つきで判断を示す'],
-              ['洞察力', '放置リスクや波及効果、代替案まで先読みする'],
-              ['組織活用力', '担当者・期限・報告方法を明確にして委任・連携する'],
-              ['ヒューマンスキル', '相手の感情や立場へ配慮した表現で対応する'],
-            ],
-          },
-          {
-            kind: 'note',
-            title: 'エンジニア視点の読み替え',
-            text: '問題発見力は根本原因分析、問題分析力は影響範囲調査、意思決定力は技術選定の根拠提示に近い。既存スキルを管理職文脈へ移す発想が有効。',
-          },
-        ],
-      },
-      {
-        id: 'chapter02-weight-and-anti-patterns',
-        title: '重みづけと低評価行動',
-        blocks: [
-          {
-            kind: 'paragraph',
-            text: '一般に意思決定力の配点が最も高い。迷って白紙にするより、理由を添えて判断を示した方が得点につながる。',
-          },
-          {
-            kind: 'bullet-list',
-            items: [
-              '白紙・未回答で終える',
-              '全案件を「検討します」で先送りする',
-              '全部自分でやろうとする',
-              '何でも上司に判断を仰ぐ',
-              '感情的・高圧的な指示を出す',
-            ],
-          },
-          {
-            kind: 'note',
-            title: '合格の最重要原則',
-            text: 'すべての案件に「判断」「理由」「指示」を残し、マネージャーとしての行動パターンを見せる。',
-          },
-        ],
-      },
-      {
-        id: 'chapter02-related-patterns',
-        title: '関連パターン',
-        blocks: [
-          {
-            kind: 'link-list',
-            items: [
-              {
-                label: '上位方針の伝達・対応（パターン17）',
-                href: '/patterns/17',
-                description: '評価ディメンションを答案に反映するための代表例',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
+  scoringGuide as ReferenceChapter,
   {
     id: 'chapter05',
     sourcePath: 'ref/chapter05-prioritization.md',

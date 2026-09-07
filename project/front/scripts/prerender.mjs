@@ -51,6 +51,12 @@ const CASES_JSON = resolve(FRONT_DIR, 'src', 'data', 'cases.json');
 // よくある失敗／回答例文／評価者視点）を焼き込む。全ページ共通の定型文は使用しない。
 const PATTERN_DEEP_DIVE_JSON = resolve(FRONT_DIR, 'src', 'data', 'patternDeepDive.json');
 const CASE_DEEP_DIVE_JSON = resolve(FRONT_DIR, 'src', 'data', 'caseDeepDive.json');
+const SCORING_GUIDE = JSON.parse(
+  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'scoringGuide.json'), 'utf-8'),
+);
+const CONTENT_NOTICE = JSON.parse(
+  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'learningContentNotice.json'), 'utf-8'),
+);
 
 const APP_NAME = 'インバスケット - 学習アプリ';
 
@@ -167,8 +173,35 @@ function resolveChapterMdPath(id) {
 
 /** 章ID → プリレンダ本文 HTML（同期読み込み）。テスト時も import 時に確定する。 */
 function loadChapterBodyHtml(id) {
+  if (id === SCORING_GUIDE.id) return referenceChapterHtml(SCORING_GUIDE);
   const md = readFileSync(resolveChapterMdPath(id), 'utf-8');
   return mdToHtml(md);
+}
+
+function referenceChapterHtml(chapter) {
+  const listHtml = (items) => `<ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>`;
+  const blockHtml = (block) => {
+    switch (block.kind) {
+      case 'paragraph':
+        return `<p>${escapeHtml(block.text)}</p>`;
+      case 'bullet-list':
+        return listHtml(block.items.map(escapeHtml));
+      case 'note':
+        return `<h3>${escapeHtml(block.title)}</h3><p>${escapeHtml(block.text)}</p>`;
+      case 'table':
+        return `<table><thead><tr>${block.headers.map((header) => `<th scope="col">${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${block.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      case 'link-list':
+        return listHtml(
+          block.items.map(
+            (item) =>
+              `<a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>${item.description ? `：${escapeHtml(item.description)}` : ''}`,
+          ),
+        );
+      default:
+        throw new Error(`未対応の本文ブロック: ${block.kind}`);
+    }
+  };
+  return `<h2>この章で学ぶこと</h2>${listHtml(chapter.learningGoals.map(escapeHtml))}${chapter.sections.map((section) => `<h2>${escapeHtml(section.title)}</h2>${section.blocks.map(blockHtml).join('')}`).join('')}`;
 }
 
 /**
@@ -193,6 +226,52 @@ const CASES_BY_ID = loadCasesById();
 /** パターン／ケースの深掘り解説（ページ固有本文）。定義源は React 側と共通の JSON。 */
 const PATTERN_DEEP_DIVE = JSON.parse(readFileSync(PATTERN_DEEP_DIVE_JSON, 'utf-8'));
 const CASE_DEEP_DIVE = JSON.parse(readFileSync(CASE_DEEP_DIVE_JSON, 'utf-8'));
+const HOME_GUIDE = JSON.parse(
+  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'homeStudyGuide.json'), 'utf-8'),
+);
+const SITE_INFORMATION = JSON.parse(
+  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'siteInformation.json'), 'utf-8'),
+);
+
+function informationBodyHtml(content) {
+  return `
+    <h1>${escapeHtml(content.title)}</h1>
+    <p>最終更新日: <time datetime="${escapeHtml(content.updated)}">${escapeHtml(content.updated)}</time></p>
+    <p>${escapeHtml(content.introduction)}</p>
+    ${content.sections
+      .map(
+        (section) => `
+      <h2>${escapeHtml(section.heading)}</h2>
+      ${section.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('')}
+      ${section.points.length ? `<ul>${section.points.map((point) => `<li>${escapeHtml(point)}</li>`).join('')}</ul>` : ''}
+      ${section.links.length ? `<ul>${section.links.map((link) => `<li><a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a></li>`).join('')}</ul>` : ''}
+    `,
+      )
+      .join('')}
+  `;
+}
+
+function homeStudyGuideHtml() {
+  const linksHtml = (links) =>
+    `<ul>${links.map((link) => `<li><a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a></li>`).join('')}</ul>`;
+  return `
+    <h2 id="home-about-heading">${escapeHtml(HOME_GUIDE.title)}</h2>
+    <p>更新日: <time datetime="${HOME_GUIDE.updated}">${HOME_GUIDE.updated}</time></p>
+    <p>${escapeHtml(HOME_GUIDE.introduction)}</p>
+    ${HOME_GUIDE.sections
+      .map(
+        (section) => `
+      <h3>${escapeHtml(section.heading)}</h3>
+      ${section.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('')}
+      ${section.points.length ? `<ul>${section.points.map((point) => `<li>${escapeHtml(point)}</li>`).join('')}</ul>` : ''}
+      ${section.links.length ? linksHtml(section.links) : ''}
+    `,
+      )
+      .join('')}
+    <p>${escapeHtml(HOME_GUIDE.siteSummary)}</p>
+    ${linksHtml(HOME_GUIDE.siteLinks)}
+  `;
+}
 
 /** 深掘り解説ブロックを `<h2>` + 本文の HTML に整形する（値が無い項目は出力しない）。 */
 function deepDiveSectionsHtml(sections) {
@@ -253,7 +332,7 @@ const CHAPTERS = [
     summary:
       'インバスケット試験では「全案件を完璧に処理したか」よりも、6つの評価ディメンション（判断力・統率力・問題分析力・計画組織力・対人関係力・主体性）でマネージャー行動の幅と質を測ります。',
     intro:
-      '本章では各評価ディメンションの観点と、高得点行動／低評価行動の見分け方を整理します。採点基準を理解することで、案件ごとに「どのディメンションでアピールするか」を意図的に設計できるようになります。',
+      '本章では公式の採点基準と教材独自の自己点検を区別し、答案の具体的な一文を根拠に振り返ります。実際の配点や合否は推測せず、条件・権限・担当・報告の抜けを比較例から確認します。',
     relatedPath: '/patterns/2',
     relatedLabel: '部下のミス報告（パターン2）',
   },
@@ -507,12 +586,13 @@ function buildCaseRoute(meta) {
     bodyHtml: `
       <div data-prerender="case-${meta.id}">
         <h1>ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}）</h1>
+        <p>${escapeHtml(CONTENT_NOTICE.text)} <a href="${CONTENT_NOTICE.href}">${escapeHtml(CONTENT_NOTICE.label)}</a></p>
         <h2>ケース概要：${escapeHtml(caseTitle)}</h2>
         <p>${escapeHtml(body)}</p>
         ${charsHtml}
         ${deptsHtml}
         ${themeHtml}
-        <h2>正解優先度：${escapeHtml(priorityLabel)}</h2>
+        <h2>教材の分類例：${escapeHtml(priorityLabel)}</h2>
         <p>${escapeHtml(explanation)}</p>
         ${analysisHtml}
         <h2>模範回答の骨格</h2>
@@ -520,6 +600,7 @@ function buildCaseRoute(meta) {
         <p>理由：${escapeHtml(reason)}</p>
         <p>対応：${escapeHtml(action)}</p>
         ${followUpHtml}
+        ${dd.sources?.length ? `<h2>制度を確認する公的資料</h2><p>学習例を実務へ適用する際は、最新の制度と所属組織の規程を確認してください。</p><ul>${dd.sources.map((source) => `<li><a href="${escapeHtml(source.href)}">${escapeHtml(source.label)}</a></li>`).join('')}</ul>` : ''}
         <p>関連リンク：<a href="/patterns/${meta.patternId}">パターン${meta.patternId}「${escapeHtml(meta.patternName)}」</a> ／ <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（chapter08）</a></p>
       </div>
     `.trim(),
@@ -664,7 +745,7 @@ function buildPatternRoute(meta) {
   const practiceHtml = deepDiveSectionsHtml([
     ['よくある失敗', dd.commonMistakes],
     ['回答例文', dd.answerExample],
-    ['評価者はどこを見ているか', dd.evaluatorView],
+    ['答案を振り返る観点', dd.evaluatorView],
   ]);
 
   return {
@@ -675,6 +756,7 @@ function buildPatternRoute(meta) {
     bodyHtml: `
       <div data-prerender="pattern-${meta.id}">
         <h1>パターン${meta.id}：${meta.name}</h1>
+        <p>${escapeHtml(CONTENT_NOTICE.text)} <a href="${CONTENT_NOTICE.href}">${escapeHtml(CONTENT_NOTICE.label)}</a></p>
         <h2>カテゴリ：${escapeHtml(category)}</h2>
         <p>${escapeHtml(categoryDesc)}</p>
         <h2>優先度の目安：${escapeHtml(priorityLabel)}</h2>
@@ -709,15 +791,7 @@ export const ROUTES = [
     bodyHtml: `
       <div data-prerender="home">
         <h1>インバスケット</h1>
-        <p>InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験まで、ブラウザ上で体系的に無料で学べる日本語の学習Webサービスです。</p>
-        <p>想定読者は管理職昇進試験を控える社会人や、優先順位判断・委任・意思決定スキルを体系的に学びたい方です。コンテンツは全12章の解説リファレンス、全20パターンのケース別解説、代表ケース20件の単独URL演習、Quick（速習）／Deep（記述）／Exam（模試）の3つの学習モードで構成され、繰り返しの訓練を通じて合格水準の判断力と回答骨格を身につけられます。</p>
-        <h2>インバスケット試験で問われること</h2>
-        <p>インバスケット試験は、架空の管理職に着任した初日に、未処理のまま溜まった案件を制限時間内で処理するシミュレーションです。制限時間は60〜90分、案件数は15〜25件が典型で、前任者が不在、自分もこの後すぐ出張に出るといった制約が設定されます。採点対象は「承認したか否か」という結論ではなく、なぜそう判断したのか、誰にどの期限で何を指示したのかという行動の中身です。そのため、正解を暗記する学習ではなく、限られた時間で優先順位を決め、判断の根拠を言語化し、適切に委任する型を身につける訓練が有効になります。</p>
-        <h2>学習の進め方</h2>
-        <p>初めての方は、まず解説リファレンス第1章から第3章で試験の全体像と評価の観点をつかみ、続いて第4章から第7章で時間管理・優先順位付け・意思決定・委任という4つの基本スキルを学ぶ流れをおすすめします。基礎を押さえたら、Quickモードで案件の優先度判定を反復し、判断のスピードを上げます。判断が安定してきたらDeepモードに切り替え、判断・理由・具体行動を文章で書く練習に移ります。仕上げとして、本番と同じ時間制約で複数案件を処理するExamモードに取り組み、時間切れになりやすい箇所を特定して弱点を補強します。</p>
-        <h2>収録コンテンツ</h2>
-        <p>解説リファレンスは全12章で、試験の概要、採点基準、マネージャーとしての思考の切り替え、時間管理、優先順位付け、意思決定フレームワーク、委任、案件パターン別の攻略、記述の技法、模擬試験、振り返りの方法、試験当日の戦略までを扱います。パターン別解説では、顧客クレーム、部下の退職相談、ハラスメント報告、情報セキュリティインシデント、複合案件など20種類の頻出パターンについて、出題される場面の読み解き、優先度判定の論拠、よくある失敗、回答例文、評価者の着眼点を掲載しています。代表ケース20件には、案件文・正解優先度・解説・模範回答に加えて、誤答パターンと一次対応後のフォローアップまで収録しています。</p>
-        <p>詳細は <a href="/about">運営者情報</a> ／ <a href="/terms">サービス利用規約</a> をご覧ください。学習コンテンツは <a href="/reference">解説リファレンス</a> ／ <a href="/patterns">パターン別解説</a> から一覧できます。</p>
+        ${homeStudyGuideHtml()}
       </div>
     `.trim(),
   },
@@ -729,10 +803,7 @@ export const ROUTES = [
       'インバスケット学習アプリ InBusket の運営者・サイト目的・コンテンツ作成方針・連絡手段・更新ポリシーをまとめた運営者情報ページです。',
     bodyHtml: `
       <div data-prerender="about">
-        <h1>運営者情報（このサイトについて）</h1>
-        <p>InBusket（インバスケット学習アプリ）は、管理職昇進試験などで出題されるインバスケット演習を、案件処理・優先順位付け・委任判断・意思決定フレームワーク・模擬試験までブラウザ上で体系的に無料学習できるようにすることを目的とした学習Webサービスです。</p>
-        <p>本ページでは運営目的・想定読者・コンテンツ作成方針・連絡手段・更新ポリシーを公開しています。紙ベース・有料研修中心になりがちなインバスケット学習を、いつでもどこでも繰り返し訓練できる環境にすることで学習機会の格差解消を目指します。</p>
-        <p>関連リンク：<a href="/terms">サービス利用規約</a> ／ <a href="/privacy-policy">プライバシーポリシー</a></p>
+        ${informationBodyHtml(SITE_INFORMATION.about)}
       </div>
     `.trim(),
   },
@@ -794,10 +865,7 @@ export const ROUTES = [
       'インバスケット学習アプリ InBusket の個人情報の取り扱い方針（収集情報・利用目的・第三者提供・問い合わせ窓口）をまとめたプライバシーポリシーです。',
     bodyHtml: `
       <div data-prerender="privacy-policy">
-        <h1>プライバシーポリシー</h1>
-        <p>本ポリシーは、InBusket（インバスケット学習アプリ）における個人情報の取り扱い方針を定めたものです。本サービスは学習進捗・回答履歴をブラウザ内（localStorage / sessionStorage）に限定して保存し、サーバーへ送信しません。</p>
-        <p>利用目的・収集情報・第三者提供・Cookie/広告（AdSense）・問い合わせ窓口・改定方針を明示し、利用者の不安を可視化のもとで解消することを目指します。</p>
-        <p>関連リンク：<a href="/terms">サービス利用規約</a> ／ <a href="/about">運営者情報</a> ／ <a href="/contact">お問い合わせ</a></p>
+        ${informationBodyHtml(SITE_INFORMATION.privacy)}
       </div>
     `.trim(),
   },
@@ -810,10 +878,7 @@ export const ROUTES = [
       'インバスケット学習アプリ InBusket へのお問い合わせ方法・連絡先・対応範囲・回答目安をまとめた連絡窓口ページです。',
     bodyHtml: `
       <div data-prerender="contact">
-        <h1>お問い合わせ</h1>
-        <p>本ページは、InBusket（インバスケット学習アプリ）に関するお問い合わせ方法を案内する連絡窓口ページです。学習内容・採点ロジック・不具合・改善要望などのご連絡を受け付けます。</p>
-        <p>対応範囲（運営者によるベストエフォート対応）・回答目安・連絡手段を公開し、利用者と運営の双方向コミュニケーションを担保します。</p>
-        <p>関連リンク：<a href="/about">運営者情報</a> ／ <a href="/privacy-policy">プライバシーポリシー</a> ／ <a href="/terms">サービス利用規約</a></p>
+        ${informationBodyHtml(SITE_INFORMATION.contact)}
       </div>
     `.trim(),
   },
@@ -895,7 +960,7 @@ function replaceCanonical(html, absoluteUrl) {
  */
 function injectIntoRoot(html, bodyHtml) {
   const re = /<div id="root">[\s\S]*?<\/div>/i;
-  return html.replace(re, `<div id="root">${bodyHtml}</div>`);
+  return html.replace(re, `<div id="root">${bodyHtml.replace(/[ \t]+$/gm, '')}</div>`);
 }
 
 function escapeHtml(s) {

@@ -4,11 +4,58 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { ReferencePage } from '../ReferencePage';
+import scoringGuide from '../../data/scoringGuide.json';
+import { REFERENCE_DATA } from '../../data/referenceData';
+import { ROUTES } from '../../../scripts/prerender.mjs';
 
 const sourcePath = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'ReferencePage.tsx');
 const source = readFileSync(sourcePath, 'utf-8');
 
 describe('PBI-056 解説リファレンス画面', () => {
+  for (const chapter of REFERENCE_DATA) {
+    it(`${chapter.id} の詳細URLは指定章のみを表示し、他の章の本文を複製しない`, () => {
+      const document = new DOMParser().parseFromString(
+        renderToStaticMarkup(<ReferencePage focusChapterId={chapter.id} />),
+        'text/html',
+      );
+      expect(document.querySelector('h1')?.textContent).toBe(chapter.title);
+      expect(document.querySelectorAll('article.reference-page__chapter')).toHaveLength(1);
+      expect(document.querySelector('article')?.id).toBe(`reference-${chapter.id}`);
+      for (const other of REFERENCE_DATA.filter((entry) => entry.id !== chapter.id)) {
+        expect(document.getElementById(`reference-${other.id}`)).toBeNull();
+      }
+    });
+  }
+
+  it('採点の章は公式基準と自己点検を区別し、全ブロックを静的HTMLと共有する', () => {
+    const chapter = scoringGuide;
+    const live = new DOMParser().parseFromString(
+      renderToStaticMarkup(<ReferencePage focusChapterId="chapter02" />),
+      'text/html',
+    );
+    const staticPage = new DOMParser().parseFromString(
+      ROUTES.find((route: { path: string }) => route.path === '/reference/chapter02')!.bodyHtml,
+      'text/html',
+    );
+    const collectText = (value: unknown): string[] => {
+      if (typeof value === 'string') return [value];
+      if (Array.isArray(value)) return value.flatMap(collectText);
+      if (value && typeof value === 'object') {
+        return Object.entries(value)
+          .filter(([key]) => !['kind', 'id', 'href'].includes(key))
+          .flatMap(([, child]) => collectText(child));
+      }
+      return [];
+    };
+    for (const output of [live, staticPage]) {
+      expect(output.body.textContent).toContain('個別の試験の採点表や配点を確認していません');
+      expect(output.body.textContent).not.toContain('一般に意思決定力の配点が最も高い');
+      for (const text of collectText(chapter.sections)) {
+        expect(output.body.textContent).toContain(text);
+      }
+    }
+  });
+
   it('主要章の見出しとスキップ導線を表示し、内部表記を UI に出さない', () => {
     const html = renderToStaticMarkup(<ReferencePage />);
 
@@ -33,8 +80,7 @@ describe('PBI-056 解説リファレンス画面', () => {
     const html = renderToStaticMarkup(<ReferencePage focusChapterId="chapter08" />);
 
     expect(html).toContain('<table');
-    expect(html).toContain('緊急度×重要度マトリクス');
-    expect(html).toContain('30秒優先度チェック');
+    expect(html).not.toContain('id="reference-chapter05"');
     expect(html).toContain('代表パターン分類（要点）');
     expect(html).toContain('href="/patterns"');
     expect(html).toContain('href="/patterns/14"');
