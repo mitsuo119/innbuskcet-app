@@ -48,7 +48,7 @@ import {
   type CaseDetailMeta,
 } from './routes';
 
-const APP_NAME = 'インバスケット - 学習アプリ';
+const APP_NAME = 'インバスケット学習アプリ';
 
 interface RouteSeo {
   title: string;
@@ -88,16 +88,16 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
         }
       }
       return {
-        title: '解説リファレンス',
+        title: '解説リファレンス（全12章）',
         description:
-          'インバスケットの基礎・採点基準・優先順位づけ・案件パターンを章構成で学べる解説リファレンスの目次ページです。',
+          'インバスケット学習の解説リファレンス全12章の目次です。入門・基礎・実践・振り返り・本番準備の順に、各章の内容と学習ゴールを確認できます。',
       };
     }
     case 'patterns':
       return {
-        title: 'パターン別解説',
+        title: 'パターン別解説（全20パターン）',
         description:
-          'インバスケット全20パターンの優先度傾向と回答の骨格を一覧で確認できるパターン別解説のトップページです。',
+          'インバスケット形式の案件を20の型に分けた索引です。各パターンの優先度の目安と特徴を一覧で確認し、詳細ページで回答の骨格と例文を読めます。',
       };
     case 'pattern-detail': {
       const pattern = state.patternId ? findPatternById(state.patternId) : undefined;
@@ -138,12 +138,14 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
     case 'privacy-policy':
       return {
         title: 'プライバシーポリシー',
-        description: 'インバスケット学習アプリの個人情報の取り扱い方針を記載しています。',
+        description:
+          'インバスケット学習アプリで扱う情報、ブラウザ内の保存、広告配信（Google AdSense）やお問い合わせに伴う情報の取り扱いを説明するプライバシーポリシーです。',
       };
     case 'terms-of-service':
       return {
-        title: '利用規約',
-        description: 'インバスケット学習アプリの利用条件と禁止事項を記載しています。',
+        title: '利用規約（条文版）',
+        description:
+          'インバスケット学習アプリの利用規約（条文版）です。サービスの目的・利用資格・禁止事項・知的財産権・広告表示・免責事項・サービスの変更停止・規約の変更・準拠法と管轄を条文形式で定めています。',
       };
     case 'about':
       // PBI-088 / TASK-088-1: 運営者情報ページ。title/description を他ルートと一意にして
@@ -151,7 +153,7 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
       return {
         title: '運営者情報',
         description:
-          'インバスケット学習アプリ InBusket の運営者・サイト目的・コンテンツ作成方針・連絡手段・更新ポリシーをまとめた運営者情報ページです。',
+          'インバスケット学習アプリの運営者・サイトの目的・コンテンツ作成方針・連絡手段・更新ポリシーをまとめた運営者情報ページです。',
       };
     case 'terms':
       // PBI-089 / TASK-089-1: サービス利用規約ページ（短い canonical URL 版）。
@@ -159,12 +161,13 @@ function resolveRouteSeo(state: RouterState): RouteSeo {
       return {
         title: 'サービス利用規約',
         description:
-          'インバスケット学習アプリ InBusket の利用条件・免責・著作権・禁止事項・準拠法・改定方針を簡潔にまとめたサービス利用規約の要旨ページです。',
+          'インバスケット学習アプリの利用条件・免責・著作権・禁止事項・準拠法・改定方針を簡潔にまとめたサービス利用規約の要旨ページです。',
       };
     case 'contact':
       return {
         title: 'お問い合わせ',
-        description: 'インバスケット学習アプリへのお問い合わせ方法を案内するページです。',
+        description:
+          'インバスケット学習アプリへのお問い合わせ方法（GitHub Issues）と、投稿が公開されることなどの注意事項を案内するページです。',
       };
     case 'not-found':
       return {

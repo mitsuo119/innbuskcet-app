@@ -68,7 +68,7 @@ function PatternStatItem({ rank, stat }: PatternStatItemProps) {
       </div>
       <div className="weakness-pattern__info">
         <div className="weakness-pattern__name">
-          {stat.patternName}
+          <a href={`/patterns/${stat.patternId}`}>{stat.patternName}</a>
           {stat.lowReliability && (
             <span
               className="weakness-pattern__low-reliability"

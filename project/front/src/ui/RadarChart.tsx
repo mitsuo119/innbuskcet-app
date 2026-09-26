@@ -7,6 +7,7 @@ import {
   type SelfScoreHistory,
   type SelfScoreAxis,
 } from '../domain/selfScore';
+import { REFERENCE_DATA } from '../data/referenceData';
 
 interface Props {
   /** セッション内の自己採点履歴 */
@@ -205,7 +206,18 @@ export function RadarChart({ history }: Props) {
         </p>
         <p className="radar-chart__weakness-suggestion">{weakestMeta.suggestion}</p>
         <p className="radar-chart__weakness-ref">
-          参考: <span className="radar-chart__chapter-ref">{weakestMeta.chapterRef}</span>
+          参考:{' '}
+          {weakestMeta.chapterIds.map((id, i) => {
+            const order = REFERENCE_DATA.findIndex((chapter) => chapter.id === id);
+            return (
+              <span key={id}>
+                {i > 0 && '・'}
+                <a href={`/reference/${id}`} className="radar-chart__chapter-ref">
+                  第{order + 1}章 {REFERENCE_DATA[order].title}
+                </a>
+              </span>
+            );
+          })}
         </p>
       </div>
     </section>

@@ -89,7 +89,8 @@ export const PATTERN_DATA: PatternItem[] = [
     name: '部下の退職・異動の相談',
     category: '人事・部下マネジメントパターン',
     typicalPriority: 'A',
-    characteristics: 'ヒューマンスキルの観点が特に重要な案件。メールではなく対面で向き合う姿勢が重要。',
+    characteristics:
+      'ヒューマンスキルの観点が特に重要な案件。メールではなく対面で向き合う姿勢が重要。',
     answerSkeleton: [
       'まず直接面談の場を設ける（メールではなく対面）',
       '本人の話をしっかり聴く姿勢を示す',
@@ -158,7 +159,8 @@ export const PATTERN_DATA: PatternItem[] = [
     name: 'プロジェクト遅延・品質問題',
     category: '業務・プロジェクトパターン',
     typicalPriority: 'A',
-    characteristics: '現場での問題解決の経験を活かしやすいパターン。原因の切り分けを答案に明示する。',
+    characteristics:
+      '現場での問題解決の経験を活かしやすいパターン。原因の切り分けを答案に明示する。',
     answerSkeleton: [
       '遅延・品質問題の影響範囲を把握',
       '原因を分析（要因の切り分け）',

@@ -8,8 +8,10 @@
  * - Sprint026 PBI-099 / TASK-099-2: ページ冒頭に導入文（一覧の目的・使い方）と、
  *   各パターン項目に1〜2文の説明文（patternData.characteristics）を追加し、
  *   AdSense「広告掲載最小コンテンツ基準」（本文600字以上）を満たす SPA 一覧化。
+ * - 導入文は pageIntro.json を静的HTML（scripts/prerender.mjs）と共有する。
  */
 import { PATTERN_DATA, type PatternPriority } from '../data/patternData';
+import pageIntro from '../data/pageIntro.json';
 import { GlobalNav } from '../ui/GlobalNav';
 
 const PRIORITY_LABEL: Record<PatternPriority, string> = {
@@ -23,6 +25,7 @@ const PRIORITY_LABEL: Record<PatternPriority, string> = {
 const CATEGORIES = [...new Set(PATTERN_DATA.map((p) => p.category))];
 
 export function PatternList() {
+  const intro = pageIntro.patternIndex;
   return (
     <div className="container">
       <header className="legal-header">
@@ -30,18 +33,17 @@ export function PatternList() {
           ← ホームに戻る
         </a>
         <GlobalNav current="patterns" />
-        <h1 className="legal-title">パターン別解説</h1>
-        <p className="legal-updated">インバスケット全20パターンの優先度・対応フレームワーク</p>
+        <h1 className="legal-title">{intro.title}</h1>
+        <p className="legal-updated">{intro.subtitle}</p>
       </header>
 
       <main className="legal-body">
         <section className="legal-section" aria-label="パターン一覧の目的と使い方">
-          <p className="pattern-list__intro">
-            本ページはインバスケット試験で頻出する案件20パターンの索引です。対外対応・人事マネジメント・業務プロジェクト・リスクトラブル・組織方針・その他の6カテゴリに分類し、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、本教材の振り返りの6観点（問題発見力・問題分析力・意思決定力・洞察力・組織活用力・ヒューマンスキル）に対応する行動を学べる構成です。
-          </p>
-          <p className="pattern-list__intro">
-            使い方の目安：まず各パターンの「優先度傾向」と「特徴」を一覧で押さえ、本番で迷いなくマトリクス分類できる状態を作ります。その上で頻出パターン（顧客クレーム・部下退職相談・プロジェクト遅延・情報セキュリティインシデント等）の回答骨格を反復し、代表ケース20件で実戦演習する流れが効果的です。
-          </p>
+          {intro.intro.map((text) => (
+            <p key={text} className="pattern-list__intro">
+              {text}
+            </p>
+          ))}
         </section>
         {CATEGORIES.map((cat) => (
           <section key={cat} className="legal-section">

@@ -8,6 +8,8 @@
  */
 import { findPatternById, type PatternPriority } from '../data/patternData';
 import { findPatternDeepDive } from '../data/deepDive';
+import casesData from '../data/cases.json';
+import { CASE_DETAIL_META } from '../routes';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 import { AdSlot } from '../ui/AdSlot';
@@ -27,6 +29,8 @@ const PRIORITY_LABEL: Record<PatternPriority, string> = {
 export function PatternDetail({ patternId }: Props) {
   const pattern = findPatternById(patternId);
   const deepDive = findPatternDeepDive(patternId);
+  const sample = CASE_DETAIL_META.find((meta) => meta.patternId === patternId);
+  const sampleCase = sample ? casesData.find((entry) => entry.id === sample.id) : undefined;
 
   if (!pattern) {
     return (
@@ -82,7 +86,7 @@ export function PatternDetail({ patternId }: Props) {
 
         {deepDive && (
           <section className="legal-section">
-            <h2 className="legal-section__title">出題される場面の読み解き</h2>
+            <h2 className="legal-section__title">案件の読み解き</h2>
             <p>{deepDive.situation}</p>
           </section>
         )}
@@ -145,6 +149,31 @@ export function PatternDetail({ patternId }: Props) {
             <p>{pattern.notes}</p>
           </section>
         )}
+
+        {sample && sampleCase && (
+          <section className="legal-section">
+            <h2 className="legal-section__title">このパターンの代表ケース</h2>
+            <ul className="legal-list">
+              <li>
+                <a href={`/cases/${sample.id}`}>
+                  ケース{sample.id.replace('case-', '')}：{sampleCase.title}（{sample.difficulty}）
+                </a>
+              </li>
+            </ul>
+          </section>
+        )}
+
+        <section className="legal-section">
+          <h2 className="legal-section__title">関連リンク</h2>
+          <ul className="legal-list">
+            <li>
+              <a href="/patterns">パターン別解説（全20パターン）</a>
+            </li>
+            <li>
+              <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（第8章）</a>
+            </li>
+          </ul>
+        </section>
         {/* PBI-100 / TASK-100-3: パターン詳細は kind='pattern-detail' で広告表示。 */}
         <AdSlot
           label="広告（コンテンツ下）"

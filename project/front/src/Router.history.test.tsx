@@ -52,7 +52,7 @@ describe('PBI-076 History API ルーター', () => {
     });
 
     expect(document.title).toContain('パターン1');
-    expect(document.title).toContain('インバスケット - 学習アプリ');
+    expect(document.title).toContain('インバスケット学習アプリ');
   });
 
   it('レガシーハッシュ `#/reference` をマウント時に pathname へ自動移行する', () => {

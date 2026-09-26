@@ -46,10 +46,13 @@ async function parsePublicRoutes() {
   return routes;
 }
 
-/** path を sitemap の `<loc>` 用に `__SITE_URL__` 接続形へ整形する（先頭 / は二重化回避のため除去）。 */
+/**
+ * path を sitemap の `<loc>` 用に `__SITE_URL__` 接続形へ整形する（先頭 / は二重化回避のため除去）。
+ * GitHub Pages は `/about` を `/about/` へ転送するため、転送後の末尾スラッシュ付き URL を掲載する。
+ */
 function toLoc(path) {
   if (path === '/') return SITE_URL_TOKEN;
-  return `${SITE_URL_TOKEN}${path.startsWith('/') ? path.slice(1) : path}`;
+  return `${SITE_URL_TOKEN}${path.replace(/^\/+/, '').replace(/\/+$/, '')}/`;
 }
 
 /** priority を `<priority>` 表記に正規化（小数点1桁・1.0 維持）。 */

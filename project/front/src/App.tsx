@@ -20,6 +20,8 @@ import { SelfScoreInput } from './ui/SelfScoreInput';
 import { RadarChart } from './ui/RadarChart';
 import { WeaknessPatternTop3 } from './ui/WeaknessPatternTop3';
 import { HomeStudyGuide } from './ui/HomeStudyGuide';
+import { HomeIntro } from './ui/HomeIntro';
+import pageIntro from './data/pageIntro.json';
 import type { Case, Priority } from './domain/case';
 import { evaluateWriting, type WritingFeedback } from './domain/feedback';
 import {
@@ -683,13 +685,12 @@ export default function App() {
       <main className="container">
         <header className="app-header">
           <div className="app-header__top">
-            <h1>インバスケット</h1>
+            <h1>{pageIntro.home.title}</h1>
             <div className="app-header__controls">
               <LearningStyleToggle style={learningStyle} onChange={handleLearningStyleChange} />
               <ThemeToggle />
             </div>
           </div>
-          <p className="app-subtitle">インバスケット学習アプリ</p>
           <ScoreCounter
             score={score}
             modeScores={modeScores}
@@ -700,15 +701,12 @@ export default function App() {
             rollingN={10}
           />
           <GlobalNav current="home" />
-          {!isExam && (
-            <a href="#home-about-heading" className="home-about__link">
-              5件の案件を比較する実践解説
-            </a>
-          )}
           {isExam && examSession !== null && (
             <ExamTimer session={examSession} onTimeUp={handleExamTimeUp} />
           )}
         </header>
+
+        {!isExam && !examResult && <HomeIntro />}
 
         {examResult ? (
           <ExamResultView
@@ -720,6 +718,9 @@ export default function App() {
           />
         ) : (
           <>
+            <h2 id="practice-heading" className="practice-heading">
+              {pageIntro.home.practiceHeading}
+            </h2>
             <ModeSelector mode={mode} onChange={handleModeChange} />
 
             <fieldset className="history-limit" aria-label="履歴表示件数">

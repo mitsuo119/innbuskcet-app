@@ -37,7 +37,7 @@ describe('PBI-072 ルート別SEOメタ同期', () => {
       root.render(<Router />);
     });
 
-    expect(document.title).toBe('インバスケット - 学習アプリ');
+    expect(document.title).toBe('インバスケット学習アプリ');
   });
 
   it('解説リファレンスではルート固有タイトルを設定する', () => {
@@ -48,7 +48,7 @@ describe('PBI-072 ルート別SEOメタ同期', () => {
     });
 
     expect(document.title).toContain('解説リファレンス');
-    expect(document.title).toContain('インバスケット - 学習アプリ');
+    expect(document.title).toContain('インバスケット学習アプリ');
   });
 
   it('パターン詳細では重複しないタイトルを設定する', () => {
@@ -59,7 +59,7 @@ describe('PBI-072 ルート別SEOメタ同期', () => {
     });
 
     expect(document.title).toContain('パターン1');
-    expect(document.title).toContain('インバスケット - 学習アプリ');
+    expect(document.title).toContain('インバスケット学習アプリ');
   });
 });
 
@@ -182,18 +182,18 @@ describe('PBI-078 公開ルートのメタ重複網羅', () => {
   });
 
   it('TASK-078-4: 全公開ルートで title がアプリ既定単独文字列に落ちない（resolveRouteSeo 未定義検知）', () => {
-    // ルート `/` のみは APP_NAME 単独タイトルが正規。それ以外は ` | インバスケット - 学習アプリ` で連結される。
+    // ルート `/` のみは APP_NAME 単独タイトルが正規。それ以外は ` | インバスケット学習アプリ` で連結される。
     for (const path of PUBLIC_ROUTE_PATHS) {
       const { title } = captureRouteSeo(path);
       if (path === '/') {
-        expect(title).toBe('インバスケット - 学習アプリ');
+        expect(title).toBe('インバスケット学習アプリ');
       } else {
         // 他ルートは必ず ` | <APP_NAME>` 連結形（resolveRouteSeo の case 漏れ＝default 分岐に落ちると
         // APP_NAME 単独になり、ホームと衝突する）。
         expect(title, `${path} のタイトルが既定値に落ちている`).toMatch(
-          / \| インバスケット - 学習アプリ$/,
+          / \| インバスケット学習アプリ$/,
         );
-        expect(title).not.toBe('インバスケット - 学習アプリ');
+        expect(title).not.toBe('インバスケット学習アプリ');
       }
     }
   });

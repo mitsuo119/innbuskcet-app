@@ -14,7 +14,6 @@ import {
   toAbsoluteUrl,
   transformTemplateForRoute,
   countVisibleText,
-  mdToHtml,
 } from './prerender.mjs';
 
 /**
@@ -54,10 +53,10 @@ describe('PBI-086 prerender 純関数', () => {
     process.env.VITE_SITE_URL = original;
   });
 
-  it('toAbsoluteUrl はトップとサブパスの双方を絶対 URL 化する', () => {
+  it('toAbsoluteUrl はトップとサブパスの双方を絶対 URL 化する（サブパスは転送後の末尾スラッシュ付き）', () => {
     expect(toAbsoluteUrl(SITE_URL, '/')).toBe('https://example.test/');
     expect(toAbsoluteUrl(SITE_URL, '/reference/chapter01')).toBe(
-      'https://example.test/reference/chapter01',
+      'https://example.test/reference/chapter01/',
     );
   });
 
@@ -271,27 +270,24 @@ describe('PBI-097 クローキング解消（hidden aria-hidden 除去）', () =
   });
 });
 
-// Sprint026 PBI-098 第1段階 / TASK-098-2
-// プリレンダ本文文字数下限の自動検証。referenceData/cases/patternData に
-// 由来する実本文とページ固有の深掘り解説を view-source: で十分な量可視出力することを
-// 担保し、AdSense審査の「有用性の低いコンテンツ」判定の退行を CI で検知する。
+// プリレンダ本文の文字数は「本文の欠落検知」としてのみ検証する（文字数は品質の基準ではない）。
+// 詳細ページは広告掲載の内部基準（adPolicy C1: 1000字）、章ページは DoD 4-3 の下限（600字）。
+// 章ページの広告は ReferencePage が章ごとの本文量で判定する。
 const MIN_BODY_CHARS = 1000;
+const MIN_CHAPTER_CHARS = 600;
 
-describe('プリレンダ本文文字数下限（1000字以上 / 章 + 詳細ページ）', () => {
-  // 第1段階: reference chapter01〜12（mdToHtml で ref/ 本文を焼き込み）
+describe('プリレンダ本文の欠落検知（章600字・詳細1000字以上）', () => {
   const chapterRoutes = ROUTES.filter((r) => /^\/reference\/chapter\d{2}$/.test(r.path));
   it('reference 章ルートが 12 件存在する', () => {
     expect(chapterRoutes).toHaveLength(12);
   });
   for (const route of chapterRoutes) {
-    it(`${route.path} の bodyHtml 可視テキストが ${MIN_BODY_CHARS} 字以上`, () => {
+    it(`${route.path} の bodyHtml 可視テキストが ${MIN_CHAPTER_CHARS} 字以上`, () => {
       const len = countVisibleText(route.bodyHtml);
-      expect(len).toBeGreaterThanOrEqual(MIN_BODY_CHARS);
+      expect(len).toBeGreaterThanOrEqual(MIN_CHAPTER_CHARS);
     });
   }
 
-  // Sprint026 PBI-098 第2段階 / TASK-098-3
-  // 代表ケース20件（cases.json 由来の本文・解説・模範回答を焼き込み）
   const caseRoutes = ROUTES.filter((r) => /^\/cases\/case-\d{3}$/.test(r.path));
   it('cases ルートが 20 件存在する', () => {
     expect(caseRoutes).toHaveLength(20);
@@ -302,22 +298,20 @@ describe('プリレンダ本文文字数下限（1000字以上 / 章 + 詳細ペ
       expect(len).toBeGreaterThanOrEqual(MIN_BODY_CHARS);
     });
   }
-  it('代表ケース case-001 / case-010 / case-053（ID昇順末尾）の本文に解説と模範回答セクションが含まれる', () => {
+  it('代表ケース case-001 / case-010 / case-053（ID昇順末尾）の本文に解説とモデル回答セクションが含まれる', () => {
     const sample = ['/cases/case-001', '/cases/case-010', '/cases/case-053'];
     for (const path of sample) {
       const r = caseRoutes.find((x) => x.path === path);
       expect(r, `${path} が ROUTES に存在しない`).toBeDefined();
-      expect(r.bodyHtml).toContain('<h2>ケース概要：');
-      expect(r.bodyHtml).toContain('<h2>教材の分類例：');
-      expect(r.bodyHtml).toContain('<h2>模範回答の骨格</h2>');
-      expect(r.bodyHtml).toContain('判断：');
-      expect(r.bodyHtml).toContain('理由：');
-      expect(r.bodyHtml).toContain('対応：');
+      expect(r.bodyHtml).toContain('<h2>ケース本文</h2>');
+      expect(r.bodyHtml).toContain('<h2>教材の分類例と解説</h2>');
+      expect(r.bodyHtml).toContain('<h2>モデル回答</h2>');
+      expect(r.bodyHtml).toContain('<dt>判断</dt>');
+      expect(r.bodyHtml).toContain('<dt>理由</dt>');
+      expect(r.bodyHtml).toContain('<dt>具体行動</dt>');
     }
   });
 
-  // Sprint026 PBI-098 第3段階 / TASK-098-4
-  // 全 20 パターン詳細（patternData.ts 由来の characteristics / answerSkeleton / keyPhrases / notes を焼き込み）
   const patternRoutes = ROUTES.filter((r) => /^\/patterns\/\d+$/.test(r.path));
   it('patterns ルートが 20 件存在する', () => {
     expect(patternRoutes).toHaveLength(20);
@@ -333,20 +327,20 @@ describe('プリレンダ本文文字数下限（1000字以上 / 章 + 詳細ペ
     for (const path of sample) {
       const r = patternRoutes.find((x) => x.path === path);
       expect(r, `${path} が ROUTES に存在しない`).toBeDefined();
-      expect(r.bodyHtml).toContain('<h2>カテゴリ：');
-      expect(r.bodyHtml).toContain('<h2>優先度の目安：');
-      expect(r.bodyHtml).toContain('<h2>回答の骨格');
+      expect(r.bodyHtml).toContain('<h2>優先度の目安</h2>');
+      expect(r.bodyHtml).toContain('<h2>特徴・優先度判定理由</h2>');
+      expect(r.bodyHtml).toContain('<h2>回答の骨格</h2>');
     }
   });
 
-  // AdSense「有用性の低いコンテンツ」対応: ページ固有の深掘り解説が全件焼き込まれていること。
-  it('パターン詳細20件全件に深掘り解説セクションが含まれる', () => {
+  it('パターン詳細20件全件に深掘り解説と代表ケースへのリンクが含まれる', () => {
     for (const r of patternRoutes) {
-      expect(r.bodyHtml, r.path).toContain('<h2>出題される場面の読み解き</h2>');
+      expect(r.bodyHtml, r.path).toContain('<h2>案件の読み解き</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>なぜこの優先度になるのか</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>よくある失敗</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>回答例文</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>答案を振り返る観点</h2>');
+      expect(r.bodyHtml, r.path).toMatch(/<a href="\/cases\/case-\d{3}">/);
     }
   });
   it('代表ケース20件全件に深掘り解説セクションが含まれる', () => {
@@ -366,35 +360,6 @@ describe('プリレンダ本文文字数下限（1000字以上 / 章 + 詳細ペ
         expect(r.bodyHtml, `${r.path} に定型文「${phrase}」が残存`).not.toContain(phrase);
       }
     }
-  });
-});
-
-// Sprint026 PBI-098 / TASK-098-1
-// Markdown→HTML 変換ヘルパー（mdToHtml）の純関数検証。
-describe('PBI-098 mdToHtml 純関数', () => {
-  it('frontmatter は除去される', () => {
-    const html = mdToHtml('---\ntitle: x\n---\n\n## H\n\n本文');
-    expect(html).not.toContain('title: x');
-    expect(html).toContain('<h2>H</h2>');
-    expect(html).toContain('<p>本文</p>');
-  });
-  it('見出し（##/###）が h2/h3 に変換される', () => {
-    expect(mdToHtml('## 章\n\n### 節')).toBe('<h2>章</h2>\n<h3>節</h3>');
-  });
-  it('箇条書きが ul/li に変換される', () => {
-    expect(mdToHtml('- a\n- b')).toBe('<ul><li>a</li><li>b</li></ul>');
-  });
-  it('表が table/thead/tbody に変換される', () => {
-    const html = mdToHtml('| h1 | h2 |\n| --- | --- |\n| a | b |');
-    expect(html).toContain('<table>');
-    expect(html).toContain('<th>h1</th>');
-    expect(html).toContain('<td>a</td>');
-  });
-  it('**bold** と `code` のインライン記法を変換しつつ HTML エスケープする', () => {
-    const html = mdToHtml('**強調** と `cmd` と <危険>');
-    expect(html).toContain('<strong>強調</strong>');
-    expect(html).toContain('<code>cmd</code>');
-    expect(html).toContain('&lt;危険&gt;');
   });
 });
 

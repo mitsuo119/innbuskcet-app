@@ -1,14 +1,18 @@
 import { useEffect } from 'react';
 import {
   REFERENCE_DATA,
+  countChapterChars,
   type ReferenceBlock,
   type ReferenceChapter,
   type ReferenceChapterId,
 } from '../data/referenceData';
+import pageIntro from '../data/pageIntro.json';
 import { Breadcrumb } from '../ui/Breadcrumb';
 import { GlobalNav } from '../ui/GlobalNav';
 import { AdSlot } from '../ui/AdSlot';
 import './ReferencePage.css';
+
+const INDEX_INTRO = pageIntro.referenceIndex;
 
 interface Props {
   focusChapterId?: ReferenceChapterId | null;
@@ -64,7 +68,7 @@ function renderBlock(block: ReferenceBlock, chapterId: ReferenceChapterId, index
           className="reference-page__note"
           aria-label={block.title}
         >
-          <h4 className="reference-page__note-title">{block.title}</h4>
+          <h3 className="reference-page__note-title">{block.title}</h3>
           <p className="reference-page__note-text">{block.text}</p>
         </aside>
       );
@@ -107,21 +111,10 @@ function getChapterNavInfo(chapter: ReferenceChapter): ChapterNavInfo {
 
 function renderChapter(chapter: ReferenceChapter) {
   const nav = getChapterNavInfo(chapter);
-  const positionLabel = `第 ${nav.index + 1} 章 / 全 ${nav.total} 章`;
   return (
     <article key={chapter.id} id={`reference-${chapter.id}`} className="reference-page__chapter">
-      <header className="reference-page__chapter-header">
-        <p className="reference-page__chapter-position" aria-hidden="true">
-          {positionLabel}
-        </p>
-        <h2 className="reference-page__chapter-title" tabIndex={-1}>
-          {chapter.title}
-        </h2>
-        <p className="reference-page__chapter-description">{chapter.description}</p>
-      </header>
-
       <section className="reference-page__goal-card" aria-label={`${chapter.title} の学習ゴール`}>
-        <h3 className="reference-page__section-heading">学習ゴール</h3>
+        <h2 className="reference-page__section-heading">学習ゴール</h2>
         <ul className="reference-page__goal-list">
           {chapter.learningGoals.map((goal, index) => (
             <li key={`${chapter.id}-goal-${index}`}>{goal}</li>
@@ -136,9 +129,9 @@ function renderChapter(chapter: ReferenceChapter) {
             className="reference-page__section"
             aria-labelledby={section.id}
           >
-            <h3 id={section.id} className="reference-page__section-heading">
+            <h2 id={section.id} className="reference-page__section-heading">
               {section.title}
-            </h3>
+            </h2>
             {section.summary && (
               <p className="reference-page__section-summary">{section.summary}</p>
             )}
@@ -175,10 +168,7 @@ function renderChapter(chapter: ReferenceChapter) {
             <span className="reference-page__pager-title">（最初の章です）</span>
           </span>
         )}
-        <a
-          className="reference-page__pager-link reference-page__pager-link--top"
-          href="#reference-chapter-nav"
-        >
+        <a className="reference-page__pager-link reference-page__pager-link--top" href="/reference">
           <span className="reference-page__pager-direction" aria-hidden="true">
             ↑
           </span>
@@ -214,16 +204,15 @@ function renderChapter(chapter: ReferenceChapter) {
 export function ReferencePage({ focusChapterId = null }: Props) {
   useEffect(() => {
     if (!focusChapterId) return;
-    const section = document.getElementById(`reference-${focusChapterId}`);
-    const heading = section?.querySelector<HTMLElement>('.reference-page__chapter-title');
-    section?.scrollIntoView?.({ block: 'start' });
+    const heading = document.querySelector<HTMLElement>('.reference-page__title');
+    heading?.scrollIntoView?.({ block: 'start' });
     heading?.focus();
   }, [focusChapterId]);
 
   const focusedChapter = focusChapterId
     ? REFERENCE_DATA.find((c) => c.id === focusChapterId)
     : undefined;
-  const visibleChapters = focusedChapter ? [focusedChapter] : REFERENCE_DATA;
+  const focusedNav = focusedChapter ? getChapterNavInfo(focusedChapter) : null;
 
   return (
     <div className="container reference-page">
@@ -243,57 +232,89 @@ export function ReferencePage({ focusChapterId = null }: Props) {
         ) : (
           <Breadcrumb items={[{ label: 'ホーム', href: '/' }, { label: '解説リファレンス' }]} />
         )}
-        <p className="reference-page__eyebrow">解説リファレンス</p>
-        <h1 className="reference-page__title">
-          {focusedChapter?.title ?? 'インバスケット解説リファレンス'}
-        </h1>
-        <p className="reference-page__lead">
-          {focusedChapter?.description ??
-            'インバスケットの基礎、判断の観点、優先順位づけ、委任、振り返りを全12章で整理します。'}
+        <p className="reference-page__eyebrow">
+          {focusedChapter ? `解説リファレンス｜${focusedChapter.level}` : '解説リファレンス'}
         </p>
-        {!focusedChapter && (
-          <p className="reference-page__lead reference-page__lead--howto">
-            使い方の目安：第1〜3章で試験の正体と振り返りの6観点を理解し、第4〜7章で時間配分・優先順位・意思決定・委任のコアテクニックを学び、第8〜9章で頻出20パターンと答案文章術を習得し、第10〜11章で模擬試験と弱点改善サイクルを回し、第12章で本番当日の戦略を確認します。各章タイトルから詳細ページへ遷移し、章末の関連リンクで隣接トピックへ横断できます。
+        <h1 className="reference-page__title" tabIndex={focusedChapter ? -1 : undefined}>
+          {focusedChapter?.title ?? INDEX_INTRO.title}
+        </h1>
+        <p className="reference-page__lead">{focusedChapter?.description ?? INDEX_INTRO.lead}</p>
+        {focusedNav ? (
+          <p className="reference-page__chapter-position" aria-hidden="true">
+            第 {focusedNav.index + 1} 章 / 全 {focusedNav.total} 章
           </p>
+        ) : (
+          <p className="reference-page__lead reference-page__lead--howto">{INDEX_INTRO.howto}</p>
         )}
       </header>
 
-      <nav
-        id="reference-chapter-nav"
-        className="reference-page__chapter-nav"
-        aria-label="章スキップ"
-      >
-        {REFERENCE_DATA.map((chapter, index) => {
-          const isCurrent = focusChapterId === chapter.id;
-          return (
-            <a
-              key={chapter.id}
-              href={`/reference/${chapter.id}`}
-              className="reference-page__chapter-link"
-              aria-current={isCurrent ? 'page' : undefined}
-            >
-              <span className="reference-page__chapter-link-index" aria-hidden="true">
-                第{index + 1}章
-              </span>
-              <span className="reference-page__chapter-link-title">{chapter.title}</span>
-              <span className="reference-page__chapter-link-description">
-                {chapter.description}
-              </span>
-            </a>
-          );
-        })}
-      </nav>
+      {focusedChapter ? (
+        <>
+          <main className="reference-page__main">
+            {renderChapter(focusedChapter)}
+            {/* 本文が広告掲載の内部基準（adPolicy C1）に満たない章では広告を出さない。 */}
+            <AdSlot
+              label="広告（コンテンツ下）"
+              className="ad-slot--footer"
+              pageMeta={{
+                kind: 'reference-chapter',
+                bodyCharCount: countChapterChars(focusedChapter),
+              }}
+            />
+          </main>
 
-      <main className="reference-page__main">
-        {visibleChapters.map((chapter) => renderChapter(chapter))}
-        {/* PBI-100 / TASK-100-3: 章詳細（focusChapterId 付）のみ広告表示。
-            /reference（一覧）は kind='reference-list' で shouldShowAds=false により非表示。 */}
-        <AdSlot
-          label="広告（コンテンツ下）"
-          className="ad-slot--footer"
-          pageMeta={{ kind: focusChapterId ? 'reference-chapter' : 'reference-list' }}
-        />
-      </main>
+          <nav
+            id="reference-chapter-nav"
+            className="reference-page__chapter-nav"
+            aria-label="章スキップ"
+          >
+            {REFERENCE_DATA.map((chapter, index) => (
+              <a
+                key={chapter.id}
+                href={`/reference/${chapter.id}`}
+                className="reference-page__chapter-link"
+                aria-current={focusChapterId === chapter.id ? 'page' : undefined}
+              >
+                <span className="reference-page__chapter-link-index" aria-hidden="true">
+                  第{index + 1}章
+                </span>
+                <span className="reference-page__chapter-link-title">{chapter.title}</span>
+              </a>
+            ))}
+          </nav>
+        </>
+      ) : (
+        <main className="reference-page__main">
+          {INDEX_INTRO.levels.map(({ level, description }) => (
+            <section key={level} className="reference-page__level">
+              <h2 className="reference-page__level-title">{level}</h2>
+              <p className="reference-page__level-description">{description}</p>
+              <ul className="reference-page__course-list">
+                {REFERENCE_DATA.map((chapter, order) => ({ chapter, order }))
+                  .filter(({ chapter }) => chapter.level === level)
+                  .map(({ chapter, order }) => (
+                    <li key={chapter.id} className="reference-page__course-item">
+                      <h3 className="reference-page__course-title">
+                        <a
+                          href={`/reference/${chapter.id}`}
+                          className="reference-page__inline-link"
+                        >
+                          第{order + 1}章 {chapter.title}
+                        </a>
+                      </h3>
+                      <p className="reference-page__paragraph">{chapter.description}</p>
+                      <ul className="reference-page__goal-list">
+                        {chapter.learningGoals.map((goal) => (
+                          <li key={goal}>{goal}</li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+              </ul>
+            </section>
+          ))}
+        </main>
+      )}
     </div>
   );
 }

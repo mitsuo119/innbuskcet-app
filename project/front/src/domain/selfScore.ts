@@ -4,6 +4,7 @@
  * 6軸（問題発見/分析/意思決定/洞察/組織活用/ヒューマンスキル）を
  * 1〜5で自己採点し、セッション内の平均をレーダーチャートで可視化する。
  */
+import type { ReferenceChapterId } from '../data/referenceData';
 
 /** 6軸の識別子（型安全な const タプル） */
 export const SELF_SCORE_AXES = [
@@ -23,8 +24,8 @@ export interface AxisMeta {
   label: string;
   /** 採点基準の説明文 */
   description: string;
-  /** 弱点改善のための参考チャプター */
-  chapterRef: string;
+  /** 弱点改善のために読む解説リファレンスの章 */
+  chapterIds: readonly ReferenceChapterId[];
   /** 改善提案メッセージ */
   suggestion: string;
 }
@@ -34,42 +35,38 @@ export const AXIS_META: Record<SelfScoreAxis, AxisMeta> = {
   problemDiscovery: {
     label: '問題発見',
     description: '案件の本質・問題点を把握できたか',
-    chapterRef: 'chapter01・chapter02',
-    suggestion:
-      'インバスケットの構造と採点基準を再確認しましょう。chapter01・chapter02を参照してください。',
+    chapterIds: ['chapter01', 'chapter02'],
+    suggestion: 'インバスケットの形式と、答案を振り返る6つの観点を確認しましょう。',
   },
   analysis: {
     label: '分析',
     description: '情報を整理・分析できたか',
-    chapterRef: 'chapter06',
-    suggestion:
-      '意思決定フレームワークを活用して情報を体系的に整理する練習をしましょう。chapter06を参照してください。',
+    chapterIds: ['chapter06'],
+    suggestion: '意思決定フレームワークで、事実・影響・選択肢を分けて整理する練習をしましょう。',
   },
   decisionMaking: {
     label: '意思決定',
     description: '適切な優先度で素早く判断できたか',
-    chapterRef: 'chapter05',
-    suggestion:
-      'ABCの優先度基準を徹底的に習得しましょう。chapter05（優先順位付け）を参照してください。',
+    chapterIds: ['chapter05'],
+    suggestion: 'A・B・Cの優先度を決める基準を確認しましょう。',
   },
   insight: {
     label: '洞察',
     description: '背景や意図を深く読み取れたか',
-    chapterRef: 'chapter03',
-    suggestion: 'マネジャーとしてのマインドセット強化が有効です。chapter03を参照してください。',
+    chapterIds: ['chapter03'],
+    suggestion: '自分で抱え込まず組織で処理する、管理職としての考え方を確認しましょう。',
   },
   orgUtilization: {
     label: '組織活用',
     description: '委任・組織リソースを適切に活用できたか',
-    chapterRef: 'chapter07',
-    suggestion:
-      '委任の判断基準と部下・関係者の活用方法を確認しましょう。chapter07を参照してください。',
+    chapterIds: ['chapter07'],
+    suggestion: '委任の判断基準と、部下・関係者への指示の出し方を確認しましょう。',
   },
   humanSkill: {
     label: 'ヒューマンスキル',
     description: '関係者への配慮・コミュニケーションを意識できたか',
-    chapterRef: 'chapter09',
-    suggestion: '説得力のある文章・指示の書き方を練習しましょう。chapter09を参照してください。',
+    chapterIds: ['chapter09'],
+    suggestion: '相手に伝わる文章と指示の書き方を練習しましょう。',
   },
 };
 

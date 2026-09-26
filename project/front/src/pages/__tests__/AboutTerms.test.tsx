@@ -4,6 +4,7 @@ import { About } from '../About';
 import { Terms } from '../Terms';
 import { Contact } from '../Contact';
 import { PrivacyPolicy } from '../PrivacyPolicy';
+import { TermsOfService } from '../TermsOfService';
 import information from '../../data/siteInformation.json';
 import { PUBLIC_ROUTES } from '../../routes';
 import { ROUTES } from '../../../scripts/prerender.mjs';
@@ -13,6 +14,8 @@ describe('運営情報とプライバシーの表示一致', () => {
     { path: '/about', page: <About />, content: information.about },
     { path: '/contact', page: <Contact />, content: information.contact },
     { path: '/privacy-policy', page: <PrivacyPolicy />, content: information.privacy },
+    { path: '/terms', page: <Terms />, content: information.terms },
+    { path: '/terms-of-service', page: <TermsOfService />, content: information.termsOfService },
   ];
 
   for (const entry of pages) {
@@ -43,6 +46,16 @@ describe('運営情報とプライバシーの表示一致', () => {
     expect(html).not.toContain('href="https://github.com"');
     expect(html).toContain('投稿内容はインターネット上に公開');
     expect(html).not.toContain('別途ご連絡方法をご案内');
+  });
+
+  it('規約ページに内部の原稿ファイル名や旧サービス名を表示しない', () => {
+    for (const html of [
+      renderToStaticMarkup(<Terms />),
+      renderToStaticMarkup(<TermsOfService />),
+    ]) {
+      expect(html).not.toContain('ref/chapter');
+      expect(html).not.toContain('InBusket');
+    }
   });
 
   it('架空の専門家監修や外部AIによる採点をうたわない', () => {

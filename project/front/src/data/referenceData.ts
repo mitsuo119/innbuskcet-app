@@ -72,21 +72,30 @@ export interface ReferenceSection {
   blocks: ReferenceBlock[];
 }
 
+/** 学習段階（章一覧で学ぶ順番を示す） */
+export type ReferenceLevel = '入門' | '基礎' | '実践' | '振り返り' | '本番準備';
+
 /** リファレンス章 */
 export interface ReferenceChapter {
   id: ReferenceChapterId;
   sourcePath: string;
+  level: ReferenceLevel;
   title: string;
   description: string;
   learningGoals: string[];
   sections: ReferenceSection[];
 }
 
-/** chapter01 / chapter02 / chapter05 / chapter08 の定義源 */
+/**
+ * 章の定義源（chapter02 は scoringGuide.json）。
+ * scripts/prerender.mjs がこの配列リテラルを読み込み、静的HTMLを同じ内容で生成する。
+ * 配列の中にはコメントや式を書かず、データのみを置くこと。
+ */
 const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter01',
     sourcePath: 'ref/chapter01-what-is-inbasket.md',
+    level: '入門',
     title: 'インバスケットとは何か',
     description: 'インバスケットの形式と、担当者から管理職への思考の切り替えを整理する。',
     learningGoals: [
@@ -178,10 +187,10 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
       },
     ],
   },
-  scoringGuide as ReferenceChapter,
   {
     id: 'chapter05',
     sourcePath: 'ref/chapter05-prioritization.md',
+    level: '基礎',
     title: '優先順位づけの技術',
     description: '緊急度×重要度で案件を素早く分類し、時間の配分を決める。',
     learningGoals: [
@@ -253,6 +262,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter08',
     sourcePath: 'ref/chapter08-case-patterns.md',
+    level: '実践',
     title: '案件パターン別攻略',
     description: '案件を20の型に分類し、回答骨格を素早く引き出す。',
     learningGoals: [
@@ -264,7 +274,8 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
       {
         id: 'chapter08-pattern-overview',
         title: '代表パターン分類（要点）',
-        summary: '本教材では案件を20の型に整理する。型を見分けられると、回答の骨格を早く組み立てられる。',
+        summary:
+          '本教材では案件を20の型に整理する。型を見分けられると、回答の骨格を早く組み立てられる。',
         blocks: [
           {
             kind: 'table',
@@ -316,15 +327,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
       },
     ],
   },
-  // PBI-080 / TASK-080-3 (Sprint022 DAY3): ref 未公開 8 章（03/04/06/07/09/10/11/12）の解説ページ展開。
-  // 各章は ref/chapterXX-*.md をベースに helpful content 原則でオリジナル化し、800 字以上の本文と
-  // h2〜h3 階層を維持。title/description は resolveRouteSeo で自動的に章タイトルが注入され重複ゼロ。
   {
     id: 'chapter03',
     sourcePath: 'ref/chapter03-mindset.md',
+    level: '入門',
     title: 'マネージャー思考への切替',
-    description:
-      'プレイヤー思考からマネージャー思考への発想転換と、陥りやすい落とし穴を整理する。',
+    description: 'プレイヤー思考からマネージャー思考への発想転換と、陥りやすい落とし穴を整理する。',
     learningGoals: [
       'プレイヤー思考とマネージャー思考の違いを答案行動に落とせる',
       '自分で抱え込まず委任・関係部署活用を選択できる',
@@ -400,6 +408,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter04',
     sourcePath: 'ref/chapter04-time-management.md',
+    level: '基礎',
     title: '時間配分とタイムマネジメント',
     description:
       '制限時間（例：60〜90分）の中で全案件を網羅するための時間配分と、序盤・中盤・終盤の使い方を整理する。',
@@ -474,6 +483,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter06',
     sourcePath: 'ref/chapter06-decision-framework.md',
+    level: '基礎',
     title: '意思決定フレームワーク',
     description:
       '判断・理由・指示の3点セットを軸に、情報整理から行動指示までを高速に組み立てる枠組みを整理する。',
@@ -486,7 +496,8 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
       {
         id: 'chapter06-three-points',
         title: '3点セットで書く',
-        summary: '答案を「判断＋理由＋指示」の3要素で組み立てると、読み手が次の行動を確認しやすい。',
+        summary:
+          '答案を「判断＋理由＋指示」の3要素で組み立てると、読み手が次の行動を確認しやすい。',
         blocks: [
           {
             kind: 'table',
@@ -548,6 +559,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter07',
     sourcePath: 'ref/chapter07-delegation.md',
+    level: '基礎',
     title: '委任と組織活用の技術',
     description: '何を誰に任せるかの判断軸と、委任時に必須の指示要素・フォロー設計を整理する。',
     learningGoals: [
@@ -622,6 +634,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter09',
     sourcePath: 'ref/chapter09-writing-technique.md',
+    level: '実践',
     title: '答案の書き方と文章技術',
     description:
       '読み手に伝わる短文・箇条書き・主語明示など、限られた時間で書き切る文章技術を整理する。',
@@ -696,6 +709,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter10',
     sourcePath: 'ref/chapter10-practice-exam.md',
+    level: '実践',
     title: '模擬試験の進め方',
     description:
       '模擬試験の準備・実施・振り返りの進め方と、関連する案件を含む3つの演習を収録する。',
@@ -904,6 +918,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter11',
     sourcePath: 'ref/chapter11-review-and-improve.md',
+    level: '振り返り',
     title: '弱点分析と継続改善',
     description:
       '模試・本番後の振り返りを定着させ、振り返りの6観点ごとの改善サイクルで本番に向けて精度を上げる。',
@@ -979,6 +994,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
   {
     id: 'chapter12',
     sourcePath: 'ref/chapter12-exam-day-strategy.md',
+    level: '本番準備',
     title: '本番当日の戦略',
     description:
       '本番当日の持ち物・心構え・直前準備・終了直前の見直しまで、力を出し切るための行動計画を整理する。',
@@ -1060,11 +1076,28 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
  * これにより ReferencePage.tsx の getChapterNavInfo で計算する prev/next が
  * 章番号通り（例: chapter03 prev=chapter02 / next=chapter04）になる。
  */
-export const REFERENCE_DATA: ReferenceChapter[] = [...REFERENCE_DATA_SOURCE].sort((a, b) =>
-  a.id.localeCompare(b.id),
-);
+export const REFERENCE_DATA: ReferenceChapter[] = [
+  ...REFERENCE_DATA_SOURCE,
+  scoringGuide as ReferenceChapter,
+].sort((a, b) => a.id.localeCompare(b.id));
 
 /** 章IDからリファレンス章を取得する */
 export function findReferenceChapterById(id: ReferenceChapterId): ReferenceChapter | undefined {
   return REFERENCE_DATA.find((chapter) => chapter.id === id);
+}
+
+/** 章本文（題名・説明・学習ゴール・各セクション）の文字数。空白は数えない。 */
+export function countChapterChars(chapter: ReferenceChapter): number {
+  const texts = [chapter.title, chapter.description, ...chapter.learningGoals];
+  for (const section of chapter.sections) {
+    texts.push(section.title, section.summary ?? '');
+    for (const block of section.blocks) {
+      if (block.kind === 'paragraph') texts.push(block.text);
+      else if (block.kind === 'bullet-list') texts.push(...block.items);
+      else if (block.kind === 'note') texts.push(block.title, block.text);
+      else if (block.kind === 'table') texts.push(...block.headers, ...block.rows.flat());
+      else texts.push(...block.items.flatMap((item) => [item.label, item.description ?? '']));
+    }
+  }
+  return texts.join('').replace(/\s+/g, '').length;
 }

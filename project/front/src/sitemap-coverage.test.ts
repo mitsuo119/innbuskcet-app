@@ -37,12 +37,12 @@ function parseSitemap(xml: string): SitemapEntry[] {
     const loc = /<loc>([^<]+)<\/loc>/.exec(block)?.[1] ?? '';
     const changefreq = /<changefreq>([^<]+)<\/changefreq>/.exec(block)?.[1] ?? '';
     const priority = /<priority>([^<]+)<\/priority>/.exec(block)?.[1] ?? '';
-    // `__SITE_URL__` を剥がして path 形式に正規化（先頭 / を補う）
+    // `__SITE_URL__` と末尾 `/`（GitHub Pages の転送後 URL）を剥がして path 形式に正規化する
     let path: string;
     if (loc === SITE_URL_TOKEN) {
       path = '/';
     } else if (loc.startsWith(SITE_URL_TOKEN)) {
-      path = `/${loc.slice(SITE_URL_TOKEN.length)}`;
+      path = `/${loc.slice(SITE_URL_TOKEN.length).replace(/\/$/, '')}`;
     } else {
       path = loc;
     }

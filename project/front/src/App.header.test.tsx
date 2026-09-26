@@ -11,8 +11,8 @@ import App from './App';
 describe('App ヘッダー文言（PBI-065）', () => {
   const html = renderToStaticMarkup(<App />);
 
-  it('h1 が「インバスケット」である', () => {
-    expect(html).toContain('<h1>インバスケット</h1>');
+  it('h1 が「インバスケット学習アプリ」である', () => {
+    expect(html).toContain('<h1>インバスケット学習アプリ</h1>');
   });
 
   it('サブタイトルが「インバスケット学習アプリ」である', () => {

@@ -8,11 +8,9 @@
 // - 既存 AdSense ローダー Vite プラグイン（vite.config.ts）／`scripts/transform-seo-tokens.mjs`／
 //   `public/404.html`（PBI-076 SPA フォールバック）と衝突しないこと。
 //
-// 対象ルート（Sprint025 PBI-087 第1〜4段階 / 計 55 ルート）:
-//   第1段階（高優先 6）: /, /about, /terms, /reference/chapter01〜03
-//   第2段階（章 9）   : /reference/chapter04〜12
-//   第3段階（cases 20）: /cases/case-XXX × 20（代表ケース）
-//   第4段階（patterns 20）: /patterns/1〜20（全パターン詳細・DAY4 TASK-087-7）
+// 対象ルート（計 60 ルート）:
+//   /, /about, /terms, /terms-of-service, /privacy-policy, /contact,
+//   /reference, /reference/chapter01〜12, /patterns, /patterns/1〜20, /cases/case-XXX × 20
 //
 // 動作:
 //   - `dist/index.html` をテンプレートとして読み込み、ルートごとに以下を差し替えて出力する。
@@ -21,162 +19,77 @@
 //       * <link rel="canonical">                    → siteUrl + path
 //       * <meta property="og:title|og:description|og:url">
 //       * <meta name="twitter:title|twitter:description">
-//       * <div id="root"></div>                     → 静的フォールバック本文（h1 + 段落）を内側に挿入
+//       * <div id="root"></div>                     → 静的フォールバック本文を内側に挿入
 //         （React マウント時に置換される。view-source: では本文テキストとして可視。）
 //   - 出力先: ルート path をディレクトリとし `index.html` を生成（`/` のみ dist 直下に in-place）。
 //
-// 注意（後続スプリントへの引き継ぎ）:
-//   - 第3〜4段階で `routes.ts.PUBLIC_ROUTES` から動的ルートを列挙する設計に拡張する予定。
-//   - DOM レンダリング（React コンポーネント評価）は行わず、ルートごとに静的に既知のテキストを
-//     書き込む方式。重量級依存（Puppeteer / Playwright）を回避（ADR-002 / E3〜E6 / R-A）。
+// 方針（2026-09-26）:
+//   - 本文は画面（React）と同じ定義源（src/data の JSON・TS データ、routes.ts）から生成し、
+//     画面に表示しない文章を静的HTMLだけに書かない（src/pages/__tests__/StaticParity.test.tsx で検証）。
+//   - DOM レンダリング（React コンポーネント評価）は行わず、重量級依存（Puppeteer / Playwright）を
+//     回避する（ADR-002 / E3〜E6 / R-A）。
 //
 // 依存追加: なし（Node 標準のみ）。
 
 import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
-import { constants, readFileSync, readdirSync } from 'node:fs';
+import { constants, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import vm from 'node:vm';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FRONT_DIR = resolve(__dirname, '..');
 const DIST_DIR = resolve(FRONT_DIR, 'dist');
 const TEMPLATE = resolve(DIST_DIR, 'index.html');
-// Sprint026 PBI-098 第1段階: `ref/chapterXX-*.md` から章本文（600字+）を取り込み、
-// プリレンダ本文として焼き込む（AdSense審査の「薄いプリレンダ」根治）。
-const REF_DIR = resolve(FRONT_DIR, '..', '..', 'ref');
-// Sprint026 PBI-098 第2段階 / TASK-098-3: `src/data/cases.json` から代表ケース20件の
-// 本文・解説・模範回答を取り込み、プリレンダ本文として焼き込む。
-const CASES_JSON = resolve(FRONT_DIR, 'src', 'data', 'cases.json');
-// AdSense「有用性の低いコンテンツ」対応: ページ固有の深掘り解説（出題場面／優先度の論拠／
-// よくある失敗／回答例文／評価者視点）を焼き込む。全ページ共通の定型文は使用しない。
-const PATTERN_DEEP_DIVE_JSON = resolve(FRONT_DIR, 'src', 'data', 'patternDeepDive.json');
-const CASE_DEEP_DIVE_JSON = resolve(FRONT_DIR, 'src', 'data', 'caseDeepDive.json');
-const SCORING_GUIDE = JSON.parse(
-  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'scoringGuide.json'), 'utf-8'),
-);
-const CONTENT_NOTICE = JSON.parse(
-  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'learningContentNotice.json'), 'utf-8'),
-);
+const DATA_DIR = resolve(FRONT_DIR, 'src', 'data');
 
-const APP_NAME = 'インバスケット - 学習アプリ';
-
-// =====================================================================
-// Sprint026 PBI-098 第1段階 / TASK-098-1
-// Markdown → HTML 変換（依存追加なし / Node 標準のみ / 同期 readFileSync で
-// ROUTES 評価時に章本文を取り込み view-source: で 600 字以上可視出力する）
-// =====================================================================
-
-/** インライン記法（**bold** / `code`）と HTML エスケープを行う。 */
-function mdInline(s) {
-  const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return esc
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
+/** 画面と同じ定義源（src/data 配下の JSON）を読み込む。 */
+function readDataJson(name) {
+  return JSON.parse(readFileSync(resolve(DATA_DIR, name), 'utf-8'));
 }
+
+const CASES_JSON = resolve(DATA_DIR, 'cases.json');
+const SCORING_GUIDE = readDataJson('scoringGuide.json');
+const CONTENT_NOTICE = readDataJson('learningContentNotice.json');
+const PAGE_INTRO = readDataJson('pageIntro.json');
+
+const APP_NAME = 'インバスケット学習アプリ';
 
 /**
- * 章Markdown を view-source: 向けの簡素な HTML に変換する。
- * 対応要素: ##/### 見出し / 段落 / `- ` 箇条書き / GFM 表 / **bold** / `inline`
- * 非対応・除外: フロントマター / `---` 区切り / コードブロック / admonition
+ * TS ファイル内の配列リテラル（`<declaration>: T[] = [...]`）を取り出して評価する。
+ * 静的HTMLを画面と同じデータから生成するために使う（依存追加なし）。
+ * 配列の中はデータのみ（関数呼び出し・型注釈なし）であることを前提とする。
  */
-export function mdToHtml(md) {
-  let s = md.replace(/^---[\s\S]*?---\s*\n/, ''); // frontmatter
-  s = s.replace(/```[\s\S]*?```/g, ''); // code fences
-  const lines = s.split(/\r?\n/);
-
-  const out = [];
-  let listBuf = [];
-  let tableBuf = [];
-  let paraBuf = [];
-
-  const flushPara = () => {
-    if (paraBuf.length) {
-      const text = mdInline(paraBuf.join(' ').trim());
-      if (text) out.push(`<p>${text}</p>`);
-      paraBuf = [];
+function loadArrayLiteral(fileName, declaration) {
+  const src = readFileSync(resolve(DATA_DIR, '..', fileName), 'utf-8');
+  const match = new RegExp(`${declaration}\\b[^=]*=\\s*\\[`).exec(src);
+  if (!match) throw new Error(`[prerender] ${fileName} に ${declaration} が見つかりません`);
+  const start = match.index + match[0].length - 1;
+  let depth = 0;
+  let quote = '';
+  for (let i = start; i < src.length; i++) {
+    const c = src[i];
+    if (quote) {
+      if (c === '\\') i++;
+      else if (c === quote) quote = '';
+      continue;
     }
-  };
-  const flushList = () => {
-    if (listBuf.length) {
-      out.push('<ul>' + listBuf.map((li) => `<li>${mdInline(li)}</li>`).join('') + '</ul>');
-      listBuf = [];
-    }
-  };
-  const flushTable = () => {
-    if (tableBuf.length >= 2) {
-      const cells = (row) =>
-        row
-          .replace(/^\||\|$/g, '')
-          .split('|')
-          .map((c) => c.trim());
-      const head = cells(tableBuf[0]);
-      const body = tableBuf.slice(2).map(cells);
-      const thead =
-        '<thead><tr>' + head.map((c) => `<th>${mdInline(c)}</th>`).join('') + '</tr></thead>';
-      const tbody =
-        '<tbody>' +
-        body
-          .map((r) => '<tr>' + r.map((c) => `<td>${mdInline(c)}</td>`).join('') + '</tr>')
-          .join('') +
-        '</tbody>';
-      out.push(`<table>${thead}${tbody}</table>`);
-    }
-    tableBuf = [];
-  };
-
-  for (const raw of lines) {
-    const line = raw.replace(/\s+$/, '');
-    const trimmed = line.trim();
-    if (trimmed.startsWith('## ')) {
-      flushPara();
-      flushList();
-      flushTable();
-      out.push(`<h2>${mdInline(trimmed.slice(3).trim())}</h2>`);
-    } else if (trimmed.startsWith('### ')) {
-      flushPara();
-      flushList();
-      flushTable();
-      out.push(`<h3>${mdInline(trimmed.slice(4).trim())}</h3>`);
-    } else if (/^- /.test(trimmed)) {
-      flushPara();
-      flushTable();
-      listBuf.push(trimmed.slice(2).trim());
-    } else if (/^\|.*\|$/.test(trimmed)) {
-      flushPara();
-      flushList();
-      tableBuf.push(trimmed);
-    } else if (trimmed === '' || /^-{3,}$/.test(trimmed) || trimmed.startsWith(':::')) {
-      flushPara();
-      flushList();
-      flushTable();
-    } else {
-      flushList();
-      flushTable();
-      paraBuf.push(trimmed);
+    if (c === "'" || c === '"' || c === '`') quote = c;
+    else if (c === '/' && src[i + 1] === '/') i = src.indexOf('\n', i);
+    else if (c === '[') depth++;
+    else if (c === ']' && --depth === 0) {
+      const value = vm.runInNewContext(`(${src.slice(start, i + 1)})`);
+      return JSON.parse(JSON.stringify(value));
     }
   }
-  flushPara();
-  flushList();
-  flushTable();
-  return out.join('\n');
+  throw new Error(`[prerender] ${declaration} の終端が見つかりません`);
 }
 
-/** 章ID → `ref/` 内の Markdown ファイル名解決（chapterXX- プレフィクス一致）。 */
-function resolveChapterMdPath(id) {
-  const files = readdirSync(REF_DIR);
-  const name = files.find((f) => f.startsWith(`${id}-`) && f.endsWith('.md'));
-  if (!name) {
-    throw new Error(`[prerender] ${id} に対応する Markdown が ref/ 配下に見つかりません`);
-  }
-  return resolve(REF_DIR, name);
-}
-
-/** 章ID → プリレンダ本文 HTML（同期読み込み）。テスト時も import 時に確定する。 */
-function loadChapterBodyHtml(id) {
-  if (id === SCORING_GUIDE.id) return referenceChapterHtml(SCORING_GUIDE);
-  const md = readFileSync(resolveChapterMdPath(id), 'utf-8');
-  return mdToHtml(md);
-}
+/** 解説リファレンス全章（ReferencePage と同じ referenceData.ts / scoringGuide.json）。 */
+const REFERENCE_CHAPTERS = [
+  ...loadArrayLiteral('data/referenceData.ts', 'const REFERENCE_DATA_SOURCE'),
+  SCORING_GUIDE,
+].sort((a, b) => a.id.localeCompare(b.id));
 
 function referenceChapterHtml(chapter) {
   const listHtml = (items) => `<ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>`;
@@ -194,44 +107,31 @@ function referenceChapterHtml(chapter) {
         return listHtml(
           block.items.map(
             (item) =>
-              `<a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>${item.description ? `：${escapeHtml(item.description)}` : ''}`,
+              `<a href="${escapeAttr(item.href)}">${escapeHtml(item.label)}</a>${item.description ? `：${escapeHtml(item.description)}` : ''}`,
           ),
         );
       default:
         throw new Error(`未対応の本文ブロック: ${block.kind}`);
     }
   };
-  return `<h2>この章で学ぶこと</h2>${listHtml(chapter.learningGoals.map(escapeHtml))}${chapter.sections.map((section) => `<h2>${escapeHtml(section.title)}</h2>${section.blocks.map(blockHtml).join('')}`).join('')}`;
+  const sectionsHtml = chapter.sections
+    .map(
+      (section) =>
+        `<h2>${escapeHtml(section.title)}</h2>${section.summary ? `<p>${escapeHtml(section.summary)}</p>` : ''}${section.blocks.map(blockHtml).join('')}`,
+    )
+    .join('\n');
+  return `<h2>学習ゴール</h2>${listHtml(chapter.learningGoals.map(escapeHtml))}\n${sectionsHtml}`;
 }
 
-/**
- * Sprint026 PBI-098 第2段階 / TASK-098-3
- * `src/data/cases.json` を同期読み込みし `id → caseEntry` の Map を返す。
- * 本文・解説・模範回答を buildCaseRoute から焼き込むためのデータソース。
- */
-function loadCasesById() {
-  const raw = readFileSync(CASES_JSON, 'utf-8');
-  /** @type {Array<Record<string, unknown>>} */
-  const arr = JSON.parse(raw);
-  /** @type {Map<string, Record<string, unknown>>} */
-  const map = new Map();
-  for (const c of arr) {
-    if (typeof c?.id === 'string') map.set(c.id, c);
-  }
-  return map;
-}
-
-const CASES_BY_ID = loadCasesById();
+const CASES_BY_ID = new Map(
+  JSON.parse(readFileSync(CASES_JSON, 'utf-8')).map((entry) => [entry.id, entry]),
+);
 
 /** パターン／ケースの深掘り解説（ページ固有本文）。定義源は React 側と共通の JSON。 */
-const PATTERN_DEEP_DIVE = JSON.parse(readFileSync(PATTERN_DEEP_DIVE_JSON, 'utf-8'));
-const CASE_DEEP_DIVE = JSON.parse(readFileSync(CASE_DEEP_DIVE_JSON, 'utf-8'));
-const HOME_GUIDE = JSON.parse(
-  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'homeStudyGuide.json'), 'utf-8'),
-);
-const SITE_INFORMATION = JSON.parse(
-  readFileSync(resolve(FRONT_DIR, 'src', 'data', 'siteInformation.json'), 'utf-8'),
-);
+const PATTERN_DEEP_DIVE = readDataJson('patternDeepDive.json');
+const CASE_DEEP_DIVE = readDataJson('caseDeepDive.json');
+const HOME_GUIDE = readDataJson('homeStudyGuide.json');
+const SITE_INFORMATION = readDataJson('siteInformation.json');
 
 function informationBodyHtml(content) {
   return `
@@ -303,483 +203,263 @@ export function resolveSiteUrl() {
   return `http://localhost:5173${withTrailing}`;
 }
 
-/** path（先頭 `/`）を絶対 URL に変換する。`/` はサイトルートのまま。 */
+/**
+ * path（先頭 `/`）を絶対 URL に変換する。`/` はサイトルートのまま。
+ * GitHub Pages は `/about` を `/about/`（about/index.html）へ転送するため、canonical と og:url は
+ * 転送後の末尾スラッシュ付き URL にそろえる（JS 実行後の canonical とも一致する）。
+ */
 export function toAbsoluteUrl(siteUrl, path) {
   if (path === '/') return siteUrl;
-  return `${siteUrl}${path.replace(/^\/+/, '')}`;
+  return `${siteUrl}${path.replace(/^\/+/, '').replace(/\/+$/, '')}/`;
+}
+
+/** 章スキップ（ReferencePage の章詳細ページと同じ章タイトル一覧）。 */
+function chapterNavHtml() {
+  return `<nav id="reference-chapter-nav" aria-label="章スキップ"><ul>${REFERENCE_CHAPTERS.map(
+    (chapter, index) =>
+      `<li><a href="/reference/${chapter.id}">第${index + 1}章 ${escapeHtml(chapter.title)}</a></li>`,
+  ).join('')}</ul></nav>`;
+}
+
+/** 章末の前後導線（ReferencePage の章間ナビゲーションと同じ文言）。 */
+function chapterPagerHtml(index) {
+  const prev = REFERENCE_CHAPTERS[index - 1];
+  const next = REFERENCE_CHAPTERS[index + 1];
+  const items = [
+    prev
+      ? `<a href="/reference/${prev.id}">← 前の章 ${escapeHtml(prev.title)}</a>`
+      : '← 前の章 （最初の章です）',
+    '<a href="/reference">↑ 章一覧へ戻る</a>',
+    next
+      ? `<a href="/reference/${next.id}">次の章 → ${escapeHtml(next.title)}</a>`
+      : '次の章 → （最後の章です）',
+  ];
+  return `<ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>`;
 }
 
 /**
- * 解説リファレンス章メタ。`src/data/referenceData.ts` の title/description と意味的に一致。
- * Sprint025 PBI-087 第1段階(chapter01〜03) + 第2段階(chapter04〜12)で全12章を対象化。
- *
- * relatedPath/relatedLabel は view-source: に出すクローラ向け主要内部リンク（パンくず相当）。
- */
-const CHAPTERS = [
-  {
-    id: 'chapter01',
-    title: 'インバスケットとは何か',
-    summary:
-      'インバスケット試験は架空の管理職に着任した初日に未処理案件を制限時間内で処理するシミュレーションです。評価対象は「承認したか」よりも、なぜそう判断し誰にどう指示したかというマネージャーとしての行動パターンです。',
-    intro:
-      '本章では試験の正体と、エンジニアが求められる思考シフト（プレイヤー思考からマネージャー思考へ）を整理します。論理的思考力や問題分析力そのものは武器になりますが、使いどころを「自分が解く」から「組織で処理する」に切り替えることが合格の鍵です。',
-    relatedPath: '/patterns/1',
-    relatedLabel: '顧客クレーム（パターン1）',
-  },
-  {
-    id: 'chapter02',
-    title: '採点基準を逆算する',
-    summary:
-      'インバスケット形式の演習の評価項目や配点は、実施者によって異なります。本章では公式の基準と区別したうえで、本教材の振り返りの6観点（問題発見力・問題分析力・意思決定力・洞察力・組織活用力・ヒューマンスキル）で答案を見直す方法を示します。',
-    intro:
-      '本章では公式の採点基準と教材独自の自己点検を区別し、答案の具体的な一文を根拠に振り返ります。実際の配点や合否は推測せず、条件・権限・担当・報告の抜けを比較例から確認します。',
-    relatedPath: '/patterns/17',
-    relatedLabel: '上位方針の伝達・対応（パターン17）',
-  },
-  {
-    id: 'chapter03',
-    title: 'マネージャー思考への切替',
-    summary:
-      'プレイヤーとして優秀な人ほど「自分でやれば早い」と考えがちですが、管理職に求められるのは組織で成果を出す思考です。1案件あたりの所要時間が短くなり、より多くの案件を処理できるようになります。',
-    intro:
-      '本章では「自分で解く」モードから「組織で処理する」モードへの切替パターンを、判断・指示・委任・フォローの4つの観点から整理します。マネージャー思考は、本教材の振り返りの6観点すべてに関わります。',
-    relatedPath: '/reference/chapter02',
-    relatedLabel: '採点基準を逆算する（第2章）',
-  },
-  {
-    id: 'chapter04',
-    title: '時間配分とタイムマネジメント',
-    summary:
-      'インバスケット試験は時間との戦いです。20件前後の案件を 60〜90 分で処理する場合、1案件あたりの平均処理時間は 3〜5 分にすぎません。配分設計を持たずに着手すると後半で時間切れになります。',
-    intro:
-      '本章では序盤の俯瞰時間・案件区分別の配分・終了直前の見直しの 3 段階で時間を設計する方法を整理します。「時間切れで白紙」を防ぐ最大の防御策は、開始直後の俯瞰で全体量を把握することです。',
-    relatedPath: '/reference/chapter05',
-    relatedLabel: '優先順位づけの技術（第5章）',
-  },
-  {
-    id: 'chapter05',
-    title: '優先順位づけの技術',
-    summary:
-      'インバスケット試験で安定して得点するには、緊急度×重要度マトリクスで案件を素早く分類し、配点効率の高い案件から処理する技術が不可欠です。判断の遅さはそのまま得点機会の喪失に直結します。',
-    intro:
-      '本章では緊急度・重要度の判定基準と、A／B／C ランク付けの実践フォーマットを整理します。マトリクスでの分類は「迷わず手を動かし続ける」ための骨格となり、終盤の時間切れを構造的に防ぎます。',
-    relatedPath: '/patterns/10',
-    relatedLabel: '予算承認・経費申請（パターン10）',
-  },
-  {
-    id: 'chapter06',
-    title: '意思決定フレームワーク',
-    summary:
-      '案件ごとの意思決定を場当たり的に行うと判断の質と速度がぶれます。フレームワーク化することで、限られた情報の中でも一貫した根拠で判断を下せるようになります。',
-    intro:
-      '本章では「事実確認 → 影響範囲評価 → 選択肢列挙 → 判断基準適用 → 指示・委任」の 5 ステップで意思決定を組み立てる手順を整理します。判断の根拠を 1 文で添える型は、振り返りの6観点のうち意思決定力と問題分析力の確認に使えます。',
-    relatedPath: '/reference/chapter07',
-    relatedLabel: '委任と組織活用の技術（第7章）',
-  },
-  {
-    id: 'chapter07',
-    title: '委任と組織活用の技術',
-    summary:
-      '管理職が自分だけで案件を抱え込むと処理量がボトルネックになります。誰に・いつまでに・どう報告させるかという委任の型を持つことで、組織として案件を捌けるようになります。',
-    intro:
-      '本章では委任先の選定基準（スキル・余力・成長機会）と、委任時に必須の指示要素（目的・期限・成果物・報告タイミング）を整理します。「組織で処理する」発想は、振り返りの6観点では組織活用力に当たります。',
-    relatedPath: '/patterns/3',
-    relatedLabel: '新規取引・営業案件（パターン3）',
-  },
-  {
-    id: 'chapter08',
-    title: '案件パターン別攻略',
-    summary:
-      'インバスケット試験で頻出する案件は 20 パターン前後に分類できます。パターンごとに「優先度の目安」「処理の骨格」「典型的な失敗」を押さえておくことで本番の即応性が大幅に高まります。',
-    intro:
-      '本章では頻出 20 パターンを分類し、各パターンの回答骨格（誰に・何を・いつまでに）を素早く引き出すための索引を提供します。パターン認識ができるとマトリクス分類の速度も同時に上がります。',
-    relatedPath: '/patterns',
-    relatedLabel: 'パターン別解説（全20パターン）',
-  },
-  {
-    id: 'chapter09',
-    title: '答案の書き方と文章技術',
-    summary:
-      '同じ判断でも、答案の書き方が曖昧だと評価されません。「誰に・いつまでに・どう報告」を必ず書く型を徹底することで、判断の質を採点者に正しく伝えられます。',
-    intro:
-      '本章では合格答案の必須要素（判断・指示・根拠）と、短時間で書き切るための文章テンプレートを整理します。1 案件あたり 30〜60 秒で要点を書き切る型が身につくと、後半の時間切れリスクが大幅に減ります。',
-    relatedPath: '/reference/chapter04',
-    relatedLabel: '時間配分とタイムマネジメント（第4章）',
-  },
-  {
-    id: 'chapter10',
-    title: '模擬試験の進め方',
-    summary:
-      '本番に近い条件で模擬試験を回すことで、時間配分・判断速度・答案の書き方の弱点が定量的に見えるようになります。模試なしの本番突入は最大のリスクです。',
-    intro:
-      '本章では模試の準備（時間設定・道具・環境）・実施（時間内完走の徹底）・振り返り（採点ログ化と弱点の特定）の 3 段階を整理します。模試 → 採点 → 改善のサイクルが学習効率を最大化します。',
-    relatedPath: '/reference/chapter11',
-    relatedLabel: '弱点分析と継続改善（第11章）',
-  },
-  {
-    id: 'chapter11',
-    title: '弱点分析と継続改善',
-    summary:
-      '模擬試験の点数だけを見て一喜一憂しても改善には繋がりません。振り返りの6観点ごとに弱点を可視化し、次回までに試す行動を 1〜2 点に絞ることで継続的に精度が上がります。',
-    intro:
-      '本章では「記録 → 採点 → 原因分析 → 対策」の改善サイクルを定型化し、答案ログ・弱点リスト・改善カードの 3 成果物として残す運用を整理します。改善幅を欲張らない設計が定着の鍵です。',
-    relatedPath: '/reference/chapter10',
-    relatedLabel: '模擬試験の進め方（第10章）',
-  },
-  {
-    id: 'chapter12',
-    title: '本番当日の戦略',
-    summary:
-      '本番当日のパフォーマンスは前日からの準備で 8 割決まります。持ち物・睡眠・到着時刻・直前の心構えまで設計しておくことで、当日の動揺要素を最小化できます。',
-    intro:
-      '本章では本番前日と当日朝の準備・試験開始 5 分間の動き・終了直前の見直しまで、得点を最大化するための行動計画を整理します。新しい解法を試さず練習通りに振る舞うことが当日最重要のルールです。',
-    relatedPath: '/reference/chapter10',
-    relatedLabel: '模擬試験の進め方（第10章）',
-  },
-];
-
-/**
  * 章ルートをプリレンダリング ROUTES 形式に変換するヘルパー。
- * description は `Router.tsx#resolveRouteSeo`（reference-chapter 分岐）と意味的に一致させる。
+ * 本文は ReferencePage と同じ referenceData.ts から生成し、画面に無い文章を加えない。
+ * title/description は `Router.tsx#resolveRouteSeo`（reference-chapter 分岐）と一致させる。
  */
-function buildChapterRoute(meta) {
-  const fullTitle = `解説リファレンス：${meta.title} | ${APP_NAME}`;
-  const description = `インバスケット学習の「${meta.title}」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。`;
-  // Sprint026 PBI-098 第1段階 / TASK-098-1
-  // ref/chapterXX-*.md の本文を mdToHtml で焼き込み、view-source: で 600 字以上の
-  // 本文を可視出力する（AdSense審査落ち「薄いプリレンダ」根治）。
-  const chapterBody = loadChapterBodyHtml(meta.id);
+function buildChapterRoute(chapter, index) {
   return {
-    path: `/reference/${meta.id}`,
-    outRelative: `reference/${meta.id}/index.html`,
-    title: fullTitle,
-    description,
+    path: `/reference/${chapter.id}`,
+    outRelative: `reference/${chapter.id}/index.html`,
+    title: `解説リファレンス：${chapter.title} | ${APP_NAME}`,
+    description: `インバスケット学習の「${chapter.title}」を中心に、要点とフレームワークを章別に確認できる解説リファレンスページです。`,
     bodyHtml: `
-      <div data-prerender="reference-${meta.id}">
-        <h1>解説リファレンス：${meta.title}</h1>
-        <p>${meta.summary}</p>
-        <p>${meta.intro}</p>
-        ${chapterBody}
-        <p>関連リンク：<a href="${meta.relatedPath}">${meta.relatedLabel}</a> ／ <a href="/reference">解説リファレンス（章一覧）</a></p>
+      <div data-prerender="reference-${chapter.id}">
+        <p>解説リファレンス｜${escapeHtml(chapter.level)}</p>
+        <h1>${escapeHtml(chapter.title)}</h1>
+        <p>${escapeHtml(chapter.description)}</p>
+        <p>第 ${index + 1} 章 / 全 ${REFERENCE_CHAPTERS.length} 章</p>
+        ${referenceChapterHtml(chapter)}
+        ${chapterPagerHtml(index)}
+        ${chapterNavHtml()}
       </div>
     `.trim(),
   };
 }
 
-/**
- * 代表ケース 20 件のメタ（Sprint025 PBI-087 第3段階 / TASK-087-5）。
- *
- * `src/routes.ts.CASE_DETAIL_META` および `src/routes.ts.PUBLIC_ROUTES` の `/cases/:id`
- * 並び順と一致させる（ID昇順）。title/description は `Router.tsx#resolveRouteSeo`
- * （`case-detail` 分岐）と意味的に一致させ、view-source: 取得時の SEO 退行ゼロを担保する。
- */
-const CASES = [
-  { id: 'case-001', patternId: 1, patternName: '顧客クレーム', difficulty: '上級' },
-  { id: 'case-002', patternId: 12, patternName: '会議・セミナーへの参加依頼', difficulty: '初級' },
-  { id: 'case-004', patternId: 8, patternName: 'ハラスメント報告', difficulty: '上級' },
-  { id: 'case-010', patternId: 4, patternName: '部下の退職・異動の相談', difficulty: '上級' },
-  { id: 'case-012', patternId: 17, patternName: '上位方針の伝達・対応', difficulty: '中級' },
-  {
-    id: 'case-013',
-    patternId: 14,
-    patternName: '情報セキュリティインシデント',
-    difficulty: '上級',
-  },
-  {
-    id: 'case-015',
-    patternId: 5,
-    patternName: '部下間の対立・人間関係トラブル',
-    difficulty: '中級',
-  },
-  { id: 'case-016', patternId: 11, patternName: '業務改善提案', difficulty: '中級' },
-  { id: 'case-017', patternId: 3, patternName: '新規取引・営業案件', difficulty: '中級' },
-  { id: 'case-018', patternId: 13, patternName: '事故・災害報告', difficulty: '中級' },
-  { id: 'case-019', patternId: 7, patternName: '部下の有給・休暇申請', difficulty: '初級' },
-  { id: 'case-021', patternId: 19, patternName: '前任者の未完了案件', difficulty: '上級' },
-  { id: 'case-029', patternId: 9, patternName: 'プロジェクト遅延・品質問題', difficulty: '上級' },
-  {
-    id: 'case-031',
-    patternId: 20,
-    patternName: '複合案件（複数パターンの組み合わせ）',
-    difficulty: '上級',
-  },
-  { id: 'case-035', patternId: 10, patternName: '予算承認・経費申請', difficulty: '初級' },
-  { id: 'case-037', patternId: 18, patternName: '他部署からの依頼・調整', difficulty: '初級' },
-  {
-    id: 'case-039',
-    patternId: 15,
-    patternName: 'コンプライアンス違反（不正行為）',
-    difficulty: '中級',
-  },
-  { id: 'case-042', patternId: 6, patternName: '部下のパフォーマンス問題', difficulty: '中級' },
-  { id: 'case-048', patternId: 16, patternName: '組織変更・人員配置', difficulty: '中級' },
-  {
-    id: 'case-053',
-    patternId: 2,
-    patternName: '取引先からの要求（値引き・仕様変更等）',
-    difficulty: '初級',
-  },
-];
+/** 解説リファレンス一覧（ReferencePage の一覧表示と同じ構成）。 */
+function referenceIndexHtml() {
+  const index = PAGE_INTRO.referenceIndex;
+  const levels = index.levels.map(({ level, description }) => {
+    const chapters = REFERENCE_CHAPTERS.map((chapter, order) => ({ chapter, order })).filter(
+      ({ chapter }) => chapter.level === level,
+    );
+    return `<h2>${escapeHtml(level)}</h2><p>${escapeHtml(description)}</p>${chapters
+      .map(
+        ({ chapter, order }) =>
+          `<h3><a href="/reference/${chapter.id}">第${order + 1}章 ${escapeHtml(chapter.title)}</a></h3><p>${escapeHtml(chapter.description)}</p><ul>${chapter.learningGoals.map((goal) => `<li>${escapeHtml(goal)}</li>`).join('')}</ul>`,
+      )
+      .join('')}`;
+  });
+  return `
+    <p>解説リファレンス</p>
+    <h1>${escapeHtml(index.title)}</h1>
+    <p>${escapeHtml(index.lead)}</p>
+    <p>${escapeHtml(index.howto)}</p>
+    ${levels.join('\n')}
+  `;
+}
+
+/** 代表ケース 20 件のメタ（CaseDetail / Router と同じ routes.ts の CASE_DETAIL_META）。 */
+const CASES = loadArrayLiteral('routes.ts', 'export const CASE_DETAIL_META');
+
+/** 優先度の表示名（CaseDetail / PatternDetail と同じ文言）。 */
+const PRIORITY_LABEL = {
+  A: 'A優先（最重要・緊急）',
+  B: 'B優先（重要）',
+  C: 'C優先（低優先度）',
+  situational: '状況依存',
+};
 
 /**
  * 代表ケース 1 件をプリレンダリング ROUTES 形式に変換するヘルパー。
- * title/description は `Router.tsx#resolveRouteSeo`（`case-detail` 分岐）と意味的に一致。
- *
- * Sprint026 PBI-098 第2段階 / TASK-098-3:
- *   `src/data/cases.json` から本文・解説・模範回答（判断/理由/対応）・登場人物・関係部署・
- *   テーマを焼き込み、view-source: で 600 字以上の本文を可視出力する。
+ * 本文は CaseDetail と同じ cases.json / caseDeepDive.json から、同じ見出しで生成する。
+ * title/description は `Router.tsx#resolveRouteSeo`（`case-detail` 分岐）と一致させる。
  */
 function buildCaseRoute(meta) {
   const num = meta.id.replace('case-', '');
-  const fullTitle = `ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}） | ${APP_NAME}`;
-  const description = `インバスケット代表ケース${num}（パターン${meta.patternId}「${meta.patternName}」・難易度${meta.difficulty}）の本文と解説、模範回答の骨格を確認できる単独URLページです。`;
-
-  // cases.json から実本文を取得（取得できないケースは ID 不整合）。
   const entry = CASES_BY_ID.get(meta.id);
   if (!entry) {
     throw new Error(`[prerender] cases.json に ${meta.id} が見つかりません`);
   }
-  const caseTitle = String(entry.title ?? '');
-  const body = String(entry.body ?? '');
-  const explanation = String(entry.explanation ?? '');
-  const correctPriority = String(entry.correctPriority ?? '');
-  const theme = String(entry.theme ?? '');
-  const characters = Array.isArray(entry.characters) ? entry.characters.map(String) : [];
-  const departments = Array.isArray(entry.departments) ? entry.departments.map(String) : [];
-  const ma = entry.modelAnswer ?? {};
-  const judgment = String(ma.judgment ?? '');
-  const reason = String(ma.reason ?? '');
-  const action = String(ma.action ?? '');
-
-  const priorityLabel =
-    correctPriority === 'A'
-      ? 'A優先（最優先）'
-      : correctPriority === 'B'
-        ? 'B優先（要計画対応）'
-        : correctPriority === 'C'
-          ? 'C優先（空き時間処理）'
-          : `${correctPriority}優先`;
-
-  const charsHtml = characters.length
-    ? `<p>登場人物：${characters.map((c) => escapeHtml(c)).join(' / ')}</p>`
+  const answer = entry.modelAnswer;
+  const dd = CASE_DEEP_DIVE[meta.id];
+  const analysisHtml = dd
+    ? deepDiveSectionsHtml([
+        ['案件文から読み取るべきこと', dd.situationAnalysis],
+        ['優先度判定の論拠', dd.priorityRationale],
+        ['よくある誤答', dd.pitfalls],
+        ['回答例文', dd.answerExample],
+      ])
     : '';
-  const deptsHtml = departments.length
-    ? `<p>関係部署：${departments.map((d) => escapeHtml(d)).join(' / ')}</p>`
+  const answerHtml = answer
+    ? `<h2>モデル回答</h2><dl><dt>判断</dt><dd>${escapeHtml(answer.judgment)}</dd><dt>理由</dt><dd>${escapeHtml(answer.reason)}</dd><dt>具体行動</dt><dd>${escapeHtml(answer.action)}</dd></dl>`
     : '';
-  const themeHtml = theme ? `<p>テーマ分類：${escapeHtml(theme)}</p>` : '';
-
-  // ページ固有の深掘り解説（AdSense「有用性の低いコンテンツ」対応）。
-  const dd = CASE_DEEP_DIVE[meta.id] ?? {};
-  const analysisHtml = deepDiveSectionsHtml([
-    ['案件文から読み取るべきこと', dd.situationAnalysis],
-    ['優先度判定の論拠', dd.priorityRationale],
-    ['よくある誤答', dd.pitfalls],
-    ['回答例文', dd.answerExample],
-  ]);
-  const followUpHtml = deepDiveSectionsHtml([['一次対応の後にやること', dd.followUp]]);
+  const followUpHtml = dd ? deepDiveSectionsHtml([['一次対応の後にやること', dd.followUp]]) : '';
+  const sourcesHtml = dd?.sources
+    ? `<h2>制度を確認する公的資料</h2><p>学習例を実務へ適用する際は、最新の制度と所属組織の規程を確認してください。</p><ul>${dd.sources.map((source) => `<li><a href="${escapeAttr(source.href)}">${escapeHtml(source.label)}</a></li>`).join('')}</ul>`
+    : '';
 
   return {
     path: `/cases/${meta.id}`,
     outRelative: `cases/${meta.id}/index.html`,
-    title: fullTitle,
-    description,
+    title: `ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}） | ${APP_NAME}`,
+    description: `インバスケット代表ケース${num}（パターン${meta.patternId}「${meta.patternName}」・難易度${meta.difficulty}）の本文と解説、模範回答の骨格を確認できる単独URLページです。`,
     bodyHtml: `
       <div data-prerender="case-${meta.id}">
-        <h1>ケース${num}：パターン${meta.patternId}「${meta.patternName}」（${meta.difficulty}）</h1>
+        <h1>ケース${num}：${escapeHtml(entry.title)}</h1>
+        <p>パターン${meta.patternId}「${escapeHtml(meta.patternName)}」／難易度：${meta.difficulty}</p>
         <p>${escapeHtml(CONTENT_NOTICE.text)} <a href="${CONTENT_NOTICE.href}">${escapeHtml(CONTENT_NOTICE.label)}</a></p>
-        <h2>ケース概要：${escapeHtml(caseTitle)}</h2>
-        <p>${escapeHtml(body)}</p>
-        ${charsHtml}
-        ${deptsHtml}
-        ${themeHtml}
-        <h2>教材の分類例：${escapeHtml(priorityLabel)}</h2>
-        <p>${escapeHtml(explanation)}</p>
+        <h2>ケース本文</h2>
+        <p>${escapeHtml(entry.body)}</p>
+        <h2>教材の分類例と解説</h2>
+        <p><strong>${escapeHtml(PRIORITY_LABEL[entry.correctPriority] ?? entry.correctPriority)}</strong></p>
+        <p>${escapeHtml(entry.explanation)}</p>
         ${analysisHtml}
-        <h2>模範回答の骨格</h2>
-        <p>判断：${escapeHtml(judgment)}</p>
-        <p>理由：${escapeHtml(reason)}</p>
-        <p>対応：${escapeHtml(action)}</p>
+        ${answerHtml}
         ${followUpHtml}
-        ${dd.sources?.length ? `<h2>制度を確認する公的資料</h2><p>学習例を実務へ適用する際は、最新の制度と所属組織の規程を確認してください。</p><ul>${dd.sources.map((source) => `<li><a href="${escapeHtml(source.href)}">${escapeHtml(source.label)}</a></li>`).join('')}</ul>` : ''}
-        <p>関連リンク：<a href="/patterns/${meta.patternId}">パターン${meta.patternId}「${escapeHtml(meta.patternName)}」</a> ／ <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（第8章）</a></p>
+        ${sourcesHtml}
+        <h2>関連リンク</h2>
+        <ul><li><a href="/patterns/${meta.patternId}">パターン${meta.patternId}「${escapeHtml(meta.patternName)}」の詳細を見る</a></li><li><a href="/reference">解説リファレンス（章別の体系解説）</a></li></ul>
       </div>
     `.trim(),
   };
 }
 
-/**
- * 全 20 パターンのメタ（Sprint025 PBI-087 第4段階 / TASK-087-7）。
- *
- * `src/data/patternData.ts` の `PATTERN_DATA[*].id / name` と意味的に一致させる
- * （ID昇順）。`Router.tsx#resolveRouteSeo`（`pattern-detail` 分岐）の
- * title/description テンプレートに合わせて view-source: 取得時の SEO 退行ゼロを担保する。
- */
-// Sprint026 PBI-098 第3段階 / TASK-098-4
-// `src/data/patternData.ts` から PATTERN_DATA を同期読み込みし、
-// id → meta の Map を返す。本文・特徴・回答骨格・キーフレーズ・注意事項を
-// buildPatternRoute から焼き込むためのデータソース（依存追加なし / 簡易TS パーサ）。
-const PATTERN_DATA_TS = resolve(FRONT_DIR, 'src', 'data', 'patternData.ts');
+/** 全 20 パターン（PatternList / PatternDetail と同じ patternData.ts の PATTERN_DATA）。 */
+const PATTERN_DATA = loadArrayLiteral('data/patternData.ts', 'export const PATTERN_DATA');
 
-/**
- * patternData.ts から PATTERN_DATA リテラルをパースする（依存追加なし）。
- * - `export const PATTERN_DATA: PatternItem[] = [...]` を抽出
- * - TS シンタックス（trailing カンマ、シングルクォート、コメント）は本ソース運用上不要なため
- *   許容範囲のみ対応：シングルクォート → ダブルクォート、trailing カンマ除去、keyless オブジェクト無効
- */
-function loadPatternData() {
-  const src = readFileSync(PATTERN_DATA_TS, 'utf-8');
-  const startMatch = src.match(/export const PATTERN_DATA[^=]*=\s*\[/);
-  if (!startMatch) throw new Error('[prerender] PATTERN_DATA 配列の開始が見つかりません');
-  const startIdx = startMatch.index + startMatch[0].length - 1; // `[` の位置
-  // 角括弧の深さで対応する `]` を探す（文字列内の `[` `]` も簡易検知）。
-  let depth = 0;
-  let endIdx = -1;
-  let inStr = false;
-  let strCh = '';
-  for (let i = startIdx; i < src.length; i++) {
-    const c = src[i];
-    if (inStr) {
-      if (c === '\\') {
-        i++;
-        continue;
-      }
-      if (c === strCh) inStr = false;
-      continue;
-    }
-    if (c === "'" || c === '"') {
-      inStr = true;
-      strCh = c;
-      continue;
-    }
-    if (c === '[') depth++;
-    else if (c === ']') {
-      depth--;
-      if (depth === 0) {
-        endIdx = i;
-        break;
-      }
-    }
-  }
-  if (endIdx < 0) throw new Error('[prerender] PATTERN_DATA 配列の終端が見つかりません');
-  let literal = src.slice(startIdx, endIdx + 1);
-  // コメント除去（行コメント）。
-  literal = literal.replace(/(^|[^:])\/\/[^\n]*/g, '$1');
-  // シングルクォート文字列 → ダブルクォート（中に " が無い前提：patternData.ts は遵守）。
-  literal = literal.replace(
-    /'([^'\\]*(?:\\.[^'\\]*)*)'/g,
-    (_m, body) => `"${body.replace(/"/g, '\\"')}"`,
-  );
-  // キーをダブルクォート化（識別子のみ）。
-  literal = literal.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":');
-  // trailing カンマ除去。
-  literal = literal.replace(/,(\s*[\]}])/g, '$1');
-  return JSON.parse(literal);
+/** パターン一覧の優先度バッジ（PatternList と同じ文言）。 */
+const PATTERN_LIST_BADGE = { A: 'A優先', B: 'B優先', C: 'C優先', situational: '状況依存' };
+
+/** パターン別解説一覧（PatternList と同じ構成）。 */
+function patternIndexHtml() {
+  const index = PAGE_INTRO.patternIndex;
+  const categories = [...new Set(PATTERN_DATA.map((pattern) => pattern.category))];
+  return `
+    <h1>${escapeHtml(index.title)}</h1>
+    <p>${escapeHtml(index.subtitle)}</p>
+    ${index.intro.map((text) => `<p>${escapeHtml(text)}</p>`).join('')}
+    ${categories
+      .map(
+        (category) =>
+          `<h2>${escapeHtml(category)}</h2><ul>${PATTERN_DATA.filter(
+            (pattern) => pattern.category === category,
+          )
+            .map(
+              (pattern) =>
+                `<li><a href="/patterns/${pattern.id}">パターン${pattern.id} ${escapeHtml(pattern.name)} ${PATTERN_LIST_BADGE[pattern.typicalPriority]}</a><p>${escapeHtml(pattern.characteristics)}</p></li>`,
+            )
+            .join('')}</ul>`,
+      )
+      .join('\n')}
+  `;
 }
-
-const PATTERN_DATA = loadPatternData();
-/** @type {Map<number, Record<string, unknown>>} */
-const PATTERNS_BY_ID = new Map(PATTERN_DATA.map((p) => [p.id, p]));
-
-const PATTERNS = PATTERN_DATA.map((p) => ({ id: p.id, name: p.name }));
-
-const PRIORITY_LABEL_FOR_PATTERN = {
-  A: 'A優先（最重要・緊急）',
-  B: 'B優先（重要）',
-  C: 'C優先（低優先度）',
-  situational: '状況依存（案件の条件で判断）',
-};
-
-const CATEGORY_DESCRIPTION = {
-  対外対応パターン:
-    '顧客・取引先・営業先など社外関係者を相手にした案件群。初動の速度と顧客視点の指示が評価の中心になります。',
-  '人事・部下マネジメントパターン':
-    '部下の育成・配置・対人トラブルなど、ヒューマンスキルが問われる案件群。事実確認と本人の意思尊重、対面コミュニケーションが鍵になります。',
-  '業務・プロジェクトパターン':
-    '日常業務やプロジェクト運営に関する案件群。リソース配分と進捗管理を、問題分析力と組織活用力の観点で組み立てます。',
-  'リスク・トラブルパターン':
-    '事故・コンプライアンス・情報セキュリティなど、組織の存続に関わるリスク案件群。最優先（A優先）扱いで、封じ込めと報告系統の即時起動が求められます。',
-  '組織・方針パターン':
-    '組織変更・上位方針・部署間調整など、構造や戦略に関わる案件群。利害関係者の整理と段階的な実施計画、納得感の醸成が評価の中心になります。',
-  その他のパターン:
-    '前任引継ぎや複数パターンの複合案件など、定型化しにくい案件群。前提条件の確認と要素分解、優先順位の高い要素からの着手が求められます。',
-};
 
 /**
  * パターン詳細 1 件をプリレンダリング ROUTES 形式に変換するヘルパー。
- * title/description は `Router.tsx#resolveRouteSeo`（`pattern-detail` 分岐）と意味的に一致。
+ * 本文は PatternDetail と同じ patternData.ts / patternDeepDive.json から、同じ見出しで生成する。
+ * title/description は `Router.tsx#resolveRouteSeo`（`pattern-detail` 分岐）と一致させる。
  */
-function buildPatternRoute(meta) {
-  const fullTitle = `パターン${meta.id}：${meta.name} | ${APP_NAME}`;
-  const description = `インバスケット案件パターン${meta.id}「${meta.name}」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。`;
+function buildPatternRoute(pattern) {
+  const dd = PATTERN_DEEP_DIVE[String(pattern.id)];
+  const sample = CASES.find((meta) => meta.patternId === pattern.id);
+  const sampleCase = sample ? CASES_BY_ID.get(sample.id) : undefined;
+  const section = (heading, html) => `<h2>${escapeHtml(heading)}</h2>${html}`;
+  const paragraph = (text) => `<p>${escapeHtml(text)}</p>`;
+  const list = (tag, items) =>
+    `<${tag}>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</${tag}>`;
 
-  // Sprint026 PBI-098 第3段階 / TASK-098-4
-  // patternData.ts の実データ（characteristics / answerSkeleton / keyPhrases / notes / category /
-  // typicalPriority）を view-source: で 600 字以上可視出力する形に焼き込む。
-  const entry = PATTERNS_BY_ID.get(meta.id);
-  if (!entry) {
-    throw new Error(`[prerender] patternData.ts に id=${meta.id} が見つかりません`);
-  }
-  const category = String(entry.category ?? '');
-  const characteristics = String(entry.characteristics ?? '');
-  const typicalPriority = String(entry.typicalPriority ?? '');
-  const priorityLabel = PRIORITY_LABEL_FOR_PATTERN[typicalPriority] ?? typicalPriority;
-  const categoryDesc = CATEGORY_DESCRIPTION[category] ?? '';
-  const skeleton = Array.isArray(entry.answerSkeleton) ? entry.answerSkeleton.map(String) : [];
-  const keyPhrases = Array.isArray(entry.keyPhrases) ? entry.keyPhrases.map(String) : [];
-  const notes = String(entry.notes ?? '');
-
-  const skeletonHtml = skeleton.length
-    ? `<h2>回答の骨格（誰に・何を・いつまでに）</h2><ol>${skeleton.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>`
-    : '';
-  const keyPhrasesHtml = keyPhrases.length
-    ? `<h2>キーフレーズ例</h2><ul>${keyPhrases.map((p) => `<li>「${escapeHtml(p)}」</li>`).join('')}</ul>`
-    : '';
-  const notesHtml = notes ? `<h2>対応ポイント・注意事項</h2><p>${escapeHtml(notes)}</p>` : '';
-
-  // ページ固有の深掘り解説（AdSense「有用性の低いコンテンツ」対応）。
-  const dd = PATTERN_DEEP_DIVE[String(meta.id)] ?? {};
-  const situationHtml = deepDiveSectionsHtml([
-    ['出題される場面の読み解き', dd.situation],
-    ['なぜこの優先度になるのか', dd.priorityRationale],
-  ]);
-  const practiceHtml = deepDiveSectionsHtml([
-    ['よくある失敗', dd.commonMistakes],
-    ['回答例文', dd.answerExample],
-    ['答案を振り返る観点', dd.evaluatorView],
-  ]);
+  const parts = [
+    section('優先度の目安', paragraph(PRIORITY_LABEL[pattern.typicalPriority])),
+    section('特徴・優先度判定理由', paragraph(pattern.characteristics)),
+    dd && section('案件の読み解き', paragraph(dd.situation)),
+    dd && section('なぜこの優先度になるのか', paragraph(dd.priorityRationale)),
+    section('回答の骨格', list('ol', pattern.answerSkeleton)),
+    dd && section('よくある失敗', list('ul', dd.commonMistakes)),
+    dd && section('回答例文', paragraph(dd.answerExample)),
+    dd && section('答案を振り返る観点', paragraph(dd.evaluatorView)),
+    pattern.keyPhrases?.length &&
+      section(
+        'キーフレーズ例',
+        list(
+          'ul',
+          pattern.keyPhrases.map((phrase) => `「${phrase}」`),
+        ),
+      ),
+    pattern.notes && section('対応ポイント・注意事項', paragraph(pattern.notes)),
+    sample &&
+      sampleCase &&
+      section(
+        'このパターンの代表ケース',
+        `<ul><li><a href="/cases/${sample.id}">ケース${sample.id.replace('case-', '')}：${escapeHtml(sampleCase.title)}（${sample.difficulty}）</a></li></ul>`,
+      ),
+    section(
+      '関連リンク',
+      '<ul><li><a href="/patterns">パターン別解説（全20パターン）</a></li><li><a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（第8章）</a></li></ul>',
+    ),
+  ].filter(Boolean);
 
   return {
-    path: `/patterns/${meta.id}`,
-    outRelative: `patterns/${meta.id}/index.html`,
-    title: fullTitle,
-    description,
+    path: `/patterns/${pattern.id}`,
+    outRelative: `patterns/${pattern.id}/index.html`,
+    title: `パターン${pattern.id}：${pattern.name} | ${APP_NAME}`,
+    description: `インバスケット案件パターン${pattern.id}「${pattern.name}」の特徴・優先度の目安・回答の骨格を確認できる詳細ページです。`,
     bodyHtml: `
-      <div data-prerender="pattern-${meta.id}">
-        <h1>パターン${meta.id}：${meta.name}</h1>
+      <div data-prerender="pattern-${pattern.id}">
+        <h1>パターン${pattern.id}：${escapeHtml(pattern.name)}</h1>
+        <p>${escapeHtml(pattern.category)}</p>
         <p>${escapeHtml(CONTENT_NOTICE.text)} <a href="${CONTENT_NOTICE.href}">${escapeHtml(CONTENT_NOTICE.label)}</a></p>
-        <h2>カテゴリ：${escapeHtml(category)}</h2>
-        <p>${escapeHtml(categoryDesc)}</p>
-        <h2>優先度の目安：${escapeHtml(priorityLabel)}</h2>
-        <p>${escapeHtml(characteristics)}</p>
-        ${situationHtml}
-        ${skeletonHtml}
-        ${practiceHtml}
-        ${keyPhrasesHtml}
-        ${notesHtml}
-        <p>関連リンク：<a href="/patterns">パターン別解説（全20パターン）</a> ／ <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（第8章）</a></p>
+        ${parts.join('\n')}
       </div>
     `.trim(),
   };
 }
 
+/** トップの導入（App の HomeIntro と同じ pageIntro.json）。 */
+function homeIntroHtml() {
+  const home = PAGE_INTRO.home;
+  return `
+    <h1>${escapeHtml(home.title)}</h1>
+    <p>${escapeHtml(home.lead)}</p>
+    <ul>${home.actions.map((action) => `<li><a href="${escapeAttr(action.href)}">${escapeHtml(action.label)}</a></li>`).join('')}</ul>
+    <h2>${escapeHtml(home.audienceHeading)}</h2>
+    <ul>${home.audience.map((text) => `<li>${escapeHtml(text)}</li>`).join('')}</ul>
+    <h2 id="home-intro-steps">${escapeHtml(home.stepsHeading)}</h2>
+    <ol>${home.steps.map((step) => `<li>${escapeHtml(step.label)} ${escapeHtml(step.text)} <a href="${escapeAttr(step.href)}">${escapeHtml(step.linkLabel)}</a></li>`).join('')}</ol>
+    <p>${escapeHtml(home.note)}</p>
+    <h2 id="practice-heading">${escapeHtml(home.practiceHeading)}</h2>
+  `;
+}
+
 /**
- * 第1〜4段階対象ルート（57 件）。
- * - トップ：`/`（既存 PoC から踏襲）
- * - 運営者情報／サービス利用規約：`/about`, `/terms`（PBI-088/089 と意味的に一致）
- * - 法務系：`/privacy-policy`, `/contact`（Sprint025 DAY5 補完で 57+ 受入基準クローズ）
- * - 解説リファレンス：`/reference/chapter01〜12`（CHAPTERS から導出）
- * - 代表ケース：`/cases/case-XXX` × 20（CASES から導出 / Sprint025 PBI-087 第3段階）
- * - パターン詳細：`/patterns/1〜20`（PATTERNS から導出 / Sprint025 PBI-087 第4段階）
+ * プリレンダ対象ルート（60 件）。本文はすべて画面（React）と同じ定義源から生成する。
+ * title/description は `Router.tsx#resolveRouteSeo` と一致させる（StaticParity.test.tsx で検証）。
  */
 export const ROUTES = [
   {
@@ -790,7 +470,7 @@ export const ROUTES = [
       '管理職昇進試験のインバスケット演習を、案件処理・優先順位付け・委任判断などのフレームワークから模擬試験までブラウザで体系的に学べる無料の日本語学習Webアプリです。',
     bodyHtml: `
       <div data-prerender="home">
-        <h1>インバスケット</h1>
+        ${homeIntroHtml()}
         ${homeStudyGuideHtml()}
       </div>
     `.trim(),
@@ -800,7 +480,7 @@ export const ROUTES = [
     outRelative: 'about/index.html',
     title: `運営者情報 | ${APP_NAME}`,
     description:
-      'インバスケット学習アプリ InBusket の運営者・サイト目的・コンテンツ作成方針・連絡手段・更新ポリシーをまとめた運営者情報ページです。',
+      'インバスケット学習アプリの運営者・サイトの目的・コンテンツ作成方針・連絡手段・更新ポリシーをまとめた運営者情報ページです。',
     bodyHtml: `
       <div data-prerender="about">
         ${informationBodyHtml(SITE_INFORMATION.about)}
@@ -812,57 +492,31 @@ export const ROUTES = [
     outRelative: 'terms/index.html',
     title: `サービス利用規約 | ${APP_NAME}`,
     description:
-      'インバスケット学習アプリ InBusket の利用条件・免責・著作権・禁止事項・準拠法・改定方針を簡潔にまとめたサービス利用規約の要旨ページです。',
+      'インバスケット学習アプリの利用条件・免責・著作権・禁止事項・準拠法・改定方針を簡潔にまとめたサービス利用規約の要旨ページです。',
     bodyHtml: `
       <div data-prerender="terms">
-        <h1>サービス利用規約</h1>
-        <p>本規約は、InBusket（インバスケット学習アプリ）の利用条件を簡潔にまとめたものです。利用者は本サービスを利用することで、本規約に同意したものとみなします。詳細条項は利用規約（条文版）を参照してください。</p>
-        <p>本サービスはどなたでも無料でご利用いただけます。本規約および <a href="/privacy-policy">プライバシーポリシー</a> に同意できない場合は、本サービスのご利用をお控えください。</p>
-        <p>関連リンク：<a href="/terms-of-service">利用規約（条文版）</a> ／ <a href="/about">運営者情報</a></p>
+        ${informationBodyHtml(SITE_INFORMATION.terms)}
       </div>
     `.trim(),
   },
   {
-    // Sprint027 追補: /terms-of-service（利用規約・条文版）。sitemap 掲載 URL だが
-    // 未プリレンダのため HTTP 404（ソフト404）になっていたのを解消する（PBI-106）。
     path: '/terms-of-service',
     outRelative: 'terms-of-service/index.html',
     title: `利用規約（条文版） | ${APP_NAME}`,
     description:
-      'インバスケット学習アプリ InBusket の利用規約（条文版）です。サービスの目的・利用資格・禁止事項・知的財産権・広告表示・免責事項・サービスの変更停止・規約の変更・準拠法と管轄を条文形式で定めています。',
+      'インバスケット学習アプリの利用規約（条文版）です。サービスの目的・利用資格・禁止事項・知的財産権・広告表示・免責事項・サービスの変更停止・規約の変更・準拠法と管轄を条文形式で定めています。',
     bodyHtml: `
       <div data-prerender="terms-of-service">
-        <h1>利用規約</h1>
-        <p>本利用規約（以下「本規約」）は、InBusket（インバスケット学習アプリ／以下「本サービス」）の利用条件を定めるものです。ユーザーは本サービスを利用することで、本規約に同意したものとみなします。最終更新日: 2026年5月16日。</p>
-        <h2>第1条（サービスの目的）</h2>
-        <p>本サービスは、インバスケット思考のトレーニングを目的としたウェブアプリケーションです。ユーザーが優先度判断・管理職思考を学ぶことを支援します。</p>
-        <h2>第2条（利用資格）</h2>
-        <p>本サービスはどなたでも無料でご利用いただけます。ただし、13歳未満の方（保護者の同意がない場合）、および過去に本規約違反により利用を禁止された方による利用を禁止します。</p>
-        <h2>第3条（禁止事項）</h2>
-        <p>ユーザーは、本サービスのコンテンツの無断複製・転載・二次利用、本サービスへの不正アクセスやシステムへの干渉、虚偽情報の流布や他者への迷惑行為、書面での事前許可のない商業目的での利用、その他運営者が不適切と判断する行為を行ってはなりません。</p>
-        <h2>第4条（知的財産権）</h2>
-        <p>本サービスに掲載されているコンテンツ（テキスト・デザイン・ソースコードなど）に関する著作権・知的財産権は、本サービス運営者または正当な権利者に帰属します。ただし、ソースコードについては、GitHubリポジトリに掲載のライセンスに従うものとします。</p>
-        <h2>第5条（広告の表示）</h2>
-        <p>本サービスでは、Google AdSense を通じた広告を表示しています。広告に関する詳細は <a href="/privacy-policy">プライバシーポリシー</a> をご参照ください。</p>
-        <h2>第6条（免責事項）</h2>
-        <p>本サービスは、利用により生じた損害（直接・間接を問わず）、サービスの中断・停止・変更・廃止、掲載情報の正確性・完全性・有用性、外部リンク先のコンテンツについて、一切の責任を負いません。</p>
-        <h2>第7条（サービスの変更・停止）</h2>
-        <p>運営者は、ユーザーへの事前通知なくサービスの内容変更・停止・廃止を行う場合があります。これによりユーザーに生じた損害について、運営者は責任を負いません。</p>
-        <h2>第8条（規約の変更）</h2>
-        <p>運営者は必要に応じて本規約を変更することがあります。変更後の規約は本ページに掲載した時点で効力を生じ、継続利用をもって同意とみなします。</p>
-        <h2>第9条（準拠法・管轄裁判所）</h2>
-        <p>本規約は日本法に準拠するものとし、本サービスに関する紛争については、運営者所在地を管轄する裁判所を専属的合意管轄とします。</p>
-        <p>関連リンク：<a href="/terms">サービス利用規約（要旨）</a> ／ <a href="/about">運営者情報</a> ／ <a href="/contact">お問い合わせ</a></p>
+        ${informationBodyHtml(SITE_INFORMATION.termsOfService)}
       </div>
     `.trim(),
   },
   {
-    // Sprint025 DAY5 / PBI-087 第4段階補完: 57+ 受入基準クローズのため追加
     path: '/privacy-policy',
     outRelative: 'privacy-policy/index.html',
     title: `プライバシーポリシー | ${APP_NAME}`,
     description:
-      'インバスケット学習アプリ InBusket の個人情報の取り扱い方針（収集情報・利用目的・第三者提供・問い合わせ窓口）をまとめたプライバシーポリシーです。',
+      'インバスケット学習アプリで扱う情報、ブラウザ内の保存、広告配信（Google AdSense）やお問い合わせに伴う情報の取り扱いを説明するプライバシーポリシーです。',
     bodyHtml: `
       <div data-prerender="privacy-policy">
         ${informationBodyHtml(SITE_INFORMATION.privacy)}
@@ -870,59 +524,41 @@ export const ROUTES = [
     `.trim(),
   },
   {
-    // Sprint025 DAY5 / PBI-087 第4段階補完: 57+ 受入基準クローズのため追加
     path: '/contact',
     outRelative: 'contact/index.html',
     title: `お問い合わせ | ${APP_NAME}`,
     description:
-      'インバスケット学習アプリ InBusket へのお問い合わせ方法・連絡先・対応範囲・回答目安をまとめた連絡窓口ページです。',
+      'インバスケット学習アプリへのお問い合わせ方法（GitHub Issues）と、投稿が公開されることなどの注意事項を案内するページです。',
     bodyHtml: `
       <div data-prerender="contact">
         ${informationBodyHtml(SITE_INFORMATION.contact)}
       </div>
     `.trim(),
   },
-  ...CHAPTERS.map(buildChapterRoute),
+  ...REFERENCE_CHAPTERS.map(buildChapterRoute),
   ...CASES.map(buildCaseRoute),
-  ...PATTERNS.map(buildPatternRoute),
-  // Sprint026 PBI-099 / TASK-099-1
-  // 一覧プリレンダ化（/reference, /patterns）。各項目に1〜2文の説明文＋導入文を
-  // 静的HTMLとして焼き込み、view-source: で本文を可視化する（広告掲載最小基準充足）。
+  ...PATTERN_DATA.map(buildPatternRoute),
   {
     path: '/reference',
     outRelative: 'reference/index.html',
-    title: `解説リファレンス（章一覧） | ${APP_NAME}`,
+    title: `解説リファレンス（全12章） | ${APP_NAME}`,
     description:
-      'インバスケット学習アプリ InBusket の解説リファレンス全12章を一覧で確認できる索引ページです。基礎理解からコアテクニック、当日戦略までを章ごとの要旨付きで整理しています。',
+      'インバスケット学習の解説リファレンス全12章の目次です。入門・基礎・実践・振り返り・本番準備の順に、各章の内容と学習ゴールを確認できます。',
     bodyHtml: `
       <div data-prerender="reference-index">
-        <h1>解説リファレンス（章一覧）</h1>
-        <p>本ページはインバスケット学習アプリ InBusket の解説リファレンス全12章の索引です。第1〜3章で試験の正体と振り返りの6観点を理解し、第4〜7章で時間配分・優先順位・意思決定・委任のコアテクニックを学び、第8〜9章で頻出20パターンと答案文章術を習得し、第10〜11章で模擬試験と弱点改善サイクルを回し、第12章で本番当日の戦略を確認する構成です。</p>
-        <p>使い方の目安：まず通しで一読し、その後は第10章の模擬試験に取り組みながら、苦手分野を該当章で繰り返し復習するとマネージャー思考が定着しやすくなります。各章タイトルから詳細ページへ遷移し、章末の関連リンクで隣接トピックへ横断できます。</p>
-        <ul>${CHAPTERS.map(
-          (c) =>
-            `<li><a href="/reference/${c.id}">${escapeHtml(c.title)}</a>：${escapeHtml(c.summary)}</li>`,
-        ).join('')}</ul>
-        <p>関連リンク：<a href="/patterns">案件パターン別解説（全20パターン）</a> ／ <a href="/about">運営者情報</a></p>
+        ${referenceIndexHtml()}
       </div>
     `.trim(),
   },
   {
     path: '/patterns',
     outRelative: 'patterns/index.html',
-    title: `案件パターン別解説（全20パターン） | ${APP_NAME}`,
+    title: `パターン別解説（全20パターン） | ${APP_NAME}`,
     description:
-      'インバスケット試験で頻出する案件20パターンの索引ページです。各パターンの特徴・優先度の目安・回答骨格（誰に・何を・いつまでに）を確認できます。',
+      'インバスケット形式の案件を20の型に分けた索引です。各パターンの優先度の目安と特徴を一覧で確認し、詳細ページで回答の骨格と例文を読めます。',
     bodyHtml: `
       <div data-prerender="patterns-index">
-        <h1>案件パターン別解説（全20パターン）</h1>
-        <p>本ページはインバスケット試験で頻出する案件20パターンの索引です。対外対応・人事マネジメント・業務プロジェクト・リスクトラブル・組織方針・その他の6カテゴリに分類し、緊急度×重要度の判定、関係者への指示、報告タイミングの設計など、本教材の振り返りの6観点（問題発見力・問題分析力・意思決定力・洞察力・組織活用力・ヒューマンスキル）に対応する行動を学べる構成です。</p>
-        <p>使い方の目安：まず各パターンの「優先度傾向」と「特徴」を一覧で押さえ、本番で迷いなくマトリクス分類できる状態を作ります。その上で頻出パターン（顧客クレーム・部下退職相談・プロジェクト遅延・情報セキュリティインシデント等）の回答骨格を反復し、代表ケース20件で実戦演習する流れが効果的です。</p>
-        <ul>${PATTERNS.map(
-          (p) =>
-            `<li><a href="/patterns/${p.id}">パターン${p.id}：${escapeHtml(p.name)}</a>：管理職昇進試験で頻出する「${escapeHtml(p.name)}」型の案件処理の特徴・優先度・回答骨格を確認できます。</li>`,
-        ).join('')}</ul>
-        <p>関連リンク：<a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（第8章）</a> ／ <a href="/reference">解説リファレンス（章一覧）</a></p>
+        ${patternIndexHtml()}
       </div>
     `.trim(),
   },

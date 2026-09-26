@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import App from './App';
 import guide from './data/homeStudyGuide.json';
+import intro from './data/pageIntro.json';
 import { PUBLIC_ROUTES } from './routes';
 import { ROUTES } from '../scripts/prerender.mjs';
 
@@ -34,6 +35,34 @@ describe('トップの実践解説', () => {
     expect(html.indexOf('優先度を選択')).toBeLessThan(html.indexOf('id="home-about-heading"'));
     expect(document.querySelector('a[href="#home-about-heading"]')).not.toBeNull();
     expect(html).not.toContain('広告（ヘッダー下バナー）');
+  });
+
+  it('サイトの目的・対象者・学習の進め方を問題演習の前に表示し、静的HTMLと共有する', () => {
+    const home = intro.home;
+    const texts = [
+      home.title,
+      home.lead,
+      home.audienceHeading,
+      ...home.audience,
+      home.stepsHeading,
+      ...home.steps.flatMap((step) => [step.label, step.text, step.linkLabel]),
+      ...home.actions.map((action) => action.label),
+      home.note,
+      home.practiceHeading,
+    ];
+    for (const text of texts) {
+      expect(document.body.textContent).toContain(text);
+      expect(staticDocument.body.textContent).toContain(text);
+    }
+    expect(html.indexOf(home.lead)).toBeLessThan(html.indexOf('優先度を選択'));
+    for (const href of [...home.steps, ...home.actions].map((link) => link.href)) {
+      const target = href.startsWith('#') ? href.slice(1) : null;
+      if (target) {
+        expect(document.getElementById(target), `${href} の移動先がない`).not.toBeNull();
+      } else {
+        expect(PUBLIC_ROUTES.map((route) => route.path)).toContain(href);
+      }
+    }
   });
 
   it('関連記事と運営者情報のリンク先が実在し、静的HTMLにも含まれる', () => {

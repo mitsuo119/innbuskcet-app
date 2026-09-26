@@ -121,18 +121,81 @@ body {
   margin-bottom: 1.5rem;
 }
 
-.app-subtitle {
-  color: var(--color-text-muted);
-  margin-top: 0;
-  margin-bottom: 0.75rem;
+/* トップの導入（HomeIntro）。home-about と同じカードの見た目に揃える。 */
+.home-intro {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-muted);
 }
 
-/* PBI-070: モバイル（〜430px）でサブタイトルとモードボタン間の余白を確保 */
-@media (max-width: 430px) {
-  .app-subtitle {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-  }
+.home-intro__lead {
+  margin: 0 0 0.75rem;
+  line-height: 1.75;
+}
+
+.home-intro__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.home-intro__action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 999px;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-intro__action:hover {
+  background: var(--color-primary-bg);
+}
+
+.home-intro__action:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.home-intro__heading {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.home-intro__list,
+.home-intro__steps {
+  margin: 0;
+  padding-left: 1.4rem;
+  line-height: 1.7;
+}
+
+.home-intro__step {
+  margin-bottom: 0.5rem;
+}
+
+.home-intro__step-label {
+  font-weight: 700;
+}
+
+.home-intro__note {
+  margin: 0.75rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.practice-heading {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
 }
 
 /* ===== ScoreCounter（PBI-021 拡張対応） ===== */

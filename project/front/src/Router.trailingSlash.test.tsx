@@ -179,7 +179,7 @@ describe('PBI-103 末尾スラッシュ正規化の回帰テスト', () => {
       root.render(<Router />);
     });
     // home ルートは既存通りタイトル接頭辞なし（resolveRouteSeo の default 分岐）
-    expect(document.title).toBe('インバスケット - 学習アプリ');
+    expect(document.title).toBe('インバスケット学習アプリ');
     expect(container.textContent).not.toContain('ページが見つかりません');
   });
 

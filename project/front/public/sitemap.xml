@@ -11,297 +11,297 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>__SITE_URL__about</loc>
+    <loc>__SITE_URL__about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__terms</loc>
+    <loc>__SITE_URL__terms/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns</loc>
+    <loc>__SITE_URL__patterns/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference</loc>
+    <loc>__SITE_URL__reference/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter01</loc>
+    <loc>__SITE_URL__reference/chapter01/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter02</loc>
+    <loc>__SITE_URL__reference/chapter02/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter03</loc>
+    <loc>__SITE_URL__reference/chapter03/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter04</loc>
+    <loc>__SITE_URL__reference/chapter04/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter05</loc>
+    <loc>__SITE_URL__reference/chapter05/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter06</loc>
+    <loc>__SITE_URL__reference/chapter06/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter07</loc>
+    <loc>__SITE_URL__reference/chapter07/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter08</loc>
+    <loc>__SITE_URL__reference/chapter08/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter09</loc>
+    <loc>__SITE_URL__reference/chapter09/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter10</loc>
+    <loc>__SITE_URL__reference/chapter10/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter11</loc>
+    <loc>__SITE_URL__reference/chapter11/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__reference/chapter12</loc>
+    <loc>__SITE_URL__reference/chapter12/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/1</loc>
+    <loc>__SITE_URL__patterns/1/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/2</loc>
+    <loc>__SITE_URL__patterns/2/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/3</loc>
+    <loc>__SITE_URL__patterns/3/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/4</loc>
+    <loc>__SITE_URL__patterns/4/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/5</loc>
+    <loc>__SITE_URL__patterns/5/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/6</loc>
+    <loc>__SITE_URL__patterns/6/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/7</loc>
+    <loc>__SITE_URL__patterns/7/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/8</loc>
+    <loc>__SITE_URL__patterns/8/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/9</loc>
+    <loc>__SITE_URL__patterns/9/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/10</loc>
+    <loc>__SITE_URL__patterns/10/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/11</loc>
+    <loc>__SITE_URL__patterns/11/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/12</loc>
+    <loc>__SITE_URL__patterns/12/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/13</loc>
+    <loc>__SITE_URL__patterns/13/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/14</loc>
+    <loc>__SITE_URL__patterns/14/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/15</loc>
+    <loc>__SITE_URL__patterns/15/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/16</loc>
+    <loc>__SITE_URL__patterns/16/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/17</loc>
+    <loc>__SITE_URL__patterns/17/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/18</loc>
+    <loc>__SITE_URL__patterns/18/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/19</loc>
+    <loc>__SITE_URL__patterns/19/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__patterns/20</loc>
+    <loc>__SITE_URL__patterns/20/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-001</loc>
+    <loc>__SITE_URL__cases/case-001/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-002</loc>
+    <loc>__SITE_URL__cases/case-002/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-004</loc>
+    <loc>__SITE_URL__cases/case-004/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-010</loc>
+    <loc>__SITE_URL__cases/case-010/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-012</loc>
+    <loc>__SITE_URL__cases/case-012/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-013</loc>
+    <loc>__SITE_URL__cases/case-013/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-015</loc>
+    <loc>__SITE_URL__cases/case-015/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-016</loc>
+    <loc>__SITE_URL__cases/case-016/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-017</loc>
+    <loc>__SITE_URL__cases/case-017/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-018</loc>
+    <loc>__SITE_URL__cases/case-018/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-019</loc>
+    <loc>__SITE_URL__cases/case-019/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-021</loc>
+    <loc>__SITE_URL__cases/case-021/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-029</loc>
+    <loc>__SITE_URL__cases/case-029/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-031</loc>
+    <loc>__SITE_URL__cases/case-031/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-035</loc>
+    <loc>__SITE_URL__cases/case-035/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-037</loc>
+    <loc>__SITE_URL__cases/case-037/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-039</loc>
+    <loc>__SITE_URL__cases/case-039/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-042</loc>
+    <loc>__SITE_URL__cases/case-042/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-048</loc>
+    <loc>__SITE_URL__cases/case-048/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__cases/case-053</loc>
+    <loc>__SITE_URL__cases/case-053/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>__SITE_URL__privacy-policy</loc>
+    <loc>__SITE_URL__privacy-policy/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>__SITE_URL__terms-of-service</loc>
+    <loc>__SITE_URL__terms-of-service/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>__SITE_URL__contact</loc>
+    <loc>__SITE_URL__contact/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
