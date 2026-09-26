@@ -6,6 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import type { HistoryItem } from './history';
+import cases from '../data/cases.json';
 import {
   aggregateByPattern,
   selectWeaknessTop3,
@@ -45,6 +46,19 @@ describe('CASE_PATTERN_MAP', () => {
     for (let i = 1; i <= 20; i++) {
       expect(usedPatterns.has(i)).toBe(true);
     }
+  });
+
+  it('解説文中の「パターンN」が案件の対応パターンと一致する', () => {
+    for (const item of cases) {
+      const cited = item.explanation.match(/パターン\s*(\d+)/);
+      if (!cited) continue;
+      expect(Number(cited[1]), item.id).toBe(CASE_PATTERN_MAP[item.id]);
+    }
+  });
+
+  it('社内イベントの案件を有給・休暇申請（パターン7）に分類しない', () => {
+    expect(CASE_PATTERN_MAP['case-046']).toBe(12);
+    expect(CASE_PATTERN_MAP['case-062']).toBe(12);
   });
 });
 
