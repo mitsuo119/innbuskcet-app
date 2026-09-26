@@ -2,6 +2,8 @@ import type { Case, Priority } from '../domain/case';
 import type { Judgement } from '../domain/judge';
 import type { RelatedCaseHighlight } from '../domain/relatedCaseHighlight';
 import { PRIORITY_LABELS, formatPriorityLabel } from '../domain/priorityLabel';
+import { CASE_PATTERN_MAP } from '../domain/patternWeakness';
+import { findPatternById } from '../data/patternData';
 import { renderExplanationWithPatternLinks } from '../utils/explanationPatternLinks';
 
 interface Props {
@@ -28,6 +30,8 @@ export function ExplanationView({
   const isCorrect = judgement === 'correct';
   const answerLabel = PRIORITY_LABELS[answer];
   const correctLabel = PRIORITY_LABELS[caseItem.correctPriority];
+  const patternId = CASE_PATTERN_MAP[caseItem.id];
+  const relatedPattern = patternId === undefined ? undefined : findPatternById(patternId);
   return (
     <section
       className={'explanation' + (isCorrect ? ' explanation--correct' : ' explanation--incorrect')}
@@ -77,8 +81,13 @@ export function ExplanationView({
         </section>
       )}
       <nav className="explanation__related" aria-label="関連学習ページ">
-        <a href="/patterns" className="explanation__related-link">
-          関連パターンを見る
+        <a
+          href={relatedPattern ? `/patterns/${relatedPattern.id}` : '/patterns'}
+          className="explanation__related-link"
+        >
+          {relatedPattern
+            ? `パターン${relatedPattern.id}「${relatedPattern.name}」を見る`
+            : '関連パターンを見る'}
         </a>
         <span className="explanation__related-sep" aria-hidden="true">
           |

@@ -6,8 +6,7 @@
  * - `Router.seo.test.tsx` 拡張（TASK-078-2/078-3/078-4）でのメタ重複/未定義検知
  * - `sitemap-coverage.test`（TASK-081-3）での実ルートと sitemap 掲載 URL の差分検知
  *
- * 動的セグメント（`/patterns/:id` / `/reference/:chapterId`）は、sitemap 掲載対象として
- * 採用する代表値のみを export する（フル列挙ではなく、SEO 露出する代表ルート）。
+ * 動的セグメントは sitemap 掲載対象の値を export する（章・パターンは全件、ケースは代表20件）。
  *
  * ルート追加手順は `project/docs/seo_metadata_sitemap_guide.md` を参照すること。
  */
@@ -58,7 +57,24 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   { path: '/reference/chapter11', changefreq: 'monthly', priority: 0.7 },
   { path: '/reference/chapter12', changefreq: 'monthly', priority: 0.7 },
   { path: '/patterns/1', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/2', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/3', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/4', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/5', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/6', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/7', changefreq: 'monthly', priority: 0.6 },
   { path: '/patterns/8', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/9', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/10', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/11', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/12', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/13', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/14', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/15', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/16', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/17', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/18', changefreq: 'monthly', priority: 0.6 },
+  { path: '/patterns/19', changefreq: 'monthly', priority: 0.6 },
   { path: '/patterns/20', changefreq: 'monthly', priority: 0.6 },
   // PBI-079 / TASK-079-2 後半（DAY2）: 代表ケース 20 件を /cases/:id 単独 URL として sitemap 掲載。
   { path: '/cases/case-001', changefreq: 'monthly', priority: 0.5 },
@@ -106,7 +122,9 @@ export const SITEMAP_REFERENCE_CHAPTER_IDS: readonly string[] = [
 ];
 
 /** sitemap 掲載対象の pattern ID（数値）。 */
-export const SITEMAP_PATTERN_IDS: readonly number[] = [1, 8, 20];
+export const SITEMAP_PATTERN_IDS: readonly number[] = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+];
 
 /**
  * sitemap 掲載対象の case ID（PBI-079 / TASK-079-2 / Sprint022 DAY1）。

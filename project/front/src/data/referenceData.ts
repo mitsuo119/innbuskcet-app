@@ -293,7 +293,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
               {
                 label: 'パターン一覧へ移動',
                 href: '/patterns',
-                description: '20パターン全体を俾瞰する',
+                description: '20パターン全体を俯瞰する',
               },
               {
                 label: '顧客クレーム（例）',
@@ -382,11 +382,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             kind: 'link-list',
             items: [
               {
-                label: '本書全文を読む',
-                href: '/reference/chapter03',
-                description: 'マネージャー思考への切替を本書全文で確認する',
-              },
-              {
                 label: '優先順位づけの技術',
                 href: '/reference/chapter05',
                 description: '時間配分の根拠となる優先度判断を確認する',
@@ -460,11 +455,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
           {
             kind: 'link-list',
             items: [
-              {
-                label: '本書全文を読む',
-                href: '/reference/chapter04',
-                description: 'タイムマネジメントの詳細を本書全文で確認する',
-              },
               {
                 label: '優先順位づけの技術',
                 href: '/reference/chapter05',
@@ -540,11 +530,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             kind: 'link-list',
             items: [
               {
-                label: '本書全文を読む',
-                href: '/reference/chapter06',
-                description: '意思決定フレームの詳細を本書全文で確認する',
-              },
-              {
                 label: '採点基準を逆算する',
                 href: '/reference/chapter02',
                 description: '評価ディメンションと3点セットの対応を確認する',
@@ -618,11 +603,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
           {
             kind: 'link-list',
             items: [
-              {
-                label: '本書全文を読む',
-                href: '/reference/chapter07',
-                description: '委任の詳細を本書全文で確認する',
-              },
               {
                 label: '案件パターン別攻略',
                 href: '/reference/chapter08',
@@ -698,11 +678,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             kind: 'link-list',
             items: [
               {
-                label: '本書全文を読む',
-                href: '/reference/chapter09',
-                description: '文章技術の詳細を本書全文で確認する',
-              },
-              {
                 label: '意思決定フレームワーク',
                 href: '/reference/chapter06',
                 description: '3点セットと書き方の対応を確認する',
@@ -775,11 +750,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
           {
             kind: 'link-list',
             items: [
-              {
-                label: '本書全文を読む',
-                href: '/reference/chapter10',
-                description: '模試運用の詳細を本書全文で確認する',
-              },
               {
                 label: '採点基準を逆算する',
                 href: '/reference/chapter02',
@@ -856,11 +826,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             kind: 'link-list',
             items: [
               {
-                label: '本書全文を読む',
-                href: '/reference/chapter11',
-                description: '振り返りの詳細を本書全文で確認する',
-              },
-              {
                 label: '模擬試験の進め方',
                 href: '/reference/chapter10',
                 description: '振り返りの素材となる模試運用を確認する',
@@ -935,11 +900,6 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
           {
             kind: 'link-list',
             items: [
-              {
-                label: '本書全文を読む',
-                href: '/reference/chapter12',
-                description: '本番戦略の詳細を本書全文で確認する',
-              },
               {
                 label: '時間配分とタイムマネジメント',
                 href: '/reference/chapter04',

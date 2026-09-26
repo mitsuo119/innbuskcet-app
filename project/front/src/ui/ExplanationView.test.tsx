@@ -90,4 +90,20 @@ describe('ExplanationView（PBI-063 / Day4 視認性向上）', () => {
     expect(html).not.toContain('案件間の関連ハイライト');
     expect(html).not.toContain('関連の気づき');
   });
+
+  it('パターンが対応する案件は、関連リンクがそのパターン詳細を指す', () => {
+    const html = renderToStaticMarkup(
+      <ExplanationView caseItem={{ ...SAMPLE, id: 'case-019' }} answer="C" judgement="correct" />,
+    );
+    expect(html).toContain('href="/patterns/7"');
+    expect(html).toContain('パターン7「部下の有給・休暇申請」を見る');
+  });
+
+  it('パターンが対応しない案件は、関連リンクがパターン一覧を指す', () => {
+    const html = renderToStaticMarkup(
+      <ExplanationView caseItem={SAMPLE} answer="A" judgement="correct" />,
+    );
+    expect(html).toContain('href="/patterns"');
+    expect(html).toContain('関連パターンを見る');
+  });
 });

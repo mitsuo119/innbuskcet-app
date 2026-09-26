@@ -61,11 +61,10 @@ describe('PBI-068 JSON-LD 構造化データ', () => {
     expect(INDEX_HTML).not.toMatch(/dangerouslySetInnerHTML\s*=/);
   });
 
-  it('WebSite と BreadcrumbList の JSON-LD を追加している（PBI-072）', () => {
+  it('WebSite の JSON-LD を持ち、旧ハッシュ URL の共通パンくずを含まない（PBI-072）', () => {
     expect(INDEX_HTML).toContain('"@type": "WebSite"');
-    expect(INDEX_HTML).toContain('"@type": "BreadcrumbList"');
-    expect(INDEX_HTML).toContain('"name": "解説リファレンス"');
-    expect(INDEX_HTML).toContain('"name": "パターン別解説"');
+    expect(INDEX_HTML).not.toContain('"@type": "BreadcrumbList"');
+    expect(INDEX_HTML).not.toContain('__SITE_URL__#/');
   });
 });
 

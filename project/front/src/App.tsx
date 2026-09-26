@@ -833,27 +833,15 @@ export default function App() {
                 ショートカット: <kbd>A</kbd> / <kbd>B</kbd> / <kbd>C</kbd> で回答、<kbd>Enter</kbd>{' '}
                 で次の問題
               </small>
-              <nav className="app-footer__legal" aria-label="法務・サポートページ">
-                <a href="/privacy-policy" className="app-footer__legal-link">
-                  プライバシーポリシー
-                </a>
-                <span className="app-footer__legal-sep" aria-hidden="true">
-                  |
-                </span>
-                <a href="/terms-of-service" className="app-footer__legal-link">
-                  利用規約
-                </a>
-                <span className="app-footer__legal-sep" aria-hidden="true">
-                  |
-                </span>
-                <a href="/contact" className="app-footer__legal-link">
-                  お問い合わせ
-                </a>
-              </nav>
-              {/* PBI-088 / 089 (TASK-088-1 / TASK-089-1): AdSense再申請向け運営者情報・利用規約 短URL動線 */}
-              <nav className="app-footer__legal" aria-label="運営者情報・規約（短URL）">
+              <nav className="app-footer__legal" aria-label="運営者情報・規約・お問い合わせ">
                 <a href="/about" className="app-footer__legal-link">
                   運営者情報
+                </a>
+                <span className="app-footer__legal-sep" aria-hidden="true">
+                  |
+                </span>
+                <a href="/privacy-policy" className="app-footer__legal-link">
+                  プライバシーポリシー
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
@@ -864,8 +852,8 @@ export default function App() {
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="/privacy-policy" className="app-footer__legal-link">
-                  プライバシー
+                <a href="/terms-of-service" className="app-footer__legal-link">
+                  利用規約（条文版）
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
