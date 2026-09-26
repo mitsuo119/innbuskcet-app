@@ -62,7 +62,7 @@ describe('PBI-056 解説リファレンス画面', () => {
     expect(html).toContain('解説リファレンス');
     expect(html).toContain('インバスケット解説リファレンス');
     expect(html).toContain('インバスケットとは何か');
-    expect(html).toContain('採点基準を逆算する');
+    expect(html).toContain('採点基準と振り返りの6観点');
     expect(html).toContain('優先順位づけの技術');
     expect(html).toContain('案件パターン別攻略');
     // PBI-061: chapter 表記と ref/ パスは UI に表示しない

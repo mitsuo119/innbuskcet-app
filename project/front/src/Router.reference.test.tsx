@@ -43,7 +43,7 @@ describe('PBI-056 解説導線', () => {
 
     expect(container.textContent).toContain('インバスケット解説リファレンス');
     expect(container.textContent).toContain('インバスケットとは何か');
-    expect(container.textContent).toContain('採点基準を逆算する');
+    expect(container.textContent).toContain('採点基準と振り返りの6観点');
     expect(container.textContent).toContain('優先順位づけの技術');
     expect(container.textContent).toContain('案件パターン別攻略');
   });

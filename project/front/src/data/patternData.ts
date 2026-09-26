@@ -89,7 +89,7 @@ export const PATTERN_DATA: PatternItem[] = [
     name: '部下の退職・異動の相談',
     category: '人事・部下マネジメントパターン',
     typicalPriority: 'A',
-    characteristics: 'ヒューマンスキルが最も問われる案件。メールではなく対面で向き合う姿勢が重要。',
+    characteristics: 'ヒューマンスキルの観点が特に重要な案件。メールではなく対面で向き合う姿勢が重要。',
     answerSkeleton: [
       'まず直接面談の場を設ける（メールではなく対面）',
       '本人の話をしっかり聴く姿勢を示す',
@@ -143,7 +143,7 @@ export const PATTERN_DATA: PatternItem[] = [
     name: 'ハラスメント報告',
     category: '人事・部下マネジメントパターン',
     typicalPriority: 'A',
-    characteristics: 'コンプライアンス案件。自動的にA案件。報告者の安全確保が最優先。',
+    characteristics: 'コンプライアンス案件。本教材ではA優先として扱う。報告者の安全確保が最優先。',
     answerSkeleton: [
       '報告者の安全を最優先で確保',
       '事実関係を慎重に調査（人事部と連携）',
@@ -158,7 +158,7 @@ export const PATTERN_DATA: PatternItem[] = [
     name: 'プロジェクト遅延・品質問題',
     category: '業務・プロジェクトパターン',
     typicalPriority: 'A',
-    characteristics: 'エンジニアが最も経験のあるパターン。原因の切り分けを明示すると高評価。',
+    characteristics: '現場での問題解決の経験を活かしやすいパターン。原因の切り分けを答案に明示する。',
     answerSkeleton: [
       '遅延・品質問題の影響範囲を把握',
       '原因を分析（要因の切り分け）',
@@ -166,7 +166,7 @@ export const PATTERN_DATA: PatternItem[] = [
       'ステークホルダーへの報告',
       '再発防止策を検討',
     ],
-    notes: '技術的な問題の構造化が得意なはず。「原因を切り分ける」プロセスを明示すると高評価。',
+    notes: '「原因を切り分ける」手順を明示すると、対策の優先順位も説明しやすい。',
   },
   {
     id: 10,
@@ -225,7 +225,7 @@ export const PATTERN_DATA: PatternItem[] = [
     name: '情報セキュリティインシデント',
     category: 'リスク・トラブルパターン',
     typicalPriority: 'A',
-    characteristics: 'エンジニアの知識が活きるパターン。封じ込めと影響範囲の特定が最優先。',
+    characteristics: 'ITや技術の知識を活かしやすいパターン。封じ込めと影響範囲の特定が最優先。',
     answerSkeleton: [
       '被害範囲の特定と封じ込め',
       '関係者（情報セキュリティ部門、法務、経営層）への報告',
@@ -238,7 +238,7 @@ export const PATTERN_DATA: PatternItem[] = [
     name: 'コンプライアンス違反（不正行為）',
     category: 'リスク・トラブルパターン',
     typicalPriority: 'A',
-    characteristics: '自動的にA案件。適切な対応が強く求められる。証拠保全と守秘が重要。',
+    characteristics: '本教材ではA優先として扱う。証拠保全と守秘が重要。',
     answerSkeleton: [
       '事実関係の慎重な確認',
       'コンプライアンス部門・法務部門への相談',
