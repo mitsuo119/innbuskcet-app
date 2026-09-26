@@ -18,13 +18,13 @@
       {
         "label": "形式を知る",
         "text": "インバスケットの形式と、担当者から管理職への考え方の切り替えを読みます。",
-        "href": "/reference/chapter01",
+        "href": "/reference/chapter01/",
         "linkLabel": "第1章 インバスケットとは何か"
       },
       {
         "label": "振り返りの観点を知る",
         "text": "答案を見直すための6つの観点を確認します。特定の試験の公式な採点基準ではありません。",
-        "href": "/reference/chapter02",
+        "href": "/reference/chapter02/",
         "linkLabel": "第2章 採点基準と振り返りの6観点"
       },
       {
@@ -36,23 +36,23 @@
       {
         "label": "解説と比べる",
         "text": "回答後の解説とモデル回答を読み、自分の答案に足りない確認や指示を探します。",
-        "href": "/reference/chapter11",
+        "href": "/reference/chapter11/",
         "linkLabel": "第11章 弱点分析と継続改善"
       },
       {
         "label": "パターンで整理する",
         "text": "迷った案件の型をパターン別解説で確かめ、回答の骨格と例文を読みます。",
-        "href": "/patterns",
+        "href": "/patterns/",
         "linkLabel": "パターン別解説（全20パターン）"
       },
       {
         "label": "通して解く",
         "text": "学習スタイルを「Exam」にすると、20問を90分で続けて解けます。時間配分と見直しを練習します。",
-        "href": "/reference/chapter10",
+        "href": "/reference/chapter10/",
         "linkLabel": "第10章 模擬試験の進め方"
       }
     ],
-    "note": "解説とモデル回答は、架空の条件に対する学習用の例です。特定の試験の公式な採点基準や正答ではありません。",
+    "note": "運営者が自分の昇進試験の準備のために作り、公開しているサイトです。解説とモデル回答は生成AIで作成した学習用の例で、特定の試験の公式な採点基準や正答ではなく、正しさも保証できません。",
     "practiceHeading": "問題演習"
   },
   "referenceIndex": {

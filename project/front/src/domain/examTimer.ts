@@ -18,6 +18,8 @@ export interface ExamSession {
   readonly startedAt: number;
   /** 出題対象の caseId 配列（出題順序を固定）。 */
   readonly questionIds: readonly string[];
+  /** シナリオ演習で解く場合のシナリオID（PBI-108）。 */
+  readonly scenarioId?: string;
 }
 
 /** Exam モードの問題数（固定 20 問）。 */
@@ -111,6 +113,21 @@ export function createExamSession(allCaseIds: readonly string[]): ExamSession {
   };
 }
 
+/** シナリオ演習の案件を、案件の順番どおり・シナリオの制限時間で出題する（PBI-108）。 */
+export function createScenarioExamSession(scenario: {
+  readonly id: string;
+  readonly timeLimitMinutes: number;
+  readonly cases: readonly { readonly id: string }[];
+}): ExamSession {
+  return {
+    totalQuestions: scenario.cases.length,
+    timeLimit: scenario.timeLimitMinutes * 60,
+    startedAt: Date.now(),
+    questionIds: scenario.cases.map((item) => item.id),
+    scenarioId: scenario.id,
+  };
+}
+
 /** 経過秒数（小数点以下切り捨て / 0 以上）。 */
 export function getElapsedSeconds(session: ExamSession, now: number = Date.now()): number {
   const elapsedMs = Math.max(0, now - session.startedAt);
@@ -150,6 +167,7 @@ function isValidExamSession(value: unknown): value is ExamSession {
   if (typeof v.startedAt !== 'number' || !Number.isFinite(v.startedAt)) return false;
   if (!Array.isArray(v.questionIds)) return false;
   if (!v.questionIds.every((id) => typeof id === 'string')) return false;
+  if (v.scenarioId !== undefined && typeof v.scenarioId !== 'string') return false;
   return true;
 }
 

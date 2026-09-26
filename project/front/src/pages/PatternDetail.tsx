@@ -35,7 +35,7 @@ export function PatternDetail({ patternId }: Props) {
   if (!pattern) {
     return (
       <div className="container">
-        <a href="/patterns" className="legal-back-btn" aria-label="パターン一覧に戻る">
+        <a href="/patterns/" className="legal-back-btn" aria-label="パターン一覧に戻る">
           ← 一覧に戻る
         </a>
         <GlobalNav current="patterns" />
@@ -47,14 +47,14 @@ export function PatternDetail({ patternId }: Props) {
   return (
     <div className="container">
       <header className="legal-header">
-        <a href="/patterns" className="legal-back-btn" aria-label="パターン一覧に戻る">
+        <a href="/patterns/" className="legal-back-btn" aria-label="パターン一覧に戻る">
           ← 一覧に戻る
         </a>
         <GlobalNav current="patterns" />
         <Breadcrumb
           items={[
             { label: 'ホーム', href: '/' },
-            { label: 'パターン別解説', href: '/patterns' },
+            { label: 'パターン別解説', href: '/patterns/' },
             { label: `パターン${pattern.id}「${pattern.name}」` },
           ]}
         />
@@ -155,7 +155,7 @@ export function PatternDetail({ patternId }: Props) {
             <h2 className="legal-section__title">このパターンの代表ケース</h2>
             <ul className="legal-list">
               <li>
-                <a href={`/cases/${sample.id}`}>
+                <a href={`/cases/${sample.id}/`}>
                   ケース{sample.id.replace('case-', '')}：{sampleCase.title}（{sample.difficulty}）
                 </a>
               </li>
@@ -167,10 +167,13 @@ export function PatternDetail({ patternId }: Props) {
           <h2 className="legal-section__title">関連リンク</h2>
           <ul className="legal-list">
             <li>
-              <a href="/patterns">パターン別解説（全20パターン）</a>
+              <a href={`/?pattern=${pattern.id}`}>このパターンの問題を解く</a>
             </li>
             <li>
-              <a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（第8章）</a>
+              <a href="/patterns/">パターン別解説（全20パターン）</a>
+            </li>
+            <li>
+              <a href="/reference/chapter08/">解説リファレンス：案件パターン別攻略（第8章）</a>
             </li>
           </ul>
         </section>

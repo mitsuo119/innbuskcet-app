@@ -6,8 +6,10 @@ import {
 } from '../domain/patternWeakness';
 
 interface Props {
-  /** セッション内の回答履歴（全件） */
+  /** 回答履歴（全件） */
   history: readonly HistoryItem[];
+  /** 指定したパターンだけを出題する（PBI-109） */
+  onPractice?: (patternId: number) => void;
 }
 
 /**
@@ -19,7 +21,7 @@ interface Props {
  *   本コンポーネントは"問題種別ごとの客観集計"を担う（役割分担）。
  * - 3問以上回答済みのときに表示（呼び出し元で制御）。
  */
-export function WeaknessPatternTop3({ history }: Props) {
+export function WeaknessPatternTop3({ history, onPractice }: Props) {
   const stats = aggregateByPattern(history);
   const top3 = selectWeaknessTop3(stats);
 
@@ -38,7 +40,12 @@ export function WeaknessPatternTop3({ history }: Props) {
       </p>
       <ol className="weakness-pattern__list" aria-label="弱点パターンランキング">
         {top3.map((stat, index) => (
-          <PatternStatItem key={stat.patternId} rank={index + 1} stat={stat} />
+          <PatternStatItem
+            key={stat.patternId}
+            rank={index + 1}
+            stat={stat}
+            onPractice={onPractice}
+          />
         ))}
       </ol>
     </section>
@@ -48,9 +55,10 @@ export function WeaknessPatternTop3({ history }: Props) {
 interface PatternStatItemProps {
   rank: number;
   stat: PatternStat;
+  onPractice?: (patternId: number) => void;
 }
 
-function PatternStatItem({ rank, stat }: PatternStatItemProps) {
+function PatternStatItem({ rank, stat, onPractice }: PatternStatItemProps) {
   const errorPercent = Math.round(stat.errorRate * 100);
   // 弱点度合いを3段階で分類
   const weaknessLevel = stat.errorRate >= 0.7 ? 'high' : stat.errorRate >= 0.4 ? 'medium' : 'low';
@@ -68,7 +76,7 @@ function PatternStatItem({ rank, stat }: PatternStatItemProps) {
       </div>
       <div className="weakness-pattern__info">
         <div className="weakness-pattern__name">
-          <a href={`/patterns/${stat.patternId}`}>{stat.patternName}</a>
+          <a href={`/patterns/${stat.patternId}/`}>{stat.patternName}</a>
           {stat.lowReliability && (
             <span
               className="weakness-pattern__low-reliability"
@@ -101,6 +109,15 @@ function PatternStatItem({ rank, stat }: PatternStatItemProps) {
             {errorPercent}% {weaknessLabel}
           </span>
         </div>
+        {onPractice && (
+          <button
+            type="button"
+            className="weakness-pattern__practice"
+            onClick={() => onPractice(stat.patternId)}
+          >
+            この型を練習する
+          </button>
+        )}
       </div>
     </li>
   );

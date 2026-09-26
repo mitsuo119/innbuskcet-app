@@ -6,7 +6,6 @@ import { PRIORITY_LABELS } from '../domain/priorityLabel';
 import type { Case, Priority } from '../domain/case';
 import { renderExplanationWithPatternLinks } from '../utils/explanationPatternLinks';
 
-const TIMELINE_TOTAL_MS = EXAM_TIME_LIMIT_SECONDS * 1000;
 const TIMELINE_SLOW_MS = 5 * 60 * 1000;
 
 function formatTimelineElapsed(ms: number | null): string {
@@ -72,6 +71,13 @@ export function ExamResultView({
 
   const { totalQuestions, correctCount, percentage, elapsedDisplay, byPriority } = summary;
 
+  /** 制限時間（模擬試験は90分・シナリオ演習はシナリオごと）。 */
+  const TIMELINE_TOTAL_MS =
+    (Number.isFinite(session.timeLimit) && session.timeLimit > 0
+      ? session.timeLimit
+      : EXAM_TIME_LIMIT_SECONDS) * 1000;
+  const limitLabel = `${Math.round(TIMELINE_TOTAL_MS / 60000)}分`;
+
   /**
    * PBI-074: 平均基準線（90 分 ÷ 問題数）の位置と表示用テキスト。
    * - totalQuestions が 0 / 不正な場合は基準線を非表示にする。
@@ -87,7 +93,7 @@ export function ExamResultView({
       widthPercent,
       label: formatTimelineElapsed(baselineMs),
     };
-  }, [session.totalQuestions]);
+  }, [session.totalQuestions, TIMELINE_TOTAL_MS]);
 
   /** PBI-053: Exam90分ミニタイムライン（設問別 elapsedMs 可視化）。 */
   const timelineItems = useMemo(
@@ -106,7 +112,7 @@ export function ExamResultView({
         const statusText =
           elapsedMs === null
             ? '所要時間未取得'
-            : `${elapsedText}${isSlow ? '・5分超' : ''}${isOverTotal ? '・90分超過' : ''}`;
+            : `${elapsedText}${isSlow ? '・5分超' : ''}${isOverTotal ? `・${limitLabel}超過` : ''}`;
         return {
           key: `${item.caseId}-${index}`,
           questionNo: index + 1,
@@ -117,7 +123,7 @@ export function ExamResultView({
           ariaLabel: `第${index + 1}問 ${statusText}`,
         };
       }),
-    [history, elapsedMsList],
+    [history, elapsedMsList, TIMELINE_TOTAL_MS, limitLabel],
   );
 
   /** 各問の caseId から Case を引くためのマップ（PBI-043）。 */
@@ -226,7 +232,7 @@ export function ExamResultView({
         aria-labelledby="exam-result-view-timeline-heading"
       >
         <h3 id="exam-result-view-timeline-heading" className="exam-result__breakdown-heading">
-          Exam 90分ミニタイムライン
+          Exam {limitLabel}ミニタイムライン
         </h3>
         {baselineInfo && (
           <p
@@ -234,7 +240,8 @@ export function ExamResultView({
             data-testid="exam-result-timeline-baseline-legend"
           >
             <span className="exam-result__timeline-baseline-swatch" aria-hidden="true" />
-            平均基準線（90分 ÷ {session.totalQuestions}問 ＝ 1問あたり {baselineInfo.label}）
+            平均基準線（{limitLabel} ÷ {session.totalQuestions}問 ＝ 1問あたり {baselineInfo.label}
+            ）
           </p>
         )}
         <ol className="exam-result__timeline-list" aria-label="設問ごとの所要時間タイムライン">
@@ -268,9 +275,9 @@ export function ExamResultView({
                 {item.isOverTotal && (
                   <span
                     className="exam-result__timeline-badge exam-result__timeline-badge--over"
-                    title="90分超過"
+                    title={`${limitLabel}超過`}
                   >
-                    ⏱ 90分超過
+                    ⏱ {limitLabel}超過
                   </span>
                 )}
               </div>

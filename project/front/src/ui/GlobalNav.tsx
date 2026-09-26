@@ -35,10 +35,10 @@ interface NavItem {
  */
 const NAV_ITEMS: readonly NavItem[] = [
   { id: 'home', label: '問題回答', href: '/' },
-  { id: 'reference', label: '解説リファレンス', href: '/reference' },
-  { id: 'patterns', label: 'パターン別解説', href: '/patterns' },
-  { id: 'about', label: '運営者情報', href: '/about' },
-  { id: 'privacy-policy', label: 'プライバシー', href: '/privacy-policy' },
+  { id: 'reference', label: '解説リファレンス', href: '/reference/' },
+  { id: 'patterns', label: 'パターン別解説', href: '/patterns/' },
+  { id: 'about', label: '運営者情報', href: '/about/' },
+  { id: 'privacy-policy', label: 'プライバシー', href: '/privacy-policy/' },
 ];
 
 interface Props {

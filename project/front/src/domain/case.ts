@@ -6,6 +6,11 @@
  */
 export type Priority = 'A' | 'B' | 'C';
 
+/** 案件の難易度（cases.json の difficulty） */
+export type Difficulty = '初級' | '中級' | '上級';
+
+export const DIFFICULTIES: readonly Difficulty[] = ['初級', '中級', '上級'];
+
 /**
  * 模範回答骨格（PBI-024）。
  * 「判断・理由・アクション」の 3 ブロックでの合格答案の型を提示する。
@@ -45,6 +50,8 @@ export interface Case {
    * 段階移行のため未設定案件は undefined。
    */
   departments?: string[];
+  /** 難易度（PBI-109 の出題範囲に使用） */
+  difficulty?: Difficulty;
   /**
    * 模範回答骨格（PBI-024 / 任意）。
    * cases.json で段階的に整備中。未整備の案件では undefined。

@@ -60,7 +60,9 @@ describe('運営情報とプライバシーの表示一致', () => {
 
   it('架空の専門家監修や外部AIによる採点をうたわない', () => {
     const html = renderToStaticMarkup(<About />);
-    expect(html).toContain('AIを教材の草案作成と実装に利用');
+    expect(html).toContain('すべて生成AIで作成');
+    expect(html).toContain('回答例や解説が正しいことは保証できません');
+    expect(html).toContain('勤務先の昇進試験に備えるため、自分用に作った');
     expect(html).toContain('公式採点基準、配点、合格ラインを示すものではありません');
     expect(html).toContain('ブラウザ内での語句・形式のチェック');
   });
@@ -125,8 +127,8 @@ describe('PBI-089 /terms サービス利用規約ページ', () => {
   });
 
   it('legal 3 点リンク（privacy-policy / terms-of-service / contact）への動線を含む', () => {
-    expect(html).toContain('href="/privacy-policy"');
-    expect(html).toContain('href="/terms-of-service"');
+    expect(html).toContain('href="/privacy-policy/"');
+    expect(html).toContain('href="/terms-of-service/"');
     // /contact は本文中に現れない場合もあるため GlobalNav 内を含めた全体で検証。
     // /terms 本文では privacy / terms-of-service を本文内リンクとして提供。
   });

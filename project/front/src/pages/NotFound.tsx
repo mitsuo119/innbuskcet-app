@@ -31,12 +31,12 @@ export function NotFound() {
         <p className="not-found-view__suggestions-lead">こちらもお試しください：</p>
         <ul className="not-found-view__suggestions-list">
           <li>
-            <a href="/patterns" className="not-found-view__suggestion-link">
+            <a href="/patterns/" className="not-found-view__suggestion-link">
               パターン一覧（/patterns）
             </a>
           </li>
           <li>
-            <a href="/reference" className="not-found-view__suggestion-link">
+            <a href="/reference/" className="not-found-view__suggestion-link">
               解説リファレンス（/reference）
             </a>
           </li>

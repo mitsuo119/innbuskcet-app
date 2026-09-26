@@ -134,12 +134,8 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         title: 'つまずきやすい3つの癖',
         blocks: [
           {
-            kind: 'bullet-list',
-            items: [
-              '唯一の正解を探しがちで、判断の妥当性より解を当てにいってしまう。',
-              '自分で解決しようとして、委任や関係者連携を弱く書いてしまう。',
-              '完璧に処理しようとして、全案件に反応を書く前に時間切れになる。',
-            ],
+            kind: 'paragraph',
+            text: '担当者として優秀な人ほど、唯一の正解を探す、自分で解決しようとする、完璧に処理しようとする、という癖が答案に出やすい。それぞれの対策は第3章で扱う。',
           },
           {
             kind: 'note',
@@ -170,6 +166,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter01-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '次の案件について、プレイヤー思考の対応とマネージャー思考の対応をそれぞれ1〜2行で書く。案件：部下が作った提案書に誤字と計算の誤りが多い。提出期限は明後日である。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: 'プレイヤー思考：自分で全ページを直して提出する。マネージャー思考：明日の午前までに本人へ修正を指示し、計算部分は別の担当者に確認させる。修正版を明日17時に受け取り、自分は結論と数字だけを確認する。',
+          },
+        ],
+      },
+      {
         id: 'chapter01-related-patterns',
         title: '関連パターン',
         blocks: [
@@ -178,7 +189,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '顧客クレーム（パターン1）',
-                href: '/patterns/1',
+                href: '/patterns/1/',
                 description: 'A優先度・並行対応の代表例で「組織で処理する」発想を実体験する',
               },
             ],
@@ -206,7 +217,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         blocks: [
           {
             kind: 'paragraph',
-            text: '全案件に同じ時間を使わず、緊急度と重要度で分類して配分を変える。本教材では、A案件は4〜5分、B案件は3分、C案件は1〜2分を目安にする。',
+            text: '全案件に同じ時間を使わず、緊急度と重要度で分類して配分を変える。区分ごとの時間の目安は第4章で扱う。',
           },
           {
             kind: 'table',
@@ -242,6 +253,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter05-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '次の3件に緊急度と重要度を付け、A・B・Cを決めて理由を1行ずつ書く。1：取引先から、明日の納品に使う部品が届かないと連絡があった。2：来月の社内イベントの幹事を頼まれた。3：部下から、来週の研修日程を確認したいと連絡があった。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '1はA。明日の納品と顧客に影響し、放置すると被害が広がるため。2はC。期限に余裕があり、担当者に任せられるため。3はC。部下本人に確認を任せ、期限だけ伝えれば足りるため。',
+          },
+        ],
+      },
+      {
         id: 'chapter05-related-patterns',
         title: '関連パターン',
         blocks: [
@@ -250,7 +276,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '予算承認・経費申請（パターン10）',
-                href: '/patterns/10',
+                href: '/patterns/10/',
                 description: '金額と決裁権限で優先度が変わる案件で、配分の判断を確認する',
               },
             ],
@@ -295,6 +321,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter08-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '次の案件を上の表の分類に当てはめ、初動を1行で書く。案件：顧客に送った請求書の金額が誤っていたと経理から連絡があった。顧客はまだ気づいていない。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '分類は対外対応。初動：経理と営業担当に誤りの範囲を本日中に確認させ、顧客には気づかれる前に営業担当と私から連絡して、訂正の手順と時期を伝える。',
+          },
+        ],
+      },
+      {
         id: 'chapter08-reference-links',
         title: '参照導線',
         blocks: [
@@ -303,22 +344,22 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: 'パターン一覧へ移動',
-                href: '/patterns',
+                href: '/patterns/',
                 description: '20パターン全体を俯瞰する',
               },
               {
                 label: '顧客クレーム（例）',
-                href: '/patterns/1',
+                href: '/patterns/1/',
                 description: '対外対応パターンの詳細を確認する',
               },
               {
                 label: 'プロジェクト遅延（例）',
-                href: '/patterns/9',
+                href: '/patterns/9/',
                 description: '業務/プロジェクト系の骨格を確認する',
               },
               {
                 label: '情報セキュリティインシデント（例）',
-                href: '/patterns/14',
+                href: '/patterns/14/',
                 description: 'リスク系パターンの初動を確認する',
               },
             ],
@@ -349,12 +390,15 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             text: 'インバスケットで問われる管理職の判断は、自分が手を動かす担当者の判断とは前提が異なる。何を任せ、誰に動いてもらうかを言語化する訓練が必要となる。',
           },
           {
-            kind: 'table',
-            headers: ['軸', 'プレイヤー思考', 'マネージャー思考'],
-            rows: [
-              ['視点', '個別案件の正解探し', '組織全体での影響と優先度'],
-              ['行動', '自分で完結させる', '担当者割当と進捗確認'],
-              ['時間配分', '全件に均等な時間', '重要度に応じた配分'],
+            kind: 'paragraph',
+            text: 'プレイヤー思考とマネージャー思考の対比表は第1章にある。本章では、答案の書き方をどう変えるかを扱う。',
+          },
+          {
+            kind: 'bullet-list',
+            items: [
+              '視点：案件ごとの正解探しから、組織全体への影響と優先度を書く形に変える',
+              '行動：「自分が対応する」から、担当者を割り当てて進み具合を確認する形に変える',
+              '時間配分：全件に同じ時間を使う形から、重要度に応じて配分を変える形に変える',
             ],
           },
           {
@@ -378,7 +422,22 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
           },
           {
             kind: 'paragraph',
-            text: '対策は、事前に決めた配分（本教材の目安はA案件4分、B案件3分、C案件1〜2分）を時計とともに守ること、判断・理由・指示の3点セットを定型化すること、迷ったら委任先と期限を即決して次の案件に移ることである。',
+            text: '対策は、第4章の時間配分を時計とともに守ること、判断・理由・指示の3点セットを定型化すること、迷ったら委任先と期限を即決して次の案件に移ることである。',
+          },
+        ],
+      },
+      {
+        id: 'chapter03-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '次の答案をマネージャー思考で書き直す。答案：「トラブルの原因は私が調べて、今日中に直します。」',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '判断：原因の調査を最優先とする。指示：田中さんに原因の調査を依頼し、15時に中間報告を受ける。顧客への連絡は私が行い、17時に部長へ報告する。自分で直すのではなく、担当と期限を決めて進み具合を確認する形にする。',
           },
         ],
       },
@@ -391,12 +450,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '優先順位づけの技術',
-                href: '/reference/chapter05',
+                href: '/reference/chapter05/',
                 description: '時間配分の根拠となる優先度判断を確認する',
               },
               {
                 label: '部下の退職・異動の相談（パターン4）',
-                href: '/patterns/4',
+                href: '/patterns/4/',
                 description: '傾聴姿勢でマネージャー思考を実体験する関連パターン',
               },
             ],
@@ -458,6 +517,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter04-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '制限時間60分、案件20件（A4件・B8件・C8件）とする。上の表の目安で配分を作り、合計が60分に収まるか確かめる。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '俯瞰3分、A案件4件×5分で20分、B案件8件×3分で24分、C案件8件×1分で8分、見直し5分で、合計60分になる。収まらない場合は、C案件を結論1行にして時間を作る。',
+          },
+        ],
+      },
+      {
         id: 'chapter04-reference-links',
         title: '参照導線',
         blocks: [
@@ -466,12 +540,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '優先順位づけの技術',
-                href: '/reference/chapter05',
+                href: '/reference/chapter05/',
                 description: '配分の前提となる優先度判定を確認する',
               },
               {
                 label: '部下の有給・休暇申請（パターン7）',
-                href: '/patterns/7',
+                href: '/patterns/7/',
                 description: '短時間定型案件の配分目安を実例で確認する',
               },
             ],
@@ -534,6 +608,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter06-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '次の案件を判断・理由・指示の3点で書く。情報が足りない点は、仮判断と再評価の時期を示す。案件：新しい会計システムの導入時期について経理課から意見を求められた。今のシステムの保守は来年3月に終わる。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '判断：来年1月までの導入を目指す方針で進める（仮判断）。理由：保守の終了後に障害が起きると業務が止まるため。指示：経理課と情報システム部に、移行に必要な期間と費用を来週金曜までに見積もってもらい、その結果で導入時期を見直す。',
+          },
+        ],
+      },
+      {
         id: 'chapter06-reference-links',
         title: '参照導線',
         blocks: [
@@ -542,12 +631,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '採点基準と振り返りの6観点',
-                href: '/reference/chapter02',
+                href: '/reference/chapter02/',
                 description: '振り返りの6観点と3点セットの対応を確認する',
               },
               {
                 label: '複合案件（パターン20）',
-                href: '/patterns/20',
+                href: '/patterns/20/',
                 description: '判断・理由・指示の3点セットを複合案件で適用する関連パターン',
               },
             ],
@@ -609,6 +698,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter07-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '毎月自分で作っている売上の集計を、今月から部下の木村さんに任せる。委任の4要素を入れて指示を書く。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '担当者：木村さん。期限：毎月第3営業日の12時まで。報告方法：初回は第2営業日に作成途中のものを一度見せてもらい、以降は完成版をメールで受け取る。裁量範囲：集計方法の工夫は任せるが、前月と10％以上違う数字は理由を添えて相談してもらう。',
+          },
+        ],
+      },
+      {
         id: 'chapter07-reference-links',
         title: '参照導線',
         blocks: [
@@ -617,12 +721,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '案件パターン別攻略',
-                href: '/reference/chapter08',
+                href: '/reference/chapter08/',
                 description: 'パターンごとの委任先候補を確認する',
               },
               {
                 label: '新規取引・営業案件（パターン3）',
-                href: '/patterns/3',
+                href: '/patterns/3/',
                 description: '委任先と裁量範囲の設計を実例で確認する',
               },
             ],
@@ -684,6 +788,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter09-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '次の答案を、結論先出し・短文・主語明示で書き直す。答案：「いろいろと状況を確認したうえで、関係者とも調整しながら、できるだけ早めに対応を検討したいと思います。」',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: 'B。今週中に対応する。鈴木さんに、明日17時までに状況の確認を依頼する。私は確認結果を受けて、木曜に関係部署と調整する。',
+          },
+        ],
+      },
+      {
         id: 'chapter09-reference-links',
         title: '参照導線',
         blocks: [
@@ -692,12 +811,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '意思決定フレームワーク',
-                href: '/reference/chapter06',
+                href: '/reference/chapter06/',
                 description: '3点セットと書き方の対応を確認する',
               },
               {
                 label: '取引先からの要求（パターン2）',
-                href: '/patterns/2',
+                href: '/patterns/2/',
                 description: '事実と判断を切り分けて記述する代表例',
               },
             ],
@@ -735,26 +854,7 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
           {
             kind: 'note',
             title: '回数より質',
-            text: '量をこなすより、1回ごとに弱点を特定し次回の重点課題を決める方が効率的である。',
-          },
-        ],
-      },
-      {
-        id: 'chapter10-review',
-        title: '振り返りの観点',
-        blocks: [
-          {
-            kind: 'bullet-list',
-            items: [
-              '時間配分: A案件に十分時間を割けたか、白紙はゼロか',
-              '判断の質: 各案件で優先度の根拠を書けたか',
-              '指示の具体性: 担当・期限・報告方法が揃っているか',
-              '横連携: 関係部署を巻き込めたか、自分で抱え込んでいないか',
-            ],
-          },
-          {
-            kind: 'paragraph',
-            text: '振り返りは6つの観点に沿って弱点を分類し、次回までに重点的に直す1〜2点を決めると改善が続きやすい。',
+            text: '量をこなすより、1回ごとに弱点を特定し次回の重点課題を決める方が効率的である。振り返りの手順は第11章で扱う。',
           },
         ],
       },
@@ -893,6 +993,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter10-try',
+        title: 'やってみる：アプリのシナリオ演習',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: 'トップページで学習スタイルをExamに切り替え、「シナリオ演習」を選ぶと、1つの共通設定（役職・組織・当日の予定）にある7件を30分で続けて解ける。案件どうしの関係（同じ人物・予算・予定の重なり）に気づけるかを確かめる演習である。問題と解答例は生成AIで作成したもので、正しさは保証できない。',
+          },
+          {
+            kind: 'note',
+            title: '進め方の例',
+            text: '最初の3分で共通設定と7件を読み、関係のある案件に印を付ける。終わったら結果画面で各案件の解説を読み、上の「自己採点の進め方」の項目で振り返る。',
+          },
+        ],
+      },
+      {
         id: 'chapter10-reference-links',
         title: '参照導線',
         blocks: [
@@ -901,12 +1016,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '採点基準と振り返りの6観点',
-                href: '/reference/chapter02',
+                href: '/reference/chapter02/',
                 description: '振り返りの6観点を確認する',
               },
               {
                 label: '部下のパフォーマンス問題（パターン6）',
-                href: '/patterns/6',
+                href: '/patterns/6/',
                 description: '模試の振り返り素材として典型的な人事系パターンを確認する',
               },
             ],
@@ -969,6 +1084,21 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
         ],
       },
       {
+        id: 'chapter11-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '直近の演習で間違えた1問を選び、改善サイクルの4ステップ（記録・採点・原因分析・対策）を1行ずつ書く。アプリでは、トップページの「パターン別弱点 Top3」で「この型を練習する」を押すと、そのパターンの案件だけを続けて解ける。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '記録：案件を3分で回答し、Cと判断した。採点：優先順位の根拠が弱い。原因分析：本文の「今週中」という期限を読み落とした。対策：次回は、判断の前に案件ごとの期限へ印を付ける。',
+          },
+        ],
+      },
+      {
         id: 'chapter11-reference-links',
         title: '参照導線',
         blocks: [
@@ -977,12 +1107,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '模擬試験の進め方',
-                href: '/reference/chapter10',
+                href: '/reference/chapter10/',
                 description: '振り返りの素材となる模試運用を確認する',
               },
               {
                 label: 'コンプライアンス違反（パターン15）',
-                href: '/patterns/15',
+                href: '/patterns/15/',
                 description: '弱点になりやすいリスク系の改善サイクル素材を確認する',
               },
             ],
@@ -1026,21 +1156,36 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
       },
       {
         id: 'chapter12-during-exam',
-        title: '残り時間ごとの行動',
+        title: '想定外と残り時間への対応',
         blocks: [
           {
             kind: 'table',
-            headers: ['残り時間', '行動'],
+            headers: ['状況', '行動'],
             rows: [
-              ['開始〜5分', '全案件を眺めA/B/C仮ラベル付与'],
-              ['5分〜終盤', 'A→B→Cの順に処理'],
+              ['難しい案件で手が止まった', '仮判断と確認することを1行書き、印を付けて次へ進む'],
+              ['配分が予定より5分以上遅れた', 'C案件を結論1行に切り替えて時間を取り戻す'],
               ['残り10分', '白紙案件チェック、最低1行で結論を埋める'],
               ['残り3分', '誤字脱字より抜け漏れの最終確認を優先'],
             ],
           },
           {
             kind: 'paragraph',
-            text: '本番では想定外（難しい案件・時間配分のズレ）が起きやすい。事前に決めた残り時間ごとの行動表を心の中で持っておくと、慱てずに切り替えられる。',
+            text: '基本の時間配分と序盤・中盤・終盤の流れは第4章で扱う。本番では想定外（難しい案件・時間配分のズレ）が起きやすい。起きたときの行動を事前に決めておくと、慌てずに切り替えられる。',
+          },
+        ],
+      },
+      {
+        id: 'chapter12-try',
+        title: 'やってみる',
+        blocks: [
+          {
+            kind: 'paragraph',
+            text: '自分用の行動表を作る。受ける試験の制限時間と案件数を想定し、開始時・残り半分・残り10分・残り3分にすることを1行ずつ書く。',
+          },
+          {
+            kind: 'note',
+            title: '解答例',
+            text: '開始時：全件を3分で読み、A・B・Cの仮の印を付ける。残り半分：A案件が終わっているか確かめ、遅れていればB案件を短くする。残り10分：白紙の案件に結論を1行ずつ書く。残り3分：担当と期限の抜けだけを見直す。',
           },
         ],
       },
@@ -1053,12 +1198,12 @@ const REFERENCE_DATA_SOURCE: ReferenceChapter[] = [
             items: [
               {
                 label: '時間配分とタイムマネジメント',
-                href: '/reference/chapter04',
+                href: '/reference/chapter04/',
                 description: '残り時間ごとの判断基盤を確認する',
               },
               {
                 label: 'プロジェクト遅延・品質問題（パターン9）',
-                href: '/patterns/9',
+                href: '/patterns/9/',
                 description: '想定外が起きやすいパターンで残り時間ごとの行動表を当てはめる',
               },
             ],

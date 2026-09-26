@@ -173,14 +173,14 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
     return event;
   }
 
-  it('通常クリック（button=0・修飾キーなし）で内部 `<a href="/patterns">` を pushState する', () => {
+  it('通常クリック（button=0・修飾キーなし）で内部 `<a href="/patterns/">` を pushState する', () => {
     window.history.replaceState(null, '', '/');
     act(() => {
       root.render(<Router />);
     });
 
     const anchor = container.querySelector<HTMLAnchorElement>(
-      'a.app-footer__legal-link[href="/patterns"]',
+      'a.app-footer__legal-link[href="/patterns/"]',
     );
     expect(anchor).not.toBeNull();
 
@@ -189,7 +189,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
       expect(event.defaultPrevented).toBe(true);
     });
 
-    expect(window.location.pathname).toBe('/patterns');
+    expect(window.location.pathname).toBe('/patterns/');
     expect(document.title).toContain('パターン別解説');
   });
 
@@ -205,7 +205,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
     });
 
     const anchor = container.querySelector<HTMLAnchorElement>(
-      'a.app-footer__legal-link[href="/patterns"]',
+      'a.app-footer__legal-link[href="/patterns/"]',
     );
     expect(anchor).not.toBeNull();
 
@@ -223,7 +223,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
     });
 
     const anchor = container.querySelector<HTMLAnchorElement>(
-      'a.app-footer__legal-link[href="/patterns"]',
+      'a.app-footer__legal-link[href="/patterns/"]',
     );
     expect(anchor).not.toBeNull();
 
@@ -239,7 +239,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
     });
 
     const anchor = container.querySelector<HTMLAnchorElement>(
-      'a.app-footer__legal-link[href="/patterns"]',
+      'a.app-footer__legal-link[href="/patterns/"]',
     );
     expect(anchor).not.toBeNull();
 
@@ -288,7 +288,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
     });
 
     const cardAnchor = container.querySelector<HTMLAnchorElement>(
-      'a.pattern-list__item[href="/patterns/1"]',
+      'a.pattern-list__item[href="/patterns/1/"]',
     );
     expect(cardAnchor).not.toBeNull();
 
@@ -297,7 +297,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
       expect(event.defaultPrevented).toBe(true);
     });
 
-    expect(window.location.pathname).toBe('/patterns/1');
+    expect(window.location.pathname).toBe('/patterns/1/');
     expect(document.title).toContain('パターン1');
   });
 
@@ -308,7 +308,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
     });
 
     const cardAnchor = container.querySelector<HTMLAnchorElement>(
-      'a.pattern-list__item[href="/patterns/1"]',
+      'a.pattern-list__item[href="/patterns/1/"]',
     );
     expect(cardAnchor).not.toBeNull();
 
@@ -324,7 +324,7 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
     });
 
     const anchor = container.querySelector<HTMLAnchorElement>(
-      'a.app-footer__legal-link[href="/reference"]',
+      'a.app-footer__legal-link[href="/reference/"]',
     );
     expect(anchor).not.toBeNull();
     // フォーカス可能であること（キーボード操作の前提）
@@ -337,6 +337,6 @@ describe('PBI-077 / TASK-077-4 内部リンクの修飾キー・中央クリッ�
       anchor!.click();
     });
 
-    expect(window.location.pathname).toBe('/reference');
+    expect(window.location.pathname).toBe('/reference/');
   });
 });

@@ -71,7 +71,7 @@ describe('FeedbackView（PBI-029 / TASK-010）', () => {
     expect(container.textContent).toContain('文章の意味や正しさ、試験の得点は判定しません');
     expect(container.textContent).not.toContain('総合評価: 優秀');
     expect(container.textContent).not.toContain('AI 評価');
-    expect(container.querySelector('a[href="/reference/chapter02"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/reference/chapter02/"]')).not.toBeNull();
 
     // 判断 1 件 + 理由 3 件 + アクション 3 件 = 7 観点
     const items = container.querySelectorAll('.feedback-view__item');

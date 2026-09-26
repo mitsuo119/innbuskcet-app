@@ -885,48 +885,142 @@ body {
   color: var(--color-text-muted);
 }
 
-/* ===== ModeSelector (PBI-018) ===== */
+/* ===== 出題範囲（PBI-109） ===== */
 
-.mode-selector {
+.practice-filter {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.75rem;
+  gap: 0.5rem 1rem;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
 }
 
-.mode-selector__label {
+.practice-filter__legend {
   font-size: 0.9rem;
   color: var(--color-text-muted);
-  margin-right: 0.25rem;
+  padding: 0 0.25rem;
 }
 
-.mode-selector__btn {
-  padding: 0.35rem 0.85rem;
+.practice-filter__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  max-width: 100%;
+}
+
+.practice-filter__select {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
   border: 1px solid var(--color-border);
-  border-radius: 999px;
+  border-radius: 6px;
   background: var(--color-surface);
   color: var(--color-text);
-  cursor: pointer;
   font: inherit;
-  font-size: 0.9rem;
-  /* PBI-045 TASK-102: モバイルタップ領域 44px 以上 */
-  min-height: 44px;
 }
 
-.mode-selector__btn:hover {
-  border-color: var(--color-primary);
-}
-
-.mode-selector__btn:focus-visible {
+.practice-filter__select:focus-visible,
+.weakness-pattern__practice:focus-visible,
+.learning-record__clear:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
-.mode-selector__btn--selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary-bg);
+.practice-filter__count {
+  margin: 0;
+  font-size: 0.9rem;
   font-weight: 700;
+}
+
+.practice-empty {
+  margin: 1rem 0;
+}
+
+.weakness-pattern__practice {
+  margin-top: 0.4rem;
+  min-height: 44px;
+  font-size: 0.9rem;
+}
+
+/* ===== 学習記録（PBI-107） ===== */
+
+.learning-record {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.learning-record__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.learning-record__text,
+.learning-record__count {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.learning-record__warning {
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  font-size: 0.9rem;
+}
+
+.learning-record__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.learning-record__clear {
+  min-height: 44px;
+}
+
+/* ===== シナリオ演習の共通設定（PBI-108） ===== */
+
+.scenario-brief {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  background: var(--color-primary-bg);
+}
+
+.scenario-brief__summary {
+  cursor: pointer;
+  font-weight: 700;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.scenario-brief__heading {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 1rem;
+}
+
+.scenario-brief__text,
+.scenario-brief__list {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.scenario-brief__notice {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
 
 /* ===== HistoryLimit (PBI-020) ===== */

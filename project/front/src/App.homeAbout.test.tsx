@@ -60,13 +60,13 @@ describe('トップの実践解説', () => {
       if (target) {
         expect(document.getElementById(target), `${href} の移動先がない`).not.toBeNull();
       } else {
-        expect(PUBLIC_ROUTES.map((route) => route.path)).toContain(href);
+        expect(PUBLIC_ROUTES.map((route) => `${route.path}/`)).toContain(href);
       }
     }
   });
 
   it('関連記事と運営者情報のリンク先が実在し、静的HTMLにも含まれる', () => {
-    const paths = PUBLIC_ROUTES.map((route) => route.path);
+    const paths = PUBLIC_ROUTES.map((route) => `${route.path}/`);
     for (const link of [
       ...guide.sections.flatMap((section) => section.links),
       ...guide.siteLinks,

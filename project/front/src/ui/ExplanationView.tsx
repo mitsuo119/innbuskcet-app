@@ -2,7 +2,7 @@ import type { Case, Priority } from '../domain/case';
 import type { Judgement } from '../domain/judge';
 import type { RelatedCaseHighlight } from '../domain/relatedCaseHighlight';
 import { PRIORITY_LABELS, formatPriorityLabel } from '../domain/priorityLabel';
-import { CASE_PATTERN_MAP } from '../domain/patternWeakness';
+import { patternIdOf } from '../domain/patternWeakness';
 import { findPatternById } from '../data/patternData';
 import { renderExplanationWithPatternLinks } from '../utils/explanationPatternLinks';
 
@@ -30,7 +30,7 @@ export function ExplanationView({
   const isCorrect = judgement === 'correct';
   const answerLabel = PRIORITY_LABELS[answer];
   const correctLabel = PRIORITY_LABELS[caseItem.correctPriority];
-  const patternId = CASE_PATTERN_MAP[caseItem.id];
+  const patternId = patternIdOf(caseItem.id);
   const relatedPattern = patternId === undefined ? undefined : findPatternById(patternId);
   return (
     <section
@@ -82,7 +82,7 @@ export function ExplanationView({
       )}
       <nav className="explanation__related" aria-label="関連学習ページ">
         <a
-          href={relatedPattern ? `/patterns/${relatedPattern.id}` : '/patterns'}
+          href={relatedPattern ? `/patterns/${relatedPattern.id}/` : '/patterns/'}
           className="explanation__related-link"
         >
           {relatedPattern
@@ -92,7 +92,7 @@ export function ExplanationView({
         <span className="explanation__related-sep" aria-hidden="true">
           |
         </span>
-        <a href="/reference" className="explanation__related-link">
+        <a href="/reference/" className="explanation__related-link">
           解説リファレンスへ
         </a>
       </nav>

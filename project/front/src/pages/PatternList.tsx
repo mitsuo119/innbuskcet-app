@@ -52,7 +52,7 @@ export function PatternList() {
               {PATTERN_DATA.filter((p) => p.category === cat).map((pattern) => (
                 <li key={pattern.id} className="pattern-list__item-wrap">
                   <a
-                    href={`/patterns/${pattern.id}`}
+                    href={`/patterns/${pattern.id}/`}
                     className="pattern-list__item"
                     aria-label={`パターン${pattern.id} ${pattern.name} 詳細を見る`}
                   >

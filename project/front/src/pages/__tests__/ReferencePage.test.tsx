@@ -71,10 +71,10 @@ describe('PBI-056 解説リファレンス画面', () => {
     expect(html).not.toContain('ref/chapter');
     expect(html).not.toContain('参照元</dt>');
     // 内部ルーティングは維持
-    expect(html).toContain('href="/reference/chapter01"');
-    expect(html).toContain('href="/reference/chapter02"');
-    expect(html).toContain('href="/reference/chapter05"');
-    expect(html).toContain('href="/reference/chapter08"');
+    expect(html).toContain('href="/reference/chapter01/"');
+    expect(html).toContain('href="/reference/chapter02/"');
+    expect(html).toContain('href="/reference/chapter05/"');
+    expect(html).toContain('href="/reference/chapter08/"');
   });
 
   it('テーブル・箇条書き・補足メモ・参照導線を安全にレンダリングする', () => {
@@ -83,8 +83,8 @@ describe('PBI-056 解説リファレンス画面', () => {
     expect(html).toContain('<table');
     expect(html).not.toContain('id="reference-chapter05"');
     expect(html).toContain('代表パターン分類（要点）');
-    expect(html).toContain('href="/patterns"');
-    expect(html).toContain('href="/patterns/14"');
+    expect(html).toContain('href="/patterns/"');
+    expect(html).toContain('href="/patterns/14/"');
     expect(html).toContain('aria-current="page"');
   });
 
@@ -105,7 +105,7 @@ describe('PBI-056 解説リファレンス画面', () => {
         expect(html.match(/class="reference-page__pager-link /g) ?? []).toHaveLength(3);
         expect(html).toContain('id="reference-chapter-nav"');
         const pager = html.slice(html.indexOf('reference-page__chapter-pager'));
-        expect(pager).toContain('href="/reference"');
+        expect(pager).toContain('href="/reference/"');
       }
     });
 
@@ -122,21 +122,21 @@ describe('PBI-056 解説リファレンス画面', () => {
       );
       expect(first).toContain('aria-disabled="true"');
       expect(first).toContain('（最初の章です）');
-      expect(first).toContain('href="/reference/chapter02"');
+      expect(first).toContain('href="/reference/chapter02/"');
 
       const last = pages[11].html;
       expect(last).toMatch(
         /reference-page__pager-link--next[^"]*reference-page__pager-link--disabled/,
       );
       expect(last).toContain('（最後の章です）');
-      expect(last).toContain('href="/reference/chapter11"');
+      expect(last).toContain('href="/reference/chapter11/"');
     });
 
     it('中間章には disabled なページャーが現れず、前後章リンクが正しく配置される', () => {
       for (const { html, index } of pages.slice(1, -1)) {
         const pager = html.slice(html.indexOf('reference-page__chapter-pager'));
-        expect(pager).toContain(`href="/reference/${REFERENCE_DATA[index - 1].id}"`);
-        expect(pager).toContain(`href="/reference/${REFERENCE_DATA[index + 1].id}"`);
+        expect(pager).toContain(`href="/reference/${REFERENCE_DATA[index - 1].id}/"`);
+        expect(pager).toContain(`href="/reference/${REFERENCE_DATA[index + 1].id}/"`);
         expect(pager).not.toContain('reference-page__pager-link--disabled');
       }
     });
@@ -172,7 +172,7 @@ describe('PBI-056 解説リファレンス画面', () => {
           html.indexOf('<article'),
           html.indexOf('reference-page__chapter-pager'),
         );
-        expect(article).toMatch(/href="\/patterns\/\d+"/);
+        expect(article).toMatch(/href="\/patterns\/\d+\/"/);
       }
     });
   });
@@ -191,7 +191,7 @@ describe('PBI-056 解説リファレンス画面', () => {
       '本番準備',
     ]);
     for (const chapter of REFERENCE_DATA) {
-      expect(document.querySelector(`a[href="/reference/${chapter.id}"]`)).not.toBeNull();
+      expect(document.querySelector(`a[href="/reference/${chapter.id}/"]`)).not.toBeNull();
       for (const goal of chapter.learningGoals) {
         expect(document.body.textContent).toContain(goal);
       }

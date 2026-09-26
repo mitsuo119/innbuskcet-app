@@ -95,6 +95,29 @@ export function addLearningStyleScore(
   };
 }
 
+/** 学習記録の回答から全体・優先度別・学習スタイル別の集計を作る（PBI-107）。 */
+export function summarizeAnswers(answers: readonly HistoryItem[]): {
+  score: Score;
+  modeScores: ModeScores;
+  learningStyleScores: LearningStyleScores;
+} {
+  let score = initialScore;
+  let modeScores = initialModeScores;
+  let learningStyleScores = initialLearningStyleScores;
+  for (const item of answers) {
+    score = addScore(score, item.judgement);
+    modeScores = addModeScore(modeScores, item.correctPriority, item.judgement);
+    if (item.learningStyle) {
+      learningStyleScores = addLearningStyleScore(
+        learningStyleScores,
+        item.learningStyle,
+        item.judgement,
+      );
+    }
+  }
+  return { score, modeScores, learningStyleScores };
+}
+
 /**
  * 直近N件のローリング正答率を計算する純粋関数（PBI-031）。
  * - style 指定時は該当学習スタイルでフィルタした上で直近 n 件を集計（Quick/Deep 独立集計）

@@ -85,7 +85,7 @@ export function FeedbackView({ feedback, visible }: FeedbackViewProps) {
         <h3 className="feedback-view__title">記述の自動チェック</h3>
         <p className="legal-note">
           語句・形式の照合結果です。文章の意味や正しさ、試験の得点は判定しません。
-          <a href="/reference/chapter02">判定の前提と限界</a>
+          <a href="/reference/chapter02/">判定の前提と限界</a>
         </p>
         <div
           className={`feedback-view__overall feedback-view__overall--${overallMod}`}

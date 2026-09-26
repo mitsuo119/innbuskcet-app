@@ -33,9 +33,9 @@ describe('GlobalNav（PBI-064 / TASK-201）', () => {
   it('各リンクが pathname ベースの正しい href を持つ（PBI-076 / TASK-076-4）', () => {
     const html = renderToStaticMarkup(<GlobalNav current="home" />);
     expect(html).toContain('href="/"');
-    expect(html).toContain('href="/reference"');
-    expect(html).toContain('href="/patterns"');
-    expect(html).toContain('href="/privacy-policy"');
+    expect(html).toContain('href="/reference/"');
+    expect(html).toContain('href="/patterns/"');
+    expect(html).toContain('href="/privacy-policy/"');
   });
 
   it('current で指定したページのリンクのみ aria-current="page" を持つ', () => {
@@ -45,7 +45,7 @@ describe('GlobalNav（PBI-064 / TASK-201）', () => {
     expect(matches).toHaveLength(1);
     // その属性は "解説リファレンス" のリンク要素に付いている
     expect(html).toMatch(
-      /<a[^>]*href="\/reference"[^>]*aria-current="page"[^>]*>解説リファレンス<\/a>/,
+      /<a[^>]*href="\/reference\/"[^>]*aria-current="page"[^>]*>解説リファレンス<\/a>/,
     );
   });
 

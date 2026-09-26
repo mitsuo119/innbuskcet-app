@@ -58,6 +58,18 @@ describe('静的HTMLと画面表示の一致', () => {
       );
 
       const staticDocument = new DOMParser().parseFromString(route.bodyHtml, 'text/html');
+
+      // PBI-110: 内部リンクは canonical と同じ末尾スラッシュ付き URL にする（リダイレクトを経由しない）。
+      for (const anchor of [
+        ...container.querySelectorAll<HTMLAnchorElement>('a[href^="/"]'),
+        ...staticDocument.querySelectorAll<HTMLAnchorElement>('a[href^="/"]'),
+      ]) {
+        const path = anchor.getAttribute('href')!.split(/[?#]/)[0];
+        expect(path === '/' || path.endsWith('/'), `${route.path} の内部リンク: ${path}`).toBe(
+          true,
+        );
+      }
+
       const live = normalize(container.textContent);
       for (const text of texts(staticDocument.querySelectorAll(BLOCK_TAGS.join(',')))) {
         expect(live, `${route.path} の静的HTMLだけにある文: ${text}`).toContain(text);

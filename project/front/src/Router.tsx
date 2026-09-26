@@ -276,12 +276,12 @@ function buildChapterBreadcrumbJsonLd(
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${origin}/` },
-      { '@type': 'ListItem', position: 2, name: '解説リファレンス', item: `${origin}/reference` },
+      { '@type': 'ListItem', position: 2, name: '解説リファレンス', item: `${origin}/reference/` },
       {
         '@type': 'ListItem',
         position: 3,
         name: chapterTitle,
-        item: `${origin}/reference/${chapterId}`,
+        item: `${origin}/reference/${chapterId}/`,
       },
     ],
   };
@@ -301,12 +301,12 @@ function buildPatternBreadcrumbJsonLd(
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${origin}/` },
-      { '@type': 'ListItem', position: 2, name: 'パターン別解説', item: `${origin}/patterns` },
+      { '@type': 'ListItem', position: 2, name: 'パターン別解説', item: `${origin}/patterns/` },
       {
         '@type': 'ListItem',
         position: 3,
         name: `パターン${patternId}「${patternName}」`,
-        item: `${origin}/patterns/${patternId}`,
+        item: `${origin}/patterns/${patternId}/`,
       },
     ],
   };
@@ -324,18 +324,18 @@ function buildCaseBreadcrumbJsonLd(meta: CaseDetailMeta): Record<string, unknown
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${origin}/` },
-      { '@type': 'ListItem', position: 2, name: 'パターン別解説', item: `${origin}/patterns` },
+      { '@type': 'ListItem', position: 2, name: 'パターン別解説', item: `${origin}/patterns/` },
       {
         '@type': 'ListItem',
         position: 3,
         name: `パターン${meta.patternId}「${meta.patternName}」`,
-        item: `${origin}/patterns/${meta.patternId}`,
+        item: `${origin}/patterns/${meta.patternId}/`,
       },
       {
         '@type': 'ListItem',
         position: 4,
         name: `ケース${num}（${meta.difficulty}）`,
-        item: `${origin}/cases/${meta.id}`,
+        item: `${origin}/cases/${meta.id}/`,
       },
     ],
   };

@@ -217,7 +217,7 @@ export function toAbsoluteUrl(siteUrl, path) {
 function chapterNavHtml() {
   return `<nav id="reference-chapter-nav" aria-label="章スキップ"><ul>${REFERENCE_CHAPTERS.map(
     (chapter, index) =>
-      `<li><a href="/reference/${chapter.id}">第${index + 1}章 ${escapeHtml(chapter.title)}</a></li>`,
+      `<li><a href="/reference/${chapter.id}/">第${index + 1}章 ${escapeHtml(chapter.title)}</a></li>`,
   ).join('')}</ul></nav>`;
 }
 
@@ -227,11 +227,11 @@ function chapterPagerHtml(index) {
   const next = REFERENCE_CHAPTERS[index + 1];
   const items = [
     prev
-      ? `<a href="/reference/${prev.id}">← 前の章 ${escapeHtml(prev.title)}</a>`
+      ? `<a href="/reference/${prev.id}/">← 前の章 ${escapeHtml(prev.title)}</a>`
       : '← 前の章 （最初の章です）',
-    '<a href="/reference">↑ 章一覧へ戻る</a>',
+    '<a href="/reference/">↑ 章一覧へ戻る</a>',
     next
-      ? `<a href="/reference/${next.id}">次の章 → ${escapeHtml(next.title)}</a>`
+      ? `<a href="/reference/${next.id}/">次の章 → ${escapeHtml(next.title)}</a>`
       : '次の章 → （最後の章です）',
   ];
   return `<ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>`;
@@ -272,7 +272,7 @@ function referenceIndexHtml() {
     return `<h2>${escapeHtml(level)}</h2><p>${escapeHtml(description)}</p>${chapters
       .map(
         ({ chapter, order }) =>
-          `<h3><a href="/reference/${chapter.id}">第${order + 1}章 ${escapeHtml(chapter.title)}</a></h3><p>${escapeHtml(chapter.description)}</p><ul>${chapter.learningGoals.map((goal) => `<li>${escapeHtml(goal)}</li>`).join('')}</ul>`,
+          `<h3><a href="/reference/${chapter.id}/">第${order + 1}章 ${escapeHtml(chapter.title)}</a></h3><p>${escapeHtml(chapter.description)}</p><ul>${chapter.learningGoals.map((goal) => `<li>${escapeHtml(goal)}</li>`).join('')}</ul>`,
       )
       .join('')}`;
   });
@@ -345,7 +345,7 @@ function buildCaseRoute(meta) {
         ${followUpHtml}
         ${sourcesHtml}
         <h2>関連リンク</h2>
-        <ul><li><a href="/patterns/${meta.patternId}">パターン${meta.patternId}「${escapeHtml(meta.patternName)}」の詳細を見る</a></li><li><a href="/reference">解説リファレンス（章別の体系解説）</a></li></ul>
+        <ul><li><a href="/patterns/${meta.patternId}/">パターン${meta.patternId}「${escapeHtml(meta.patternName)}」の詳細を見る</a></li><li><a href="/reference/">解説リファレンス（章別の体系解説）</a></li></ul>
       </div>
     `.trim(),
   };
@@ -373,7 +373,7 @@ function patternIndexHtml() {
           )
             .map(
               (pattern) =>
-                `<li><a href="/patterns/${pattern.id}">パターン${pattern.id} ${escapeHtml(pattern.name)} ${PATTERN_LIST_BADGE[pattern.typicalPriority]}</a><p>${escapeHtml(pattern.characteristics)}</p></li>`,
+                `<li><a href="/patterns/${pattern.id}/">パターン${pattern.id} ${escapeHtml(pattern.name)} ${PATTERN_LIST_BADGE[pattern.typicalPriority]}</a><p>${escapeHtml(pattern.characteristics)}</p></li>`,
             )
             .join('')}</ul>`,
       )
@@ -417,11 +417,11 @@ function buildPatternRoute(pattern) {
       sampleCase &&
       section(
         'このパターンの代表ケース',
-        `<ul><li><a href="/cases/${sample.id}">ケース${sample.id.replace('case-', '')}：${escapeHtml(sampleCase.title)}（${sample.difficulty}）</a></li></ul>`,
+        `<ul><li><a href="/cases/${sample.id}/">ケース${sample.id.replace('case-', '')}：${escapeHtml(sampleCase.title)}（${sample.difficulty}）</a></li></ul>`,
       ),
     section(
       '関連リンク',
-      '<ul><li><a href="/patterns">パターン別解説（全20パターン）</a></li><li><a href="/reference/chapter08">解説リファレンス：案件パターン別攻略（第8章）</a></li></ul>',
+      `<ul><li><a href="/?pattern=${pattern.id}">このパターンの問題を解く</a></li><li><a href="/patterns/">パターン別解説（全20パターン）</a></li><li><a href="/reference/chapter08/">解説リファレンス：案件パターン別攻略（第8章）</a></li></ul>`,
     ),
   ].filter(Boolean);
 

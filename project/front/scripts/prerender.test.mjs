@@ -340,7 +340,7 @@ describe('プリレンダ本文の欠落検知（章600字・詳細1000字以上
       expect(r.bodyHtml, r.path).toContain('<h2>よくある失敗</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>回答例文</h2>');
       expect(r.bodyHtml, r.path).toContain('<h2>答案を振り返る観点</h2>');
-      expect(r.bodyHtml, r.path).toMatch(/<a href="\/cases\/case-\d{3}">/);
+      expect(r.bodyHtml, r.path).toMatch(/<a href="\/cases\/case-\d{3}\/">/);
     }
   });
   it('代表ケース20件全件に深掘り解説セクションが含まれる', () => {

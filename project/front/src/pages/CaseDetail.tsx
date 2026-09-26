@@ -51,7 +51,7 @@ export function CaseDetail({ caseId }: Props) {
   if (!meta || !record) {
     return (
       <div className="container">
-        <a href="/patterns" className="legal-back-btn" aria-label="パターン一覧に戻る">
+        <a href="/patterns/" className="legal-back-btn" aria-label="パターン一覧に戻る">
           ← パターン一覧へ
         </a>
         <GlobalNav current="patterns" />
@@ -63,17 +63,17 @@ export function CaseDetail({ caseId }: Props) {
   return (
     <div className="container">
       <header className="legal-header">
-        <a href="/patterns" className="legal-back-btn" aria-label="パターン一覧に戻る">
+        <a href="/patterns/" className="legal-back-btn" aria-label="パターン一覧に戻る">
           ← パターン一覧へ
         </a>
         <GlobalNav current="patterns" />
         <Breadcrumb
           items={[
             { label: 'ホーム', href: '/' },
-            { label: 'パターン別解説', href: '/patterns' },
+            { label: 'パターン別解説', href: '/patterns/' },
             {
               label: `パターン${meta.patternId}「${meta.patternName}」`,
-              href: `/patterns/${meta.patternId}`,
+              href: `/patterns/${meta.patternId}/`,
             },
             { label: `ケース${record.id.replace('case-', '')}（${meta.difficulty}）` },
           ]}
@@ -176,12 +176,12 @@ export function CaseDetail({ caseId }: Props) {
           <h2 className="legal-section__title">関連リンク</h2>
           <ul className="legal-list">
             <li>
-              <a href={`/patterns/${meta.patternId}`}>
+              <a href={`/patterns/${meta.patternId}/`}>
                 パターン{meta.patternId}「{meta.patternName}」の詳細を見る
               </a>
             </li>
             <li>
-              <a href="/reference">解説リファレンス（章別の体系解説）</a>
+              <a href="/reference/">解説リファレンス（章別の体系解説）</a>
             </li>
           </ul>
         </section>

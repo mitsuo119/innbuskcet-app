@@ -1,5 +1,5 @@
 import casesData from '../data/cases.json';
-import type { Case, ModelAnswer, Priority } from './case';
+import { DIFFICULTIES, type Case, type Difficulty, type ModelAnswer, type Priority } from './case';
 
 const VALID_PRIORITIES: ReadonlySet<Priority> = new Set<Priority>(['A', 'B', 'C']);
 
@@ -88,47 +88,63 @@ export function loadCases(): Case[] {
     throw new Error('cases.json はトップレベルが配列である必要があります');
   }
 
-  return casesData.map((raw, index) => {
-    if (typeof raw !== 'object' || raw === null) {
-      throw new Error(`cases.json[${index}] がオブジェクトではありません`);
-    }
-    const c = raw as Partial<Record<keyof Case, unknown>>;
+  return casesData.map((raw, index) => parseCase(raw, index));
+}
 
-    const { id, title, body, correctPriority, explanation, modelAnswer, characters, departments } =
-      c;
+/**
+ * 案件1件を検証して Case に変換する（cases.json とシナリオ演習の案件で共用）。
+ * @param source エラーメッセージに出すデータ名
+ */
+export function parseCase(raw: unknown, index: number, source = 'cases.json'): Case {
+  if (typeof raw !== 'object' || raw === null) {
+    throw new Error(`${source}[${index}] がオブジェクトではありません`);
+  }
+  const c = raw as Partial<Record<keyof Case, unknown>>;
 
-    if (typeof id !== 'string' || id.length === 0) {
-      throw new Error(`cases.json[${index}] の id が不正です`);
-    }
-    if (typeof title !== 'string' || title.length === 0) {
-      throw new Error(`cases.json[${index}] の title が不正です (id=${id})`);
-    }
-    if (typeof body !== 'string' || body.length === 0) {
-      throw new Error(`cases.json[${index}] の body が不正です (id=${id})`);
-    }
-    if (typeof correctPriority !== 'string' || !VALID_PRIORITIES.has(correctPriority as Priority)) {
-      throw new Error(
-        `cases.json[${index}] の correctPriority は A/B/C のいずれかである必要があります (id=${id})`,
-      );
-    }
-    if (typeof explanation !== 'string' || explanation.length === 0) {
-      throw new Error(`cases.json[${index}] の explanation が不正です (id=${id})`);
-    }
+  const {
+    id,
+    title,
+    body,
+    correctPriority,
+    explanation,
+    modelAnswer,
+    characters,
+    departments,
+    difficulty,
+  } = c;
 
-    const parsedModel = parseModelAnswer(modelAnswer, index, id);
-    const parsedCharacters = parseOptionalStringArray(characters, 'characters', index, id);
-    const parsedDepartments = parseOptionalStringArray(departments, 'departments', index, id);
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new Error(`${source}[${index}] の id が不正です`);
+  }
+  if (typeof title !== 'string' || title.length === 0) {
+    throw new Error(`${source}[${index}] の title が不正です (id=${id})`);
+  }
+  if (typeof body !== 'string' || body.length === 0) {
+    throw new Error(`${source}[${index}] の body が不正です (id=${id})`);
+  }
+  if (typeof correctPriority !== 'string' || !VALID_PRIORITIES.has(correctPriority as Priority)) {
+    throw new Error(
+      `${source}[${index}] の correctPriority は A/B/C のいずれかである必要があります (id=${id})`,
+    );
+  }
+  if (typeof explanation !== 'string' || explanation.length === 0) {
+    throw new Error(`${source}[${index}] の explanation が不正です (id=${id})`);
+  }
 
-    const result: Case = {
-      id,
-      title,
-      body,
-      correctPriority: correctPriority as Priority,
-      explanation,
-    };
-    if (parsedCharacters) result.characters = parsedCharacters;
-    if (parsedDepartments) result.departments = parsedDepartments;
-    if (parsedModel) result.modelAnswer = parsedModel;
-    return result;
-  });
+  const parsedModel = parseModelAnswer(modelAnswer, index, id);
+  const parsedCharacters = parseOptionalStringArray(characters, 'characters', index, id);
+  const parsedDepartments = parseOptionalStringArray(departments, 'departments', index, id);
+
+  const result: Case = {
+    id,
+    title,
+    body,
+    correctPriority: correctPriority as Priority,
+    explanation,
+  };
+  if (parsedCharacters) result.characters = parsedCharacters;
+  if (parsedDepartments) result.departments = parsedDepartments;
+  if (parsedModel) result.modelAnswer = parsedModel;
+  if (DIFFICULTIES.includes(difficulty as Difficulty)) result.difficulty = difficulty as Difficulty;
+  return result;
 }

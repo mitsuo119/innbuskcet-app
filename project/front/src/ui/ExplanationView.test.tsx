@@ -95,7 +95,7 @@ describe('ExplanationView（PBI-063 / Day4 視認性向上）', () => {
     const html = renderToStaticMarkup(
       <ExplanationView caseItem={{ ...SAMPLE, id: 'case-019' }} answer="C" judgement="correct" />,
     );
-    expect(html).toContain('href="/patterns/7"');
+    expect(html).toContain('href="/patterns/7/"');
     expect(html).toContain('パターン7「部下の有給・休暇申請」を見る');
   });
 
@@ -103,7 +103,7 @@ describe('ExplanationView（PBI-063 / Day4 視認性向上）', () => {
     const html = renderToStaticMarkup(
       <ExplanationView caseItem={SAMPLE} answer="A" judgement="correct" />,
     );
-    expect(html).toContain('href="/patterns"');
+    expect(html).toContain('href="/patterns/"');
     expect(html).toContain('関連パターンを見る');
   });
 });

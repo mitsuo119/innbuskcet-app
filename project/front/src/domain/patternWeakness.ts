@@ -9,6 +9,7 @@
  */
 
 import type { HistoryItem } from './history';
+import scenarios from '../data/scenarios.json';
 
 /** 1パターンの集計結果 */
 export interface PatternStat {
@@ -112,6 +113,16 @@ export const CASE_PATTERN_MAP: Record<string, number> = {
   'case-070': 20,
 };
 
+/** シナリオ演習（scenarios.json）の案件ID → パターン番号。 */
+const SCENARIO_CASE_PATTERN_MAP: Record<string, number> = Object.fromEntries(
+  scenarios.flatMap((scenario) => scenario.cases.map((item) => [item.id, item.patternId])),
+);
+
+/** 案件IDからパターン番号を引く（シナリオ演習の案件を含む）。 */
+export function patternIdOf(caseId: string): number | undefined {
+  return CASE_PATTERN_MAP[caseId] ?? SCENARIO_CASE_PATTERN_MAP[caseId];
+}
+
 /** パターンID → パターン名称のマッピング（chapter08-case-patterns.md より） */
 export const PATTERN_NAME_MAP: Record<number, string> = {
   1: '顧客クレーム',
@@ -139,11 +150,11 @@ export const PATTERN_NAME_MAP: Record<number, string> = {
 /**
  * 回答履歴をパターン別に集計する（TASK-261）。
  *
- * - `history` のうち CASE_PATTERN_MAP に存在しない case_id は無視する。
+ * - `history` のうちパターンが分からない case_id は無視する。
  * - 出題が0件のパターンは結果に含まれない。
  * - 純粋関数（入力を変更しない）。
  *
- * @param history セッション内の回答履歴（無制限件数を受け付ける）
+ * @param history 回答履歴（無制限件数を受け付ける）
  * @returns パターン別集計結果（出題ありのもの全件）
  */
 export function aggregateByPattern(history: readonly HistoryItem[]): PatternStat[] {
@@ -152,7 +163,7 @@ export function aggregateByPattern(history: readonly HistoryItem[]): PatternStat
   const incorrects: Record<number, number> = {};
 
   for (const item of history) {
-    const patternId = CASE_PATTERN_MAP[item.caseId];
+    const patternId = patternIdOf(item.caseId);
     if (patternId === undefined) continue;
 
     totals[patternId] = (totals[patternId] ?? 0) + 1;

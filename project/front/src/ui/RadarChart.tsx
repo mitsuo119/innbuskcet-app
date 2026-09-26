@@ -212,7 +212,7 @@ export function RadarChart({ history }: Props) {
             return (
               <span key={id}>
                 {i > 0 && '・'}
-                <a href={`/reference/${id}`} className="radar-chart__chapter-ref">
+                <a href={`/reference/${id}/`} className="radar-chart__chapter-ref">
                   第{order + 1}章 {REFERENCE_DATA[order].title}
                 </a>
               </span>

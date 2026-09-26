@@ -149,7 +149,7 @@ function renderChapter(chapter: ReferenceChapter) {
         {nav.prev ? (
           <a
             className="reference-page__pager-link reference-page__pager-link--prev"
-            href={`/reference/${nav.prev.id}`}
+            href={`/reference/${nav.prev.id}/`}
           >
             <span className="reference-page__pager-direction" aria-hidden="true">
               ← 前の章
@@ -168,7 +168,10 @@ function renderChapter(chapter: ReferenceChapter) {
             <span className="reference-page__pager-title">（最初の章です）</span>
           </span>
         )}
-        <a className="reference-page__pager-link reference-page__pager-link--top" href="/reference">
+        <a
+          className="reference-page__pager-link reference-page__pager-link--top"
+          href="/reference/"
+        >
           <span className="reference-page__pager-direction" aria-hidden="true">
             ↑
           </span>
@@ -177,7 +180,7 @@ function renderChapter(chapter: ReferenceChapter) {
         {nav.next ? (
           <a
             className="reference-page__pager-link reference-page__pager-link--next"
-            href={`/reference/${nav.next.id}`}
+            href={`/reference/${nav.next.id}/`}
           >
             <span className="reference-page__pager-direction" aria-hidden="true">
               次の章 →
@@ -225,7 +228,7 @@ export function ReferencePage({ focusChapterId = null }: Props) {
           <Breadcrumb
             items={[
               { label: 'ホーム', href: '/' },
-              { label: '解説リファレンス', href: '/reference' },
+              { label: '解説リファレンス', href: '/reference/' },
               { label: focusedChapter.title },
             ]}
           />
@@ -271,7 +274,7 @@ export function ReferencePage({ focusChapterId = null }: Props) {
             {REFERENCE_DATA.map((chapter, index) => (
               <a
                 key={chapter.id}
-                href={`/reference/${chapter.id}`}
+                href={`/reference/${chapter.id}/`}
                 className="reference-page__chapter-link"
                 aria-current={focusChapterId === chapter.id ? 'page' : undefined}
               >
@@ -296,7 +299,7 @@ export function ReferencePage({ focusChapterId = null }: Props) {
                     <li key={chapter.id} className="reference-page__course-item">
                       <h3 className="reference-page__course-title">
                         <a
-                          href={`/reference/${chapter.id}`}
+                          href={`/reference/${chapter.id}/`}
                           className="reference-page__inline-link"
                         >
                           第{order + 1}章 {chapter.title}

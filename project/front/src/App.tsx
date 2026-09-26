@@ -6,7 +6,9 @@ import { ExplanationView } from './ui/ExplanationView';
 import { GlobalNav } from './ui/GlobalNav';
 import { HistoryView } from './ui/HistoryView';
 import { LearningStyleToggle } from './ui/LearningStyleToggle';
-import { ModeSelector } from './ui/ModeSelector';
+import { PracticeFilterSelector } from './ui/PracticeFilterSelector';
+import { LearningRecordPanel } from './ui/LearningRecordPanel';
+import { ScenarioBrief } from './ui/ScenarioBrief';
 import { ScoreCounter } from './ui/ScoreCounter';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { ModelAnswerView } from './ui/ModelAnswerView';
@@ -24,14 +26,7 @@ import { HomeIntro } from './ui/HomeIntro';
 import pageIntro from './data/pageIntro.json';
 import type { Case, Priority } from './domain/case';
 import { evaluateWriting, type WritingFeedback } from './domain/feedback';
-import {
-  initialHistory,
-  pushHistory,
-  trimHistory,
-  type HistoryItem,
-  type HistoryLimit,
-  HISTORY_LIMIT_OPTIONS,
-} from './domain/history';
+import { type HistoryItem, type HistoryLimit, HISTORY_LIMIT_OPTIONS } from './domain/history';
 import { judge, type Judgement } from './domain/judge';
 import {
   loadLearningStyle,
@@ -40,24 +35,33 @@ import {
   type LearningStyle,
 } from './domain/learningStyle';
 import { loadCases } from './domain/loader';
-import { applyModeChange, initialMode } from './domain/mode';
-import { pickNextCaseByMode, type FilterMode } from './domain/random';
+import { pickNextCase } from './domain/random';
 import {
-  addLearningStyleScore,
-  addModeScore,
-  addScore,
-  calcRollingScore,
-  initialLearningStyleScores,
-  initialModeScores,
-  initialScore,
-} from './domain/score';
+  filterCases,
+  filterFromSearch,
+  isSameFilter,
+  ALL_CASES_FILTER,
+  type PracticeFilter,
+} from './domain/practiceFilter';
+import {
+  appendAnswer,
+  appendSelfScore,
+  clearLearningRecord,
+  loadLearningRecord,
+  saveLearningRecord,
+  EMPTY_LEARNING_RECORD,
+  type LearningRecord,
+} from './domain/learningRecord';
+import { findScenario, SCENARIOS } from './domain/scenario';
+import { calcRollingScore, summarizeAnswers } from './domain/score';
 import { resolveShortcut, isEditableTarget } from './domain/shortcut';
 import { createEmptyWritingEntry, isWritingEntryEmpty, type WritingEntry } from './domain/writing';
-import { type SelfScoreEntry, type SelfScoreHistory } from './domain/selfScore';
+import { type SelfScoreEntry } from './domain/selfScore';
 import {
   clearExamProgress,
   clearExamSession,
   createExamSession,
+  createScenarioExamSession,
   loadExamProgress,
   loadExamSession,
   saveExamProgress,
@@ -84,19 +88,36 @@ const DIALOG_CLOSED: DialogState = {
 
 export default function App() {
   const allCases = useMemo<Case[]>(() => loadCases(), []);
-  const [mode, setMode] = useState<FilterMode>(initialMode);
+  /** Exam の出題と結果表示で参照する案件（シナリオ演習の案件を含む）。 */
+  const examCases = useMemo<Case[]>(
+    () => [...allCases, ...SCENARIOS.flatMap((scenario) => scenario.cases)],
+    [allCases],
+  );
+  const [practiceFilter, setPracticeFilter] = useState<PracticeFilter>(() =>
+    filterFromSearch(window.location.search),
+  );
   const [current, setCurrent] = useState<Case | null>(() =>
-    pickNextCaseByMode(allCases, undefined, initialMode),
+    pickNextCase(filterCases(allCases, practiceFilter), undefined),
   );
   const [selected, setSelected] = useState<Priority | null>(null);
   const [judgement, setJudgement] = useState<Judgement | null>(null);
-  const [score, setScore] = useState(initialScore);
-  const [modeScores, setModeScores] = useState(initialModeScores);
-  const [history, setHistory] = useState<readonly HistoryItem[]>(initialHistory);
+  /** ブラウザに保存する学習記録（PBI-107）。集計・履歴・弱点表示はここから導く。 */
+  const [record, setRecord] = useState<LearningRecord>(() => loadLearningRecord());
+  const [recordSaveFailed, setRecordSaveFailed] = useState(false);
+  const recordChangedRef = useRef(false);
+  /** このページを開いた時点の回答数。案件間の関連表示は今回解いた案件だけを対象にする。 */
+  const sessionStartRef = useRef(record.answers.length);
   const [historyLimit, setHistoryLimit] = useState<HistoryLimit>(10);
+  const history = useMemo(
+    () => record.answers.slice(-historyLimit),
+    [record.answers, historyLimit],
+  );
+  const { score, modeScores, learningStyleScores } = useMemo(
+    () => summarizeAnswers(record.answers),
+    [record.answers],
+  );
   const [writingEntry, setWritingEntry] = useState<WritingEntry>(() => createEmptyWritingEntry());
   const [learningStyle, setLearningStyle] = useState<LearningStyle>(() => loadLearningStyle());
-  const [learningStyleScores, setLearningStyleScores] = useState(initialLearningStyleScores);
   const [examSession, setExamSession] = useState<ExamSession | null>(null);
   /** Exam モードでの現在の出題インデックス（0 始まり・examSession.questionIds に対応）。 */
   const [examIndex, setExamIndex] = useState<number>(0);
@@ -129,11 +150,6 @@ export default function App() {
   /** ConfirmDialog の表示 state（PBI-038）。 */
   const [dialogState, setDialogState] = useState<DialogState>(DIALOG_CLOSED);
   /**
-   * PBI-025: 6軸自己採点履歴（セッション内のみ保持・リロードで初期化）。
-   * - 採点済みエントリを順番に蓄積し RadarChart の平均計算に使用する。
-   */
-  const [selfScoreHistory, setSelfScoreHistory] = useState<SelfScoreHistory>([]);
-  /**
    * PBI-025: 現在の問題に対して自己採点が完了（または スキップ）したかどうか。
    * - true の場合は SelfScoreInput を非表示にする。
    */
@@ -142,33 +158,48 @@ export default function App() {
   const locked = judgement !== null;
   const isDeep = isDeepMode(learningStyle);
   const isExam = learningStyle === 'exam';
+  const activeScenario = isExam ? findScenario(examSession?.scenarioId) : undefined;
+
+  /** 学習記録を更新し、更新後に保存する（初期表示だけでは書き込まない）。 */
+  const updateRecord = (update: (prev: LearningRecord) => LearningRecord) => {
+    recordChangedRef.current = true;
+    setRecord(update);
+  };
+
+  useEffect(() => {
+    if (!recordChangedRef.current) return;
+    setRecordSaveFailed(!saveLearningRecord(record));
+  }, [record]);
+
+  /** 出題範囲から次の1件を選ぶ（直前の案件は避ける）。 */
+  const pickPracticeCase = (previousId?: string, filter: PracticeFilter = practiceFilter) =>
+    pickNextCase(filterCases(allCases, filter), previousId);
 
   /** 直近10問ローリング正答率（PBI-031）。Exam モードは表示しない（undefined）。 */
   const rollingScore = useMemo(
-    () => (isExam ? undefined : calcRollingScore(history, 10, learningStyle)),
-    [history, isExam, learningStyle],
+    () => (isExam ? undefined : calcRollingScore(record.answers, 10, learningStyle)),
+    [record.answers, isExam, learningStyle],
   );
 
   /** caseId 逆引きマップ（PBI-028: 既出案件参照のため）。 */
   const caseMap = useMemo(() => {
     const map = new Map<string, Case>();
-    for (const item of allCases) map.set(item.id, item);
+    for (const item of examCases) map.set(item.id, item);
     return map;
-  }, [allCases]);
+  }, [examCases]);
 
   /**
-   * PBI-028: セッション内の既出案件との関連（同一人物/同一部署）を算出する。
-   * - handleSubmit で history 末尾に「現在回答」が追加されるため、slice(0, -1) で除外。
-   * - ハイライト対象がない場合は空配列（解説表示は通常動作）。
+   * PBI-028: 今回解いた既出案件との関連（同一人物/同一部署）を算出する。
+   * - handleSubmit で記録の末尾に「現在回答」が追加されるため、末尾を除外する。
    */
   const relatedHighlights = useMemo(() => {
     if (!current || judgement === null) return [];
-    const previousCases = history
-      .slice(0, -1)
+    const previousCases = record.answers
+      .slice(sessionStartRef.current, -1)
       .map((h) => caseMap.get(h.caseId))
       .filter((c): c is Case => c !== undefined);
     return buildRelatedCaseHighlights(current, previousCases);
-  }, [caseMap, current, history, judgement]);
+  }, [caseMap, current, record.answers, judgement]);
 
   const handleSelect = (priority: Priority) => {
     if (locked || !current) return;
@@ -182,21 +213,14 @@ export default function App() {
     const result: Judgement = judge(answer, current.correctPriority);
     setSelected(answer);
     setJudgement(result);
-    setScore((prev) => addScore(prev, result));
-    setModeScores((prev) => addModeScore(prev, current.correctPriority, result));
-    setLearningStyleScores((prev) => addLearningStyleScore(prev, learningStyle, result));
-    setHistory((prev) =>
-      pushHistory(
-        prev,
-        {
-          caseId: current.id,
-          judgement: result,
-          correctPriority: current.correctPriority,
-          learningStyle,
-          answeredPriority: answer,
-        },
-        historyLimit,
-      ),
+    updateRecord((prev) =>
+      appendAnswer(prev, {
+        caseId: current.id,
+        judgement: result,
+        correctPriority: current.correctPriority,
+        learningStyle,
+        answeredPriority: answer,
+      }),
     );
     // Exam モード中は別 state に出題順で蓄積し、結果画面で参照する（PBI-030 / TASK-002）。
     if (isExam && examSession) {
@@ -245,7 +269,7 @@ export default function App() {
       }
       setExamIndex(nextIdx);
       const nextId = examSession.questionIds[nextIdx];
-      const next = allCases.find((c) => c.id === nextId) ?? null;
+      const next = examCases.find((c) => c.id === nextId) ?? null;
       setCurrent(next);
       setSelected(null);
       setJudgement(null);
@@ -256,7 +280,7 @@ export default function App() {
       questionStartedAtRef.current = Date.now();
       return;
     }
-    setCurrent(pickNextCaseByMode(allCases, current?.id, mode));
+    setCurrent(pickPracticeCase(current?.id));
     setSelected(null);
     setJudgement(null);
     setWritingEntry(createEmptyWritingEntry());
@@ -266,10 +290,10 @@ export default function App() {
 
   /**
    * PBI-025: 自己採点記録ハンドラ。
-   * - 入力スコアを selfScoreHistory に追加し、入力フォームを閉じる。
+   * - 入力スコアを学習記録に追加し、入力フォームを閉じる。
    */
   const handleSelfScoreSubmit = (entry: SelfScoreEntry) => {
-    setSelfScoreHistory((prev) => [...prev, entry]);
+    updateRecord((prev) => appendSelfScore(prev, entry));
     setSelfScoreInputDone(true);
   };
 
@@ -319,7 +343,7 @@ export default function App() {
     setSelected(null);
     setJudgement(null);
     setWritingEntry(createEmptyWritingEntry());
-    setCurrent(pickNextCaseByMode(allCases, undefined, mode));
+    setCurrent(pickPracticeCase());
   };
 
   /** ExamTimer からの時間切れコールバック（PBI-027 / TASK-006）。 */
@@ -352,34 +376,54 @@ export default function App() {
   };
 
   /**
-   * 出題モード切替（PBI-018）。
-   * - 履歴・カウンタを初期化し、新モードでフィルタした候補から次の1件を選び直す。
-   * - 同モード再選択は no-op。
+   * 出題範囲の切替（PBI-109）。
+   * - 学習記録は消さず、新しい範囲から次の1件を選び直す。
    */
-  const handleModeChange = (next: FilterMode) => {
-    if (next === mode) return;
-    const reset = applyModeChange(allCases, next);
-    setMode(reset.mode);
-    setHistory(reset.history);
-    setScore(reset.score);
-    setCurrent(reset.current);
+  const handleFilterChange = (next: PracticeFilter) => {
+    if (isSameFilter(next, practiceFilter)) return;
+    setPracticeFilter(next);
+    setCurrent(pickPracticeCase(undefined, next));
     setSelected(null);
     setJudgement(null);
     setWritingEntry(createEmptyWritingEntry());
     setWritingFeedback(null);
+    setSelfScoreInputDone(false);
+  };
+
+  /** 弱点Top3から指定したパターンの出題へ移る（PBI-109）。 */
+  const handlePracticePattern = (patternId: number) => {
+    handleFilterChange({ patternId, difficulty: null });
+    document.getElementById('practice-heading')?.scrollIntoView?.({ block: 'start' });
+  };
+
+  /** 学習記録の消去（PBI-107）。確認後に保存先からも削除する。 */
+  const handleClearRecord = () => {
+    setDialogState({
+      open: true,
+      title: '学習記録を消去しますか？',
+      description:
+        'このブラウザに保存した回答の記録と自己採点をすべて削除します。元には戻せません。',
+      actions: [
+        { id: 'cancel', label: 'キャンセル', variant: 'secondary', autoFocus: true },
+        { id: 'confirm', label: '消去する', variant: 'danger' },
+      ],
+      onAction: (id) => {
+        setDialogState(DIALOG_CLOSED);
+        if (id !== 'confirm') return;
+        recordChangedRef.current = false;
+        sessionStartRef.current = 0;
+        setRecordSaveFailed(!clearLearningRecord());
+        setRecord(EMPTY_LEARNING_RECORD);
+      },
+    });
   };
 
   /**
-   * 履歴表示件数の切替（PBI-020）。
-   * - 同値再選択は no-op。
-   * - 縮小（20 → 10）時は既存履歴を末尾優先で切り詰める（カウンタ・モードは非リセット）。
-   * - 拡大（10 → 20）時は履歴を維持し、以降のpushで上限が広がる。
-   * - セッション内のみ保持（永続化なし）。
+   * 履歴表示件数の切替（PBI-020）。記録は削らず、表示する件数だけを変える。
    */
   const handleHistoryLimitChange = (next: HistoryLimit) => {
     if (next === historyLimit) return;
     setHistoryLimit(next);
-    setHistory((prev) => trimHistory(prev, next));
   };
 
   /**
@@ -406,11 +450,14 @@ export default function App() {
       setWritingFeedback(null);
     };
 
-    /** Exam セッション起動処理。失敗時は Deep に戻すダイアログを出す。 */
-    const startExam = () => {
+    /** Exam セッション起動処理。scenarioId 指定時はシナリオ演習（PBI-108）。失敗時は Deep に戻す。 */
+    const startExam = (scenarioId?: string) => {
       const allCaseIds = allCases.map((c) => c.id);
       try {
-        const session = createExamSession(allCaseIds);
+        const scenario = findScenario(scenarioId);
+        const session = scenario
+          ? createScenarioExamSession(scenario)
+          : createExamSession(allCaseIds);
         setExamSession(session);
         setExamIndex(0);
         setExamAnswers([]);
@@ -418,7 +465,7 @@ export default function App() {
         setExamResult(null);
         saveExamSession(session);
         const firstId = session.questionIds[0];
-        const first = allCases.find((c) => c.id === firstId) ?? null;
+        const first = examCases.find((c) => c.id === firstId) ?? null;
         setCurrent(first);
         setSelected(null);
         setJudgement(null);
@@ -446,6 +493,46 @@ export default function App() {
       }
     };
 
+    /** Exam 開始確認。模擬試験（20問・90分）かシナリオ演習（PBI-108）を選ぶ。 */
+    const openExamStartDialog = () => {
+      const scenario = SCENARIOS[0];
+      const scenarioActions: ConfirmDialogAction[] = scenario
+        ? [
+            {
+              id: 'scenario',
+              label: `シナリオ演習（${scenario.cases.length}問・${scenario.timeLimitMinutes}分）`,
+              variant: 'secondary',
+            },
+          ]
+        : [];
+      setDialogState({
+        open: true,
+        title: 'Examモードを開始しますか？',
+        description: scenario
+          ? `20問・90分タイマーのExamが開始されます。シナリオ演習では、1つの共通設定にある${scenario.cases.length}件を${scenario.timeLimitMinutes}分で処理します。`
+          : '20問・90分タイマーのExamが開始されます。',
+        actions: [
+          { id: 'cancel', label: 'キャンセル', variant: 'secondary' },
+          ...scenarioActions,
+          { id: 'confirm', label: '開始する', variant: 'primary', autoFocus: true },
+        ],
+        onAction: (id) => {
+          if (id === 'confirm') {
+            startExam();
+            return;
+          }
+          if (id === 'scenario' && scenario) {
+            startExam(scenario.id);
+            return;
+          }
+          setDialogState(DIALOG_CLOSED);
+          setLearningStyle('deep');
+          saveLearningStyle('deep');
+          setWritingEntry(createEmptyWritingEntry());
+        },
+      });
+    };
+
     // Exam 中に他モードへ切替る場合は中断確認（PBI-027 / TASK-005）。
     if (learningStyle === 'exam' && examSession) {
       setDialogState({
@@ -461,7 +548,7 @@ export default function App() {
           setDialogState(DIALOG_CLOSED);
           if (id !== 'confirm') return;
           switchToNonExam(next);
-          setCurrent(pickNextCaseByMode(allCases, undefined, mode));
+          setCurrent(pickPracticeCase());
         },
       });
       return;
@@ -483,25 +570,7 @@ export default function App() {
           if (id !== 'confirm') return;
           if (next === 'exam') {
             // 破棄確認OK → Exam 開始確認へ進む
-            setDialogState({
-              open: true,
-              title: 'Examモードを開始しますか？',
-              description: '20問・90分タイマーのExamが開始されます。',
-              actions: [
-                { id: 'cancel', label: 'キャンセル', variant: 'secondary' },
-                { id: 'confirm', label: '開始する', variant: 'primary', autoFocus: true },
-              ],
-              onAction: (actionId) => {
-                if (actionId !== 'confirm') {
-                  setDialogState(DIALOG_CLOSED);
-                  setLearningStyle('deep');
-                  saveLearningStyle('deep');
-                  setWritingEntry(createEmptyWritingEntry());
-                  return;
-                }
-                startExam();
-              },
-            });
+            openExamStartDialog();
             return;
           }
           switchToNonExam(next);
@@ -512,25 +581,7 @@ export default function App() {
 
     // Exam へ切替る場合は開始確認（PBI-027 / TASK-002）。
     if (next === 'exam') {
-      setDialogState({
-        open: true,
-        title: 'Examモードを開始しますか？',
-        description: '20問・90分タイマーのExamが開始されます。',
-        actions: [
-          { id: 'cancel', label: 'キャンセル', variant: 'secondary' },
-          { id: 'confirm', label: '開始する', variant: 'primary', autoFocus: true },
-        ],
-        onAction: (id) => {
-          if (id !== 'confirm') {
-            setDialogState(DIALOG_CLOSED);
-            setLearningStyle('deep');
-            saveLearningStyle('deep');
-            setWritingEntry(createEmptyWritingEntry());
-            return;
-          }
-          startExam();
-        },
-      });
+      openExamStartDialog();
       return;
     }
 
@@ -593,7 +644,7 @@ export default function App() {
             }))
           : // 旧スナップショット互換（answeredIds のみ）。
             savedProgress.answeredIds.map((cid) => {
-              const c = allCases.find((x) => x.id === cid);
+              const c = examCases.find((x) => x.id === cid);
               return {
                 caseId: cid,
                 judgement: 'correct',
@@ -614,7 +665,7 @@ export default function App() {
       setExamElapsedMs(restoredElapsed);
       setExamResult(null);
       const cid = savedSession.questionIds[savedProgress.examIndex] ?? null;
-      setCurrent(cid ? (allCases.find((c) => c.id === cid) ?? null) : null);
+      setCurrent(cid ? (examCases.find((c) => c.id === cid) ?? null) : null);
       setSelected(null);
       setJudgement(null);
       setWritingEntry(createEmptyWritingEntry());
@@ -630,7 +681,8 @@ export default function App() {
       clearExamProgress();
       const ids = allCases.map((c) => c.id);
       try {
-        const session = createExamSession(ids);
+        const scenario = findScenario(savedSession.scenarioId);
+        const session = scenario ? createScenarioExamSession(scenario) : createExamSession(ids);
         saveExamSession(session);
         setExamSession(session);
         setExamIndex(0);
@@ -638,7 +690,7 @@ export default function App() {
         setExamElapsedMs([]);
         setExamResult(null);
         const firstId = session.questionIds[0];
-        setCurrent(allCases.find((c) => c.id === firstId) ?? null);
+        setCurrent(examCases.find((c) => c.id === firstId) ?? null);
         setSelected(null);
         setJudgement(null);
         setWritingFeedback(null);
@@ -680,6 +732,20 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** `/?pattern=N` で開いたとき（PBI-109）：出題欄へ移動し、URL から条件を外す。 */
+  useEffect(() => {
+    if (practiceFilter.patternId === null) return;
+    document.getElementById('practice-heading')?.scrollIntoView?.({ block: 'start' });
+    const url = new URL(window.location.href);
+    url.searchParams.delete('pattern');
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <main className="container">
@@ -694,7 +760,7 @@ export default function App() {
           <ScoreCounter
             score={score}
             modeScores={modeScores}
-            currentMode={mode}
+            currentMode="all"
             learningStyleScores={learningStyleScores}
             currentStyle={learningStyle}
             rollingScore={rollingScore}
@@ -714,14 +780,21 @@ export default function App() {
             history={examResult.history}
             elapsedMsList={examResult.elapsedMsList}
             onBackToStudy={handleBackToStudyFromExamResult}
-            cases={allCases}
+            cases={examCases}
           />
         ) : (
           <>
             <h2 id="practice-heading" className="practice-heading">
               {pageIntro.home.practiceHeading}
             </h2>
-            <ModeSelector mode={mode} onChange={handleModeChange} />
+            {activeScenario && <ScenarioBrief scenario={activeScenario} />}
+            {!isExam && (
+              <PracticeFilterSelector
+                cases={allCases}
+                filter={practiceFilter}
+                onChange={handleFilterChange}
+              />
+            )}
 
             <fieldset className="history-limit" aria-label="履歴表示件数">
               <legend className="history-limit__legend">履歴表示件数</legend>
@@ -802,14 +875,26 @@ export default function App() {
                 )}
               </>
             ) : (
-              <p>該当する優先度の案件がありません。モードを切替えてください。</p>
+              <div className="practice-empty" role="status">
+                <p>条件に合う案件がありません。出題範囲を変更してください。</p>
+                {!isExam && (
+                  <button type="button" onClick={() => handleFilterChange(ALL_CASES_FILTER)}>
+                    すべての案件から出題する
+                  </button>
+                )}
+              </div>
             )}
 
             {/* PBI-025: 6軸レーダーチャート（1問以上採点済みのときに表示） */}
-            {selfScoreHistory.length > 0 && <RadarChart history={selfScoreHistory} />}
+            {record.selfScores.length > 0 && <RadarChart history={record.selfScores} />}
 
             {/* PBI-026: パターン別弱点Top3（3問以上回答済みのときに表示） */}
-            {history.length >= 3 && <WeaknessPatternTop3 history={history} />}
+            {record.answers.length >= 3 && (
+              <WeaknessPatternTop3
+                history={record.answers}
+                onPractice={isExam ? undefined : handlePracticePattern}
+              />
+            )}
 
             <div className="actions">
               {!locked ? (
@@ -827,6 +912,15 @@ export default function App() {
               )}
             </div>
 
+            {!isExam && (
+              <LearningRecordPanel
+                answerCount={record.answers.length}
+                selfScoreCount={record.selfScores.length}
+                saveFailed={recordSaveFailed}
+                onClear={handleClearRecord}
+              />
+            )}
+
             {!isExam && <HomeStudyGuide />}
 
             <footer className="app-footer" aria-label="キーボードショートカット">
@@ -835,42 +929,42 @@ export default function App() {
                 で次の問題
               </small>
               <nav className="app-footer__legal" aria-label="運営者情報・規約・お問い合わせ">
-                <a href="/about" className="app-footer__legal-link">
+                <a href="/about/" className="app-footer__legal-link">
                   運営者情報
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="/privacy-policy" className="app-footer__legal-link">
+                <a href="/privacy-policy/" className="app-footer__legal-link">
                   プライバシーポリシー
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="/terms" className="app-footer__legal-link">
+                <a href="/terms/" className="app-footer__legal-link">
                   サービス利用規約
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="/terms-of-service" className="app-footer__legal-link">
+                <a href="/terms-of-service/" className="app-footer__legal-link">
                   利用規約（条文版）
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="/contact" className="app-footer__legal-link">
+                <a href="/contact/" className="app-footer__legal-link">
                   お問い合わせ
                 </a>
               </nav>
               <nav className="app-footer__legal" aria-label="学習サポートページ">
-                <a href="/reference" className="app-footer__legal-link">
+                <a href="/reference/" className="app-footer__legal-link">
                   解説リファレンス
                 </a>
                 <span className="app-footer__legal-sep" aria-hidden="true">
                   |
                 </span>
-                <a href="/patterns" className="app-footer__legal-link">
+                <a href="/patterns/" className="app-footer__legal-link">
                   パターン別解説
                 </a>
               </nav>
